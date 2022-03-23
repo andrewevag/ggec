@@ -38,3 +38,14 @@ W [ \t\r]
           exit(42); }
 
 %%
+
+int main(){
+	int token;
+	do{
+		token = yylex();
+		printf("tokenId=%d, lexeme=\"%s\ ", token, yytext)
+	}while(token != T_eof)
+
+
+	return 0;
+}
