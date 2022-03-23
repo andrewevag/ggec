@@ -1,13 +1,18 @@
-PHONY: clean distclean default help
+.PHONY: clean distclean default help
 
 CXX=c++
 CXXFLAGS=-Wall
 
-default: ggec
+default: lexer
 
 lexer.cpp: lexer.l
 	flex -s -o lexer.cpp lexer.l
 
+lexer.o: lexer.cpp
+	$(CXX) -c $(CXXFLAGS) -o $@ $^
+
+lexer: lexer.o
+	$(CXX) $(CXXFLAGS) -o $@ $^
 # lexer.o: lexer.cpp lexer.hpp parser.hpp
 
 # parser.hpp parser.cpp: parser.y
@@ -19,7 +24,7 @@ lexer.cpp: lexer.l
 # 	$(CXX) $(CXXFLAGS) -o minibasic lexer.o parser.o
 
 clean:
-	$(RM) lexer.cpp parser.cpp parser.hpp parser.output *.o
+	$(RM) lexer.cpp lexer *.o
 
 distclean: clean
 	$(RM) 
