@@ -23,7 +23,6 @@
 #define T_double_const  1020
 #define T_char_const    1021
 #define T_string_const  1022
-
 #define T_eq            1023
 #define T_neq           1024
 #define T_geq           1025   
@@ -76,6 +75,19 @@ P [^\x00-\x1f\x7f\\\'\"]
 "void"	    { return T_void; }
 
 
+"=="        { return T_eq; }
+"!="        { return T_neq; }
+">="        { return T_geq; }
+"<="        { return T_leq; }
+"&&"        { return T_land; }
+"||"        { return T_lor; }
+"++"        { return T_plusplus; }
+"--"        { return T_minusminus; }
+"+="        { return T_pluseq; }
+"-="        { return T_minuseq; }
+"*="        { return T_multeq; }
+"/="        { return T_diveq; }
+"%="        { return T_modeq; }
 [\=\+\-\*\/\%\(\)\<\>\&\!\?\:\,\;\(\)\{\}\[\]]    { return yytext[0]; }
 
 {L}({L}|{D}|_)*	                    { return T_id; }
@@ -87,14 +99,16 @@ P [^\x00-\x1f\x7f\\\'\"]
 <CHAR>\\x[0-9a-fA-F][0-9a-fA-F]\'   { BEGIN(INITIAL); return T_char_const; }
 <CHAR>\\[ntr0\\\'\"]\'              { BEGIN(INITIAL); return T_char_const; }
 <CHAR>{P}\'                         { BEGIN(INITIAL); return T_char_const; }
-
+<CHAR>.|\n                          { fprintf(stderr, "didnot expect non printable in string %d\n", yytext[0]); exit(1); }
+<CHAR><<EOF>>                       { fprintf(stderr, "received EOF without string closing\n"); exit(1);}
 
 \"                                  { BEGIN(STRING); }
 <STRING>\"                          { BEGIN(INITIAL); return T_string_const; }
 <STRING>\\x[0-9a-fA-F][0-9a-fA-F]   { /* nothing */ }
 <STRING>\\[ntr0\\\'\"]              { /* nothing */ }
 <STRING>{P}                         { /* nothing */ }
-
+<STRING>.|\n                        { fprintf(stderr, "didnot expect non printable in string %d\n", yytext[0]); exit(1);}
+<STRING><<EOF>>                     { fprintf(stderr, "received EOF without string closing\n"); exit(1);}
 
 \n                                  { ++lineno; }
 {W}+	                            { /* nothing */ }
@@ -105,7 +119,7 @@ P [^\x00-\x1f\x7f\\\'\"]
 <COMMENT>\n                         { ++lineno; }
 <COMMENT>"*"                        { /* nothing */ }
 <COMMENT>[^*\n]+                    { /* nothing */ }
-
+<COMMENT><<EOF>>                    { fprintf(stderr, "received EOF without string closing\n"); exit(1);}
 .	                                { fprintf(stderr,"Illegal character %c at line %d\n",yytext[0],lineno);
                                         exit(1); }
 

@@ -6,6 +6,8 @@ BINS=lexertest
 
 default: main.o
 
+main.o: main.cpp
+	$(CXX) -c $(CXXFLAGS) -o $@ $^
 %.o: %.cpp
 
 

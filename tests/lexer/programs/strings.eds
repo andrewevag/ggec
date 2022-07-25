@@ -1,0 +1,4 @@
+"hello people!! 432"
+"hello athens \t\r\0\xff this is me talking and this will not work by reading the yytext"
+"and is thus untestable"
+"but we can see if it is consumed correctly"

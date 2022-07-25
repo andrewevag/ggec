@@ -1,0 +1,12 @@
+'a' '1'
+'\n' '\'' '\x20'
+'\t' '\"'
+'\r' ' '
+'\0' 'n'
+
+// hello people this is a magnificent comment$$$$$$$$
+/*
+ * @brief This is how i usually write documentation
+ * 
+ * @return no fail please
+ */

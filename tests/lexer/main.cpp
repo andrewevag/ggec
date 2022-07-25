@@ -8,7 +8,7 @@ int main(){
 	int token;
 	do{
 		token = yylex();
-		printf("tokenId=%d, lexeme=\"%s\" ", token, yytext);
+		printf("%d \"%s\"\n", token, yytext);
 	}while(token != 0);
 
 

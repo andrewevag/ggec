@@ -2,7 +2,7 @@
 
 CXX=c++
 CXXFLAGS=-Wall
-BINS=ggec
+BINS=ggec lexertest
 
 default: $(BINS)
 
