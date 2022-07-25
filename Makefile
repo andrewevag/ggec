@@ -2,8 +2,13 @@
 
 CXX=c++
 CXXFLAGS=-Wall
+BINS=ggec
 
-default: lexer
+default: $(BINS)
+
+ggec: lexer.o main.o
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
 
 lexer.cpp: lexer.l
 	flex -s -o lexer.cpp lexer.l
@@ -11,8 +16,15 @@ lexer.cpp: lexer.l
 lexer.o: lexer.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $^
 
-lexer: lexer.o
-	$(CXX) $(CXXFLAGS) -o $@ $^
+%.o: %.cpp
+	$(CXX) -c $(CXXFLAGS) -o $@ $^
+
+
+lexertest: lexer.o 
+	$(MAKE) -C ./tests/lexer
+	$(CXX) $(CXXFLAGS) -o ./tests/lexer/$@ ./tests/lexer/main.o $^
+
+
 # lexer.o: lexer.cpp lexer.hpp parser.hpp
 
 # parser.hpp parser.cpp: parser.y
@@ -24,7 +36,8 @@ lexer: lexer.o
 # 	$(CXX) $(CXXFLAGS) -o minibasic lexer.o parser.o
 
 clean:
-	$(RM) lexer.cpp lexer *.o
+	$(RM) *.o $(BINS) lexer.cpp
+	$(MAKE) -C ./tests/lexer clean
 
 distclean: clean
 	$(RM) 

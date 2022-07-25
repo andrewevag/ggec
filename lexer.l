@@ -1,7 +1,6 @@
 %{
 
 #define T_eof           0
-
 #define T_bool          1001
 #define T_break         1002
 #define T_byref         1003
@@ -70,14 +69,3 @@ P [\x20-\x26\x28-\x7f]
           exit(42); }
 
 %%
-
-int main(){
-	int token;
-	do{
-		token = yylex();
-		printf("tokenId=%d, lexeme=\"%s\" ", token, yytext);
-	}while(token != T_eof);
-
-
-	return 0;
-}
