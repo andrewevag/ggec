@@ -22,16 +22,38 @@
 #define T_int_const     1019
 #define T_double_const  1020
 #define T_char_const    1021
+#define T_string_const  1022
+
+#define T_eq            1023
+#define T_neq           1024
+#define T_geq           1025   
+#define T_leq           1026
+#define T_land          1027
+#define T_lor           1028
+#define T_plusplus      1029
+#define T_minusminus    1030
+#define T_pluseq        1031
+#define T_minuseq       1032
+#define T_multeq        1033
+#define T_diveq         1034
+#define T_modeq         1035
+
+
+
 
 int lineno = 1;
 %}
 
-L [a-z]
+L [a-zA-Z]
 D [0-9]
 W [ \t\r]
-P [\x20-\x26\x28-\x7f]
+P [^\x00-\x1f\x7f\\\'\"]
 
 %option noyywrap
+
+%x CHAR
+%x STRING
+%x COMMENT
 
 %%
 
@@ -54,18 +76,37 @@ P [\x20-\x26\x28-\x7f]
 "void"	    { return T_void; }
 
 
-[\=\+\-\*\/\%\(\)]	{ return yytext[0]; }
+[\=\+\-\*\/\%\(\)\<\>\&\!\?\:\,\;\(\)\{\}\[\]]    { return yytext[0]; }
 
-{L}({L}|{D}|_)*	    { return T_id; }
-{D}+	            { return T_int_const; }
-{D}+(\.{D}+((e|E)(\-|\+)?{D}+)?) { return T_double_const; }
-\'({P}|(\\(n|t|r|0|\\|\'|\"|(x[0-9a-fA-F][0-9a-fA-F]))))\'  { return T_char_const; }
+{L}({L}|{D}|_)*	                    { return T_id; }
+{D}+	                            { return T_int_const; }
+{D}+(\.{D}+([eE][\-\+]?{D}+)?)      { return T_double_const; }
 
-\n      { ++lineno; }
-{W}+	{ /* ignore */ }
-'.*\n	{ ++lineno; }
 
-.	{ fprintf(stderr,"Illegal character %c at line %d\n",yytext[0],lineno);
-          exit(42); }
+\'                                  { BEGIN(CHAR); }
+<CHAR>\\x[0-9a-fA-F][0-9a-fA-F]\'   { BEGIN(INITIAL); return T_char_const; }
+<CHAR>\\[ntr0\\\'\"]\'              { BEGIN(INITIAL); return T_char_const; }
+<CHAR>{P}\'                         { BEGIN(INITIAL); return T_char_const; }
+
+
+\"                                  { BEGIN(STRING); }
+<STRING>\"                          { BEGIN(INITIAL); return T_string_const; }
+<STRING>\\x[0-9a-fA-F][0-9a-fA-F]   { /* nothing */ }
+<STRING>\\[ntr0\\\'\"]              { /* nothing */ }
+<STRING>{P}                         { /* nothing */ }
+
+
+\n                                  { ++lineno; }
+{W}+	                            { /* nothing */ }
+\/\/.*\n                            { ++lineno; }
+
+"/*"                                { BEGIN(COMMENT); }
+<COMMENT>"*/"                       { BEGIN(INITIAL); }
+<COMMENT>\n                         { ++lineno; }
+<COMMENT>"*"                        { /* nothing */ }
+<COMMENT>[^*\n]+                    { /* nothing */ }
+
+.	                                { fprintf(stderr,"Illegal character %c at line %d\n",yytext[0],lineno);
+                                        exit(1); }
 
 %%
