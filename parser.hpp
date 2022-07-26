@@ -84,17 +84,20 @@ extern int yydebug;
     T_multeq = 290,
     T_diveq = 291,
     T_modeq = 292,
-    IPLUSPLUS = 293,
-    IMINUSMINUS = 294,
-    NEW = 295,
-    DELETE = 296,
-    ADDRESS = 297,
-    DEREF = 298,
-    PLUSIGN = 299,
-    MINUSIGN = 300,
-    NEGATION = 301,
-    PPLUSPLUS = 302,
-    PMINUSMINUS = 303
+    TYPECAST = 293,
+    IPLUSPLUS = 294,
+    IMINUSMINUS = 295,
+    NEW = 296,
+    DELETE = 297,
+    ADDRESS = 298,
+    DEREF = 299,
+    PLUSIGN = 300,
+    MINUSIGN = 301,
+    NEGATION = 302,
+    PPLUSPLUS = 303,
+    PMINUSMINUS = 304,
+    FUNCTIONCALL = 305,
+    BRACTETINDEX = 306
   };
 #endif
 

@@ -12,7 +12,7 @@ W [ \t\r]
 P [^\x00-\x1f\x7f\\\'\"]
 
 %option noyywrap
-
+%option nounput
 %x CHAR
 %x STRING
 %x COMMENT
