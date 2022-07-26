@@ -73,7 +73,8 @@ declaration:
 ;
 
 variable_declaration:
-    type declarator sep_by_comma_declarator ';'
+    type_id sep_by_comma_declarator ';'
+|   type_id '[' constant_expression ']' sep_by_comma_declarator ';'
 ;
 
 sep_by_comma_declarator:
@@ -83,6 +84,10 @@ sep_by_comma_declarator:
 
 type:
     basic_type star_list   
+;
+
+type_id:
+    type T_id
 ;
 
 star_list:
@@ -102,16 +107,22 @@ declarator:
 |   T_id '[' constant_expression ']'
 ;
 
-// thelei factoring
-function_declaration:
-    result_type T_id '(' ')' ';'
-|   result_type T_id '(' parameter_list ')' ';'
+function_head:
+    type_id '(' ')'
+|   type_id '(' parameter_list ')'
+|   "void" T_id '(' ')'
+|   "void" T_id '(' parameter_list ')'
 ;
 
-result_type:
-    type
-|   "void"
+// thelei factoring
+function_declaration:
+    function_head ';'
 ;
+
+// result_type:
+//     type
+// |   "void"
+// ;
 
 parameter_list:
     parameter sep_by_comma_parameter
@@ -128,8 +139,7 @@ parameter:
 ;
 
 function_definition:
-    result_type T_id '(' ')' '{' declaration_list statement_list '}'
-|   result_type T_id '(' parameter_list ')' '{' declaration_list statement_list '}'
+    function_head '{' declaration_list statement_list '}'
 ;
 
 statement_list:

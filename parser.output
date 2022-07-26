@@ -1,0 +1,4644 @@
+State 11 conflicts: 1 shift/reduce
+State 23 conflicts: 1 shift/reduce
+State 63 conflicts: 4 shift/reduce
+State 64 conflicts: 1 shift/reduce
+State 66 conflicts: 4 shift/reduce
+State 67 conflicts: 4 shift/reduce
+State 68 conflicts: 4 shift/reduce
+State 69 conflicts: 4 shift/reduce
+State 70 conflicts: 4 shift/reduce
+State 73 conflicts: 4 shift/reduce
+State 74 conflicts: 4 shift/reduce
+State 124 conflicts: 4 shift/reduce
+State 125 conflicts: 4 shift/reduce
+State 126 conflicts: 4 shift/reduce
+State 127 conflicts: 4 shift/reduce
+State 128 conflicts: 4 shift/reduce
+State 129 conflicts: 4 shift/reduce
+State 130 conflicts: 4 shift/reduce
+State 131 conflicts: 4 shift/reduce
+State 132 conflicts: 4 shift/reduce
+State 133 conflicts: 4 shift/reduce
+State 134 conflicts: 4 shift/reduce
+State 135 conflicts: 4 shift/reduce
+State 136 conflicts: 4 shift/reduce
+State 137 conflicts: 4 shift/reduce
+State 138 conflicts: 4 shift/reduce
+State 139 conflicts: 4 shift/reduce
+State 140 conflicts: 4 shift/reduce
+State 141 conflicts: 4 shift/reduce
+State 142 conflicts: 4 shift/reduce
+State 143 conflicts: 4 shift/reduce
+State 167 conflicts: 24 shift/reduce
+State 179 conflicts: 4 shift/reduce, 1 reduce/reduce
+State 180 conflicts: 24 shift/reduce
+State 184 conflicts: 1 shift/reduce
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: declaration declaration_list
+
+    2 declaration_list: %empty
+    3                 | declaration_list declaration
+
+    4 declaration: variable_declaration
+    5            | function_declaration
+    6            | function_definition
+
+    7 variable_declaration: type_id sep_by_comma_declarator ';'
+    8                     | type_id '[' constant_expression ']' sep_by_comma_declarator ';'
+
+    9 sep_by_comma_declarator: %empty
+   10                        | ',' declarator sep_by_comma_declarator
+
+   11 type: basic_type star_list
+
+   12 type_id: type T_id
+
+   13 star_list: %empty
+   14          | '*' star_list
+
+   15 basic_type: "int"
+   16           | "char"
+   17           | "bool"
+   18           | "double"
+
+   19 declarator: T_id
+   20           | T_id '[' constant_expression ']'
+
+   21 function_head: type_id '(' ')'
+   22              | type_id '(' parameter_list ')'
+   23              | "void" T_id '(' ')'
+   24              | "void" T_id '(' parameter_list ')'
+
+   25 function_declaration: function_head ';'
+
+   26 parameter_list: parameter sep_by_comma_parameter
+
+   27 sep_by_comma_parameter: %empty
+   28                       | ',' parameter sep_by_comma_parameter
+
+   29 parameter: "byref" type T_id
+   30          | type T_id
+
+   31 function_definition: function_head '{' declaration_list statement_list '}'
+
+   32 statement_list: %empty
+   33               | statement statement_list
+
+   34 statement: ';'
+   35          | expression ';'
+   36          | '{' statement_list '}'
+   37          | "if" '(' expression ')' statement
+   38          | "if" '(' expression ')' statement "else" statement
+   39          | label "for" '(' expression_or_empty ';' expression_or_empty ';' expression_or_empty ')' statement
+   40          | "continue" ';'
+   41          | "continue" T_id ';'
+   42          | "break" ';'
+   43          | "break" T_id ';'
+   44          | "return" expression_or_empty ';'
+
+   45 label: %empty
+   46      | T_id ':'
+
+   47 expression_or_empty: %empty
+   48                    | expression
+
+   49 expression: T_id
+   50           | '(' expression ')'
+   51           | "true"
+   52           | "false"
+   53           | "NULL"
+   54           | T_int_const
+   55           | T_char_const
+   56           | T_double_const
+   57           | T_string_const
+   58           | T_id '(' ')'
+   59           | T_id '(' expression_list ')'
+   60           | expression '[' expression ']'
+   61           | '&' expression
+   62           | '*' expression
+   63           | '+' expression
+   64           | '-' expression
+   65           | '!' expression
+   66           | expression '*' expression
+   67           | expression '/' expression
+   68           | expression '%' expression
+   69           | expression '+' expression
+   70           | expression '-' expression
+   71           | expression '<' expression
+   72           | expression '>' expression
+   73           | expression "<=" expression
+   74           | expression ">=" expression
+   75           | expression "==" expression
+   76           | expression "!=" expression
+   77           | expression "&&" expression
+   78           | expression "||" expression
+   79           | expression ',' expression
+   80           | "++" expression
+   81           | "--" expression
+   82           | expression "++"
+   83           | expression "--"
+   84           | expression '=' expression
+   85           | expression "*=" expression
+   86           | expression "/=" expression
+   87           | expression "%=" expression
+   88           | expression "+=" expression
+   89           | expression "-=" expression
+   90           | '(' type ')' expression
+   91           | expression '?' expression ':' expression
+   92           | "new" type
+   93           | "new" type '[' expression ']'
+   94           | "delete" expression
+
+   95 expression_list: expression sep_by_comma_expression
+
+   96 sep_by_comma_expression: %empty
+   97                        | ',' expression sep_by_comma_expression
+
+   98 constant_expression: expression
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    '!' (33) 65
+    '%' (37) 68
+    '&' (38) 61
+    '(' (40) 21 22 23 24 37 38 39 50 58 59 90
+    ')' (41) 21 22 23 24 37 38 39 50 58 59 90
+    '*' (42) 14 62 66
+    '+' (43) 63 69
+    ',' (44) 10 28 79 97
+    '-' (45) 64 70
+    '/' (47) 67
+    ':' (58) 46 91
+    ';' (59) 7 8 25 34 35 39 40 41 42 43 44
+    '<' (60) 71
+    '=' (61) 84
+    '>' (62) 72
+    '?' (63) 91
+    '[' (91) 8 20 60 93
+    ']' (93) 8 20 60 93
+    '{' (123) 31 36
+    '}' (125) 31 36
+    error (256)
+    "bool" (258) 17
+    "break" (259) 42 43
+    "byref" (260) 29
+    "char" (261) 16
+    "continue" (262) 40 41
+    "delete" (263) 94
+    "double" (264) 18
+    "else" (265) 38
+    "for" (266) 39
+    "false" (267) 52
+    "if" (268) 37 38
+    "int" (269) 15
+    "new" (270) 92 93
+    "NULL" (271) 53
+    "return" (272) 44
+    "true" (273) 51
+    "void" (274) 23 24
+    T_id (275) 12 19 20 23 24 29 30 41 43 46 49 58 59
+    T_int_const (276) 54
+    T_double_const (277) 56
+    T_char_const (278) 55
+    T_string_const (279) 57
+    "==" (280) 75
+    "!=" (281) 76
+    ">=" (282) 74
+    "<=" (283) 73
+    "&&" (284) 77
+    "||" (285) 78
+    "++" (286) 80 82
+    "--" (287) 81 83
+    "+=" (288) 88
+    "-=" (289) 89
+    "*=" (290) 85
+    "/=" (291) 86
+    "%=" (292) 87
+    IPLUSPLUS (293)
+    IMINUSMINUS (294)
+    NEW (295)
+    DELETE (296)
+    ADDRESS (297)
+    DEREF (298)
+    PLUSIGN (299)
+    MINUSIGN (300)
+    NEGATION (301)
+    PPLUSPLUS (302)
+    PMINUSMINUS (303)
+
+
+Nonterminals, with rules where they appear
+
+    $accept (69)
+        on left: 0
+    program (70)
+        on left: 1
+        on right: 0
+    declaration_list (71)
+        on left: 2 3
+        on right: 1 3 31
+    declaration (72)
+        on left: 4 5 6
+        on right: 1 3
+    variable_declaration (73)
+        on left: 7 8
+        on right: 4
+    sep_by_comma_declarator (74)
+        on left: 9 10
+        on right: 7 8 10
+    type (75)
+        on left: 11
+        on right: 12 29 30 90 92 93
+    type_id (76)
+        on left: 12
+        on right: 7 8 21 22
+    star_list (77)
+        on left: 13 14
+        on right: 11 14
+    basic_type (78)
+        on left: 15 16 17 18
+        on right: 11
+    declarator (79)
+        on left: 19 20
+        on right: 10
+    function_head (80)
+        on left: 21 22 23 24
+        on right: 25 31
+    function_declaration (81)
+        on left: 25
+        on right: 5
+    parameter_list (82)
+        on left: 26
+        on right: 22 24
+    sep_by_comma_parameter (83)
+        on left: 27 28
+        on right: 26 28
+    parameter (84)
+        on left: 29 30
+        on right: 26 28
+    function_definition (85)
+        on left: 31
+        on right: 6
+    statement_list (86)
+        on left: 32 33
+        on right: 31 33 36
+    statement (87)
+        on left: 34 35 36 37 38 39 40 41 42 43 44
+        on right: 33 37 38 39
+    label (88)
+        on left: 45 46
+        on right: 39
+    expression_or_empty (89)
+        on left: 47 48
+        on right: 39 44
+    expression (90)
+        on left: 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94
+        on right: 35 37 38 48 50 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 93 94 95 97 98
+    expression_list (91)
+        on left: 95
+        on right: 59
+    sep_by_comma_expression (92)
+        on left: 96 97
+        on right: 95 97
+    constant_expression (93)
+        on left: 98
+        on right: 8 20
+
+
+State 0
+
+    0 $accept: . program $end
+
+    "bool"    shift, and go to state 1
+    "char"    shift, and go to state 2
+    "double"  shift, and go to state 3
+    "int"     shift, and go to state 4
+    "void"    shift, and go to state 5
+
+    program               go to state 6
+    declaration           go to state 7
+    variable_declaration  go to state 8
+    type                  go to state 9
+    type_id               go to state 10
+    basic_type            go to state 11
+    function_head         go to state 12
+    function_declaration  go to state 13
+    function_definition   go to state 14
+
+
+State 1
+
+   17 basic_type: "bool" .
+
+    $default  reduce using rule 17 (basic_type)
+
+
+State 2
+
+   16 basic_type: "char" .
+
+    $default  reduce using rule 16 (basic_type)
+
+
+State 3
+
+   18 basic_type: "double" .
+
+    $default  reduce using rule 18 (basic_type)
+
+
+State 4
+
+   15 basic_type: "int" .
+
+    $default  reduce using rule 15 (basic_type)
+
+
+State 5
+
+   23 function_head: "void" . T_id '(' ')'
+   24              | "void" . T_id '(' parameter_list ')'
+
+    T_id  shift, and go to state 15
+
+
+State 6
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 16
+
+
+State 7
+
+    1 program: declaration . declaration_list
+
+    $default  reduce using rule 2 (declaration_list)
+
+    declaration_list  go to state 17
+
+
+State 8
+
+    4 declaration: variable_declaration .
+
+    $default  reduce using rule 4 (declaration)
+
+
+State 9
+
+   12 type_id: type . T_id
+
+    T_id  shift, and go to state 18
+
+
+State 10
+
+    7 variable_declaration: type_id . sep_by_comma_declarator ';'
+    8                     | type_id . '[' constant_expression ']' sep_by_comma_declarator ';'
+   21 function_head: type_id . '(' ')'
+   22              | type_id . '(' parameter_list ')'
+
+    ','  shift, and go to state 19
+    '['  shift, and go to state 20
+    '('  shift, and go to state 21
+
+    $default  reduce using rule 9 (sep_by_comma_declarator)
+
+    sep_by_comma_declarator  go to state 22
+
+
+State 11
+
+   11 type: basic_type . star_list
+
+    '*'  shift, and go to state 23
+
+    '*'       [reduce using rule 13 (star_list)]
+    $default  reduce using rule 13 (star_list)
+
+    star_list  go to state 24
+
+
+State 12
+
+   25 function_declaration: function_head . ';'
+   31 function_definition: function_head . '{' declaration_list statement_list '}'
+
+    ';'  shift, and go to state 25
+    '{'  shift, and go to state 26
+
+
+State 13
+
+    5 declaration: function_declaration .
+
+    $default  reduce using rule 5 (declaration)
+
+
+State 14
+
+    6 declaration: function_definition .
+
+    $default  reduce using rule 6 (declaration)
+
+
+State 15
+
+   23 function_head: "void" T_id . '(' ')'
+   24              | "void" T_id . '(' parameter_list ')'
+
+    '('  shift, and go to state 27
+
+
+State 16
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+State 17
+
+    1 program: declaration declaration_list .
+    3 declaration_list: declaration_list . declaration
+
+    "bool"    shift, and go to state 1
+    "char"    shift, and go to state 2
+    "double"  shift, and go to state 3
+    "int"     shift, and go to state 4
+    "void"    shift, and go to state 5
+
+    $default  reduce using rule 1 (program)
+
+    declaration           go to state 28
+    variable_declaration  go to state 8
+    type                  go to state 9
+    type_id               go to state 10
+    basic_type            go to state 11
+    function_head         go to state 12
+    function_declaration  go to state 13
+    function_definition   go to state 14
+
+
+State 18
+
+   12 type_id: type T_id .
+
+    $default  reduce using rule 12 (type_id)
+
+
+State 19
+
+   10 sep_by_comma_declarator: ',' . declarator sep_by_comma_declarator
+
+    T_id  shift, and go to state 29
+
+    declarator  go to state 30
+
+
+State 20
+
+    8 variable_declaration: type_id '[' . constant_expression ']' sep_by_comma_declarator ';'
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression           go to state 49
+    constant_expression  go to state 50
+
+
+State 21
+
+   21 function_head: type_id '(' . ')'
+   22              | type_id '(' . parameter_list ')'
+
+    "bool"    shift, and go to state 1
+    "byref"   shift, and go to state 51
+    "char"    shift, and go to state 2
+    "double"  shift, and go to state 3
+    "int"     shift, and go to state 4
+    ')'       shift, and go to state 52
+
+    type            go to state 53
+    basic_type      go to state 11
+    parameter_list  go to state 54
+    parameter       go to state 55
+
+
+State 22
+
+    7 variable_declaration: type_id sep_by_comma_declarator . ';'
+
+    ';'  shift, and go to state 56
+
+
+State 23
+
+   14 star_list: '*' . star_list
+
+    '*'  shift, and go to state 23
+
+    '*'       [reduce using rule 13 (star_list)]
+    $default  reduce using rule 13 (star_list)
+
+    star_list  go to state 57
+
+
+State 24
+
+   11 type: basic_type star_list .
+
+    $default  reduce using rule 11 (type)
+
+
+State 25
+
+   25 function_declaration: function_head ';' .
+
+    $default  reduce using rule 25 (function_declaration)
+
+
+State 26
+
+   31 function_definition: function_head '{' . declaration_list statement_list '}'
+
+    $default  reduce using rule 2 (declaration_list)
+
+    declaration_list  go to state 58
+
+
+State 27
+
+   23 function_head: "void" T_id '(' . ')'
+   24              | "void" T_id '(' . parameter_list ')'
+
+    "bool"    shift, and go to state 1
+    "byref"   shift, and go to state 51
+    "char"    shift, and go to state 2
+    "double"  shift, and go to state 3
+    "int"     shift, and go to state 4
+    ')'       shift, and go to state 59
+
+    type            go to state 53
+    basic_type      go to state 11
+    parameter_list  go to state 60
+    parameter       go to state 55
+
+
+State 28
+
+    3 declaration_list: declaration_list declaration .
+
+    $default  reduce using rule 3 (declaration_list)
+
+
+State 29
+
+   19 declarator: T_id .
+   20           | T_id . '[' constant_expression ']'
+
+    '['  shift, and go to state 61
+
+    $default  reduce using rule 19 (declarator)
+
+
+State 30
+
+   10 sep_by_comma_declarator: ',' declarator . sep_by_comma_declarator
+
+    ','  shift, and go to state 19
+
+    $default  reduce using rule 9 (sep_by_comma_declarator)
+
+    sep_by_comma_declarator  go to state 62
+
+
+State 31
+
+   94 expression: "delete" . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 63
+
+
+State 32
+
+   52 expression: "false" .
+
+    $default  reduce using rule 52 (expression)
+
+
+State 33
+
+   92 expression: "new" . type
+   93           | "new" . type '[' expression ']'
+
+    "bool"    shift, and go to state 1
+    "char"    shift, and go to state 2
+    "double"  shift, and go to state 3
+    "int"     shift, and go to state 4
+
+    type        go to state 64
+    basic_type  go to state 11
+
+
+State 34
+
+   53 expression: "NULL" .
+
+    $default  reduce using rule 53 (expression)
+
+
+State 35
+
+   51 expression: "true" .
+
+    $default  reduce using rule 51 (expression)
+
+
+State 36
+
+   49 expression: T_id .
+   58           | T_id . '(' ')'
+   59           | T_id . '(' expression_list ')'
+
+    '('  shift, and go to state 65
+
+    $default  reduce using rule 49 (expression)
+
+
+State 37
+
+   54 expression: T_int_const .
+
+    $default  reduce using rule 54 (expression)
+
+
+State 38
+
+   56 expression: T_double_const .
+
+    $default  reduce using rule 56 (expression)
+
+
+State 39
+
+   55 expression: T_char_const .
+
+    $default  reduce using rule 55 (expression)
+
+
+State 40
+
+   57 expression: T_string_const .
+
+    $default  reduce using rule 57 (expression)
+
+
+State 41
+
+   80 expression: "++" . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 66
+
+
+State 42
+
+   81 expression: "--" . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 67
+
+
+State 43
+
+   63 expression: '+' . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 68
+
+
+State 44
+
+   64 expression: '-' . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 69
+
+
+State 45
+
+   62 expression: '*' . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 70
+
+
+State 46
+
+   50 expression: '(' . expression ')'
+   90           | '(' . type ')' expression
+
+    "bool"          shift, and go to state 1
+    "char"          shift, and go to state 2
+    "delete"        shift, and go to state 31
+    "double"        shift, and go to state 3
+    "false"         shift, and go to state 32
+    "int"           shift, and go to state 4
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    type        go to state 71
+    basic_type  go to state 11
+    expression  go to state 72
+
+
+State 47
+
+   61 expression: '&' . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 73
+
+
+State 48
+
+   65 expression: '!' . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 74
+
+
+State 49
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+   98 constant_expression: expression .
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "||"  shift, and go to state 80
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    "+="  shift, and go to state 83
+    "-="  shift, and go to state 84
+    "*="  shift, and go to state 85
+    "/="  shift, and go to state 86
+    "%="  shift, and go to state 87
+    ','   shift, and go to state 88
+    '='   shift, and go to state 89
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    $default  reduce using rule 98 (constant_expression)
+
+
+State 50
+
+    8 variable_declaration: type_id '[' constant_expression . ']' sep_by_comma_declarator ';'
+
+    ']'  shift, and go to state 99
+
+
+State 51
+
+   29 parameter: "byref" . type T_id
+
+    "bool"    shift, and go to state 1
+    "char"    shift, and go to state 2
+    "double"  shift, and go to state 3
+    "int"     shift, and go to state 4
+
+    type        go to state 100
+    basic_type  go to state 11
+
+
+State 52
+
+   21 function_head: type_id '(' ')' .
+
+    $default  reduce using rule 21 (function_head)
+
+
+State 53
+
+   30 parameter: type . T_id
+
+    T_id  shift, and go to state 101
+
+
+State 54
+
+   22 function_head: type_id '(' parameter_list . ')'
+
+    ')'  shift, and go to state 102
+
+
+State 55
+
+   26 parameter_list: parameter . sep_by_comma_parameter
+
+    ','  shift, and go to state 103
+
+    $default  reduce using rule 27 (sep_by_comma_parameter)
+
+    sep_by_comma_parameter  go to state 104
+
+
+State 56
+
+    7 variable_declaration: type_id sep_by_comma_declarator ';' .
+
+    $default  reduce using rule 7 (variable_declaration)
+
+
+State 57
+
+   14 star_list: '*' star_list .
+
+    $default  reduce using rule 14 (star_list)
+
+
+State 58
+
+    3 declaration_list: declaration_list . declaration
+   31 function_definition: function_head '{' declaration_list . statement_list '}'
+
+    "bool"          shift, and go to state 1
+    "break"         shift, and go to state 105
+    "char"          shift, and go to state 2
+    "continue"      shift, and go to state 106
+    "delete"        shift, and go to state 31
+    "double"        shift, and go to state 3
+    "false"         shift, and go to state 32
+    "if"            shift, and go to state 107
+    "int"           shift, and go to state 4
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "return"        shift, and go to state 108
+    "true"          shift, and go to state 35
+    "void"          shift, and go to state 5
+    T_id            shift, and go to state 109
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    ';'             shift, and go to state 110
+    '('             shift, and go to state 46
+    '{'             shift, and go to state 111
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    "for"     reduce using rule 45 (label)
+    $default  reduce using rule 32 (statement_list)
+
+    declaration           go to state 28
+    variable_declaration  go to state 8
+    type                  go to state 9
+    type_id               go to state 10
+    basic_type            go to state 11
+    function_head         go to state 12
+    function_declaration  go to state 13
+    function_definition   go to state 14
+    statement_list        go to state 112
+    statement             go to state 113
+    label                 go to state 114
+    expression            go to state 115
+
+
+State 59
+
+   23 function_head: "void" T_id '(' ')' .
+
+    $default  reduce using rule 23 (function_head)
+
+
+State 60
+
+   24 function_head: "void" T_id '(' parameter_list . ')'
+
+    ')'  shift, and go to state 116
+
+
+State 61
+
+   20 declarator: T_id '[' . constant_expression ']'
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression           go to state 49
+    constant_expression  go to state 117
+
+
+State 62
+
+   10 sep_by_comma_declarator: ',' declarator sep_by_comma_declarator .
+
+    $default  reduce using rule 10 (sep_by_comma_declarator)
+
+
+State 63
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+   94           | "delete" expression .
+
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 94 (expression)]
+    "--"      [reduce using rule 94 (expression)]
+    '['       [reduce using rule 94 (expression)]
+    '?'       [reduce using rule 94 (expression)]
+    $default  reduce using rule 94 (expression)
+
+
+State 64
+
+   92 expression: "new" type .
+   93           | "new" type . '[' expression ']'
+
+    '['  shift, and go to state 118
+
+    '['       [reduce using rule 92 (expression)]
+    $default  reduce using rule 92 (expression)
+
+
+State 65
+
+   58 expression: T_id '(' . ')'
+   59           | T_id '(' . expression_list ')'
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    ')'             shift, and go to state 119
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression       go to state 120
+    expression_list  go to state 121
+
+
+State 66
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   80           | "++" expression .
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 80 (expression)]
+    "--"      [reduce using rule 80 (expression)]
+    '['       [reduce using rule 80 (expression)]
+    '?'       [reduce using rule 80 (expression)]
+    $default  reduce using rule 80 (expression)
+
+
+State 67
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   81           | "--" expression .
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 81 (expression)]
+    "--"      [reduce using rule 81 (expression)]
+    '['       [reduce using rule 81 (expression)]
+    '?'       [reduce using rule 81 (expression)]
+    $default  reduce using rule 81 (expression)
+
+
+State 68
+
+   60 expression: expression . '[' expression ']'
+   63           | '+' expression .
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 63 (expression)]
+    "--"      [reduce using rule 63 (expression)]
+    '['       [reduce using rule 63 (expression)]
+    '?'       [reduce using rule 63 (expression)]
+    $default  reduce using rule 63 (expression)
+
+
+State 69
+
+   60 expression: expression . '[' expression ']'
+   64           | '-' expression .
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 64 (expression)]
+    "--"      [reduce using rule 64 (expression)]
+    '['       [reduce using rule 64 (expression)]
+    '?'       [reduce using rule 64 (expression)]
+    $default  reduce using rule 64 (expression)
+
+
+State 70
+
+   60 expression: expression . '[' expression ']'
+   62           | '*' expression .
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 62 (expression)]
+    "--"      [reduce using rule 62 (expression)]
+    '['       [reduce using rule 62 (expression)]
+    '?'       [reduce using rule 62 (expression)]
+    $default  reduce using rule 62 (expression)
+
+
+State 71
+
+   90 expression: '(' type . ')' expression
+
+    ')'  shift, and go to state 122
+
+
+State 72
+
+   50 expression: '(' expression . ')'
+   60           | expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "||"  shift, and go to state 80
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    "+="  shift, and go to state 83
+    "-="  shift, and go to state 84
+    "*="  shift, and go to state 85
+    "/="  shift, and go to state 86
+    "%="  shift, and go to state 87
+    ','   shift, and go to state 88
+    '='   shift, and go to state 89
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    ')'   shift, and go to state 123
+    '?'   shift, and go to state 98
+
+
+State 73
+
+   60 expression: expression . '[' expression ']'
+   61           | '&' expression .
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 61 (expression)]
+    "--"      [reduce using rule 61 (expression)]
+    '['       [reduce using rule 61 (expression)]
+    '?'       [reduce using rule 61 (expression)]
+    $default  reduce using rule 61 (expression)
+
+
+State 74
+
+   60 expression: expression . '[' expression ']'
+   65           | '!' expression .
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 65 (expression)]
+    "--"      [reduce using rule 65 (expression)]
+    '['       [reduce using rule 65 (expression)]
+    '?'       [reduce using rule 65 (expression)]
+    $default  reduce using rule 65 (expression)
+
+
+State 75
+
+   75 expression: expression "==" . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 124
+
+
+State 76
+
+   76 expression: expression "!=" . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 125
+
+
+State 77
+
+   74 expression: expression ">=" . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 126
+
+
+State 78
+
+   73 expression: expression "<=" . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 127
+
+
+State 79
+
+   77 expression: expression "&&" . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 128
+
+
+State 80
+
+   78 expression: expression "||" . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 129
+
+
+State 81
+
+   82 expression: expression "++" .
+
+    $default  reduce using rule 82 (expression)
+
+
+State 82
+
+   83 expression: expression "--" .
+
+    $default  reduce using rule 83 (expression)
+
+
+State 83
+
+   88 expression: expression "+=" . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 130
+
+
+State 84
+
+   89 expression: expression "-=" . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 131
+
+
+State 85
+
+   85 expression: expression "*=" . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 132
+
+
+State 86
+
+   86 expression: expression "/=" . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 133
+
+
+State 87
+
+   87 expression: expression "%=" . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 134
+
+
+State 88
+
+   79 expression: expression ',' . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 135
+
+
+State 89
+
+   84 expression: expression '=' . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 136
+
+
+State 90
+
+   72 expression: expression '>' . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 137
+
+
+State 91
+
+   71 expression: expression '<' . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 138
+
+
+State 92
+
+   69 expression: expression '+' . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 139
+
+
+State 93
+
+   70 expression: expression '-' . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 140
+
+
+State 94
+
+   66 expression: expression '*' . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 141
+
+
+State 95
+
+   67 expression: expression '/' . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 142
+
+
+State 96
+
+   68 expression: expression '%' . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 143
+
+
+State 97
+
+   60 expression: expression '[' . expression ']'
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 144
+
+
+State 98
+
+   91 expression: expression '?' . expression ':' expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 145
+
+
+State 99
+
+    8 variable_declaration: type_id '[' constant_expression ']' . sep_by_comma_declarator ';'
+
+    ','  shift, and go to state 19
+
+    $default  reduce using rule 9 (sep_by_comma_declarator)
+
+    sep_by_comma_declarator  go to state 146
+
+
+State 100
+
+   29 parameter: "byref" type . T_id
+
+    T_id  shift, and go to state 147
+
+
+State 101
+
+   30 parameter: type T_id .
+
+    $default  reduce using rule 30 (parameter)
+
+
+State 102
+
+   22 function_head: type_id '(' parameter_list ')' .
+
+    $default  reduce using rule 22 (function_head)
+
+
+State 103
+
+   28 sep_by_comma_parameter: ',' . parameter sep_by_comma_parameter
+
+    "bool"    shift, and go to state 1
+    "byref"   shift, and go to state 51
+    "char"    shift, and go to state 2
+    "double"  shift, and go to state 3
+    "int"     shift, and go to state 4
+
+    type        go to state 53
+    basic_type  go to state 11
+    parameter   go to state 148
+
+
+State 104
+
+   26 parameter_list: parameter sep_by_comma_parameter .
+
+    $default  reduce using rule 26 (parameter_list)
+
+
+State 105
+
+   42 statement: "break" . ';'
+   43          | "break" . T_id ';'
+
+    T_id  shift, and go to state 149
+    ';'   shift, and go to state 150
+
+
+State 106
+
+   40 statement: "continue" . ';'
+   41          | "continue" . T_id ';'
+
+    T_id  shift, and go to state 151
+    ';'   shift, and go to state 152
+
+
+State 107
+
+   37 statement: "if" . '(' expression ')' statement
+   38          | "if" . '(' expression ')' statement "else" statement
+
+    '('  shift, and go to state 153
+
+
+State 108
+
+   44 statement: "return" . expression_or_empty ';'
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    $default  reduce using rule 47 (expression_or_empty)
+
+    expression_or_empty  go to state 154
+    expression           go to state 155
+
+
+State 109
+
+   46 label: T_id . ':'
+   49 expression: T_id .
+   58           | T_id . '(' ')'
+   59           | T_id . '(' expression_list ')'
+
+    '('  shift, and go to state 65
+    ':'  shift, and go to state 156
+
+    $default  reduce using rule 49 (expression)
+
+
+State 110
+
+   34 statement: ';' .
+
+    $default  reduce using rule 34 (statement)
+
+
+State 111
+
+   36 statement: '{' . statement_list '}'
+
+    "break"         shift, and go to state 105
+    "continue"      shift, and go to state 106
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "if"            shift, and go to state 107
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "return"        shift, and go to state 108
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 109
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    ';'             shift, and go to state 110
+    '('             shift, and go to state 46
+    '{'             shift, and go to state 111
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    "for"     reduce using rule 45 (label)
+    $default  reduce using rule 32 (statement_list)
+
+    statement_list  go to state 157
+    statement       go to state 113
+    label           go to state 114
+    expression      go to state 115
+
+
+State 112
+
+   31 function_definition: function_head '{' declaration_list statement_list . '}'
+
+    '}'  shift, and go to state 158
+
+
+State 113
+
+   33 statement_list: statement . statement_list
+
+    "break"         shift, and go to state 105
+    "continue"      shift, and go to state 106
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "if"            shift, and go to state 107
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "return"        shift, and go to state 108
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 109
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    ';'             shift, and go to state 110
+    '('             shift, and go to state 46
+    '{'             shift, and go to state 111
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    "for"     reduce using rule 45 (label)
+    $default  reduce using rule 32 (statement_list)
+
+    statement_list  go to state 159
+    statement       go to state 113
+    label           go to state 114
+    expression      go to state 115
+
+
+State 114
+
+   39 statement: label . "for" '(' expression_or_empty ';' expression_or_empty ';' expression_or_empty ')' statement
+
+    "for"  shift, and go to state 160
+
+
+State 115
+
+   35 statement: expression . ';'
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "||"  shift, and go to state 80
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    "+="  shift, and go to state 83
+    "-="  shift, and go to state 84
+    "*="  shift, and go to state 85
+    "/="  shift, and go to state 86
+    "%="  shift, and go to state 87
+    ','   shift, and go to state 88
+    '='   shift, and go to state 89
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    ';'   shift, and go to state 161
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+
+State 116
+
+   24 function_head: "void" T_id '(' parameter_list ')' .
+
+    $default  reduce using rule 24 (function_head)
+
+
+State 117
+
+   20 declarator: T_id '[' constant_expression . ']'
+
+    ']'  shift, and go to state 162
+
+
+State 118
+
+   93 expression: "new" type '[' . expression ']'
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 163
+
+
+State 119
+
+   58 expression: T_id '(' ')' .
+
+    $default  reduce using rule 58 (expression)
+
+
+State 120
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+   95 expression_list: expression . sep_by_comma_expression
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "||"  shift, and go to state 80
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    "+="  shift, and go to state 83
+    "-="  shift, and go to state 84
+    "*="  shift, and go to state 85
+    "/="  shift, and go to state 86
+    "%="  shift, and go to state 87
+    ','   shift, and go to state 164
+    '='   shift, and go to state 89
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    $default  reduce using rule 96 (sep_by_comma_expression)
+
+    sep_by_comma_expression  go to state 165
+
+
+State 121
+
+   59 expression: T_id '(' expression_list . ')'
+
+    ')'  shift, and go to state 166
+
+
+State 122
+
+   90 expression: '(' type ')' . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 167
+
+
+State 123
+
+   50 expression: '(' expression ')' .
+
+    $default  reduce using rule 50 (expression)
+
+
+State 124
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   75           | expression "==" expression .
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "=="  error (nonassociative)
+    "!="  error (nonassociative)
+    ">="  error (nonassociative)
+    "<="  error (nonassociative)
+    '>'   error (nonassociative)
+    '<'   error (nonassociative)
+
+    "++"      [reduce using rule 75 (expression)]
+    "--"      [reduce using rule 75 (expression)]
+    '['       [reduce using rule 75 (expression)]
+    '?'       [reduce using rule 75 (expression)]
+    $default  reduce using rule 75 (expression)
+
+
+State 125
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   76           | expression "!=" expression .
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "=="  error (nonassociative)
+    "!="  error (nonassociative)
+    ">="  error (nonassociative)
+    "<="  error (nonassociative)
+    '>'   error (nonassociative)
+    '<'   error (nonassociative)
+
+    "++"      [reduce using rule 76 (expression)]
+    "--"      [reduce using rule 76 (expression)]
+    '['       [reduce using rule 76 (expression)]
+    '?'       [reduce using rule 76 (expression)]
+    $default  reduce using rule 76 (expression)
+
+
+State 126
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   74           | expression ">=" expression .
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "=="  error (nonassociative)
+    "!="  error (nonassociative)
+    ">="  error (nonassociative)
+    "<="  error (nonassociative)
+    '>'   error (nonassociative)
+    '<'   error (nonassociative)
+
+    "++"      [reduce using rule 74 (expression)]
+    "--"      [reduce using rule 74 (expression)]
+    '['       [reduce using rule 74 (expression)]
+    '?'       [reduce using rule 74 (expression)]
+    $default  reduce using rule 74 (expression)
+
+
+State 127
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   73           | expression "<=" expression .
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "=="  error (nonassociative)
+    "!="  error (nonassociative)
+    ">="  error (nonassociative)
+    "<="  error (nonassociative)
+    '>'   error (nonassociative)
+    '<'   error (nonassociative)
+
+    "++"      [reduce using rule 73 (expression)]
+    "--"      [reduce using rule 73 (expression)]
+    '['       [reduce using rule 73 (expression)]
+    '?'       [reduce using rule 73 (expression)]
+    $default  reduce using rule 73 (expression)
+
+
+State 128
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   77           | expression "&&" expression .
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 77 (expression)]
+    "--"      [reduce using rule 77 (expression)]
+    '['       [reduce using rule 77 (expression)]
+    '?'       [reduce using rule 77 (expression)]
+    $default  reduce using rule 77 (expression)
+
+
+State 129
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   78           | expression "||" expression .
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 78 (expression)]
+    "--"      [reduce using rule 78 (expression)]
+    '['       [reduce using rule 78 (expression)]
+    '?'       [reduce using rule 78 (expression)]
+    $default  reduce using rule 78 (expression)
+
+
+State 130
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   88           | expression "+=" expression .
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "||"  shift, and go to state 80
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    "+="  shift, and go to state 83
+    "-="  shift, and go to state 84
+    "*="  shift, and go to state 85
+    "/="  shift, and go to state 86
+    "%="  shift, and go to state 87
+    '='   shift, and go to state 89
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 88 (expression)]
+    "--"      [reduce using rule 88 (expression)]
+    '['       [reduce using rule 88 (expression)]
+    '?'       [reduce using rule 88 (expression)]
+    $default  reduce using rule 88 (expression)
+
+
+State 131
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   89           | expression "-=" expression .
+   91           | expression . '?' expression ':' expression
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "||"  shift, and go to state 80
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    "+="  shift, and go to state 83
+    "-="  shift, and go to state 84
+    "*="  shift, and go to state 85
+    "/="  shift, and go to state 86
+    "%="  shift, and go to state 87
+    '='   shift, and go to state 89
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 89 (expression)]
+    "--"      [reduce using rule 89 (expression)]
+    '['       [reduce using rule 89 (expression)]
+    '?'       [reduce using rule 89 (expression)]
+    $default  reduce using rule 89 (expression)
+
+
+State 132
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   85           | expression "*=" expression .
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "||"  shift, and go to state 80
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    "+="  shift, and go to state 83
+    "-="  shift, and go to state 84
+    "*="  shift, and go to state 85
+    "/="  shift, and go to state 86
+    "%="  shift, and go to state 87
+    '='   shift, and go to state 89
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 85 (expression)]
+    "--"      [reduce using rule 85 (expression)]
+    '['       [reduce using rule 85 (expression)]
+    '?'       [reduce using rule 85 (expression)]
+    $default  reduce using rule 85 (expression)
+
+
+State 133
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   86           | expression "/=" expression .
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "||"  shift, and go to state 80
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    "+="  shift, and go to state 83
+    "-="  shift, and go to state 84
+    "*="  shift, and go to state 85
+    "/="  shift, and go to state 86
+    "%="  shift, and go to state 87
+    '='   shift, and go to state 89
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 86 (expression)]
+    "--"      [reduce using rule 86 (expression)]
+    '['       [reduce using rule 86 (expression)]
+    '?'       [reduce using rule 86 (expression)]
+    $default  reduce using rule 86 (expression)
+
+
+State 134
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   87           | expression "%=" expression .
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "||"  shift, and go to state 80
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    "+="  shift, and go to state 83
+    "-="  shift, and go to state 84
+    "*="  shift, and go to state 85
+    "/="  shift, and go to state 86
+    "%="  shift, and go to state 87
+    '='   shift, and go to state 89
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 87 (expression)]
+    "--"      [reduce using rule 87 (expression)]
+    '['       [reduce using rule 87 (expression)]
+    '?'       [reduce using rule 87 (expression)]
+    $default  reduce using rule 87 (expression)
+
+
+State 135
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   79           | expression ',' expression .
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "||"  shift, and go to state 80
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    "+="  shift, and go to state 83
+    "-="  shift, and go to state 84
+    "*="  shift, and go to state 85
+    "/="  shift, and go to state 86
+    "%="  shift, and go to state 87
+    '='   shift, and go to state 89
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 79 (expression)]
+    "--"      [reduce using rule 79 (expression)]
+    '['       [reduce using rule 79 (expression)]
+    '?'       [reduce using rule 79 (expression)]
+    $default  reduce using rule 79 (expression)
+
+
+State 136
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   84           | expression '=' expression .
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "||"  shift, and go to state 80
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    "+="  shift, and go to state 83
+    "-="  shift, and go to state 84
+    "*="  shift, and go to state 85
+    "/="  shift, and go to state 86
+    "%="  shift, and go to state 87
+    '='   shift, and go to state 89
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 84 (expression)]
+    "--"      [reduce using rule 84 (expression)]
+    '['       [reduce using rule 84 (expression)]
+    '?'       [reduce using rule 84 (expression)]
+    $default  reduce using rule 84 (expression)
+
+
+State 137
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   72           | expression '>' expression .
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "=="  error (nonassociative)
+    "!="  error (nonassociative)
+    ">="  error (nonassociative)
+    "<="  error (nonassociative)
+    '>'   error (nonassociative)
+    '<'   error (nonassociative)
+
+    "++"      [reduce using rule 72 (expression)]
+    "--"      [reduce using rule 72 (expression)]
+    '['       [reduce using rule 72 (expression)]
+    '?'       [reduce using rule 72 (expression)]
+    $default  reduce using rule 72 (expression)
+
+
+State 138
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   71           | expression '<' expression .
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "=="  error (nonassociative)
+    "!="  error (nonassociative)
+    ">="  error (nonassociative)
+    "<="  error (nonassociative)
+    '>'   error (nonassociative)
+    '<'   error (nonassociative)
+
+    "++"      [reduce using rule 71 (expression)]
+    "--"      [reduce using rule 71 (expression)]
+    '['       [reduce using rule 71 (expression)]
+    '?'       [reduce using rule 71 (expression)]
+    $default  reduce using rule 71 (expression)
+
+
+State 139
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   69           | expression '+' expression .
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 69 (expression)]
+    "--"      [reduce using rule 69 (expression)]
+    '['       [reduce using rule 69 (expression)]
+    '?'       [reduce using rule 69 (expression)]
+    $default  reduce using rule 69 (expression)
+
+
+State 140
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   70           | expression '-' expression .
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 70 (expression)]
+    "--"      [reduce using rule 70 (expression)]
+    '['       [reduce using rule 70 (expression)]
+    '?'       [reduce using rule 70 (expression)]
+    $default  reduce using rule 70 (expression)
+
+
+State 141
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   66           | expression '*' expression .
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 66 (expression)]
+    "--"      [reduce using rule 66 (expression)]
+    '['       [reduce using rule 66 (expression)]
+    '?'       [reduce using rule 66 (expression)]
+    $default  reduce using rule 66 (expression)
+
+
+State 142
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   67           | expression '/' expression .
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 67 (expression)]
+    "--"      [reduce using rule 67 (expression)]
+    '['       [reduce using rule 67 (expression)]
+    '?'       [reduce using rule 67 (expression)]
+    $default  reduce using rule 67 (expression)
+
+
+State 143
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   68           | expression '%' expression .
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 68 (expression)]
+    "--"      [reduce using rule 68 (expression)]
+    '['       [reduce using rule 68 (expression)]
+    '?'       [reduce using rule 68 (expression)]
+    $default  reduce using rule 68 (expression)
+
+
+State 144
+
+   60 expression: expression . '[' expression ']'
+   60           | expression '[' expression . ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "||"  shift, and go to state 80
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    "+="  shift, and go to state 83
+    "-="  shift, and go to state 84
+    "*="  shift, and go to state 85
+    "/="  shift, and go to state 86
+    "%="  shift, and go to state 87
+    ','   shift, and go to state 88
+    '='   shift, and go to state 89
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    ']'   shift, and go to state 168
+    '?'   shift, and go to state 98
+
+
+State 145
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+   91           | expression '?' expression . ':' expression
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "||"  shift, and go to state 80
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    "+="  shift, and go to state 83
+    "-="  shift, and go to state 84
+    "*="  shift, and go to state 85
+    "/="  shift, and go to state 86
+    "%="  shift, and go to state 87
+    ','   shift, and go to state 88
+    '='   shift, and go to state 89
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    ':'   shift, and go to state 169
+    '?'   shift, and go to state 98
+
+
+State 146
+
+    8 variable_declaration: type_id '[' constant_expression ']' sep_by_comma_declarator . ';'
+
+    ';'  shift, and go to state 170
+
+
+State 147
+
+   29 parameter: "byref" type T_id .
+
+    $default  reduce using rule 29 (parameter)
+
+
+State 148
+
+   28 sep_by_comma_parameter: ',' parameter . sep_by_comma_parameter
+
+    ','  shift, and go to state 103
+
+    $default  reduce using rule 27 (sep_by_comma_parameter)
+
+    sep_by_comma_parameter  go to state 171
+
+
+State 149
+
+   43 statement: "break" T_id . ';'
+
+    ';'  shift, and go to state 172
+
+
+State 150
+
+   42 statement: "break" ';' .
+
+    $default  reduce using rule 42 (statement)
+
+
+State 151
+
+   41 statement: "continue" T_id . ';'
+
+    ';'  shift, and go to state 173
+
+
+State 152
+
+   40 statement: "continue" ';' .
+
+    $default  reduce using rule 40 (statement)
+
+
+State 153
+
+   37 statement: "if" '(' . expression ')' statement
+   38          | "if" '(' . expression ')' statement "else" statement
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 174
+
+
+State 154
+
+   44 statement: "return" expression_or_empty . ';'
+
+    ';'  shift, and go to state 175
+
+
+State 155
+
+   48 expression_or_empty: expression .
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "||"  shift, and go to state 80
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    "+="  shift, and go to state 83
+    "-="  shift, and go to state 84
+    "*="  shift, and go to state 85
+    "/="  shift, and go to state 86
+    "%="  shift, and go to state 87
+    ','   shift, and go to state 88
+    '='   shift, and go to state 89
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    $default  reduce using rule 48 (expression_or_empty)
+
+
+State 156
+
+   46 label: T_id ':' .
+
+    $default  reduce using rule 46 (label)
+
+
+State 157
+
+   36 statement: '{' statement_list . '}'
+
+    '}'  shift, and go to state 176
+
+
+State 158
+
+   31 function_definition: function_head '{' declaration_list statement_list '}' .
+
+    $default  reduce using rule 31 (function_definition)
+
+
+State 159
+
+   33 statement_list: statement statement_list .
+
+    $default  reduce using rule 33 (statement_list)
+
+
+State 160
+
+   39 statement: label "for" . '(' expression_or_empty ';' expression_or_empty ';' expression_or_empty ')' statement
+
+    '('  shift, and go to state 177
+
+
+State 161
+
+   35 statement: expression ';' .
+
+    $default  reduce using rule 35 (statement)
+
+
+State 162
+
+   20 declarator: T_id '[' constant_expression ']' .
+
+    $default  reduce using rule 20 (declarator)
+
+
+State 163
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+   93           | "new" type '[' expression . ']'
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "||"  shift, and go to state 80
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    "+="  shift, and go to state 83
+    "-="  shift, and go to state 84
+    "*="  shift, and go to state 85
+    "/="  shift, and go to state 86
+    "%="  shift, and go to state 87
+    ','   shift, and go to state 88
+    '='   shift, and go to state 89
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    ']'   shift, and go to state 178
+    '?'   shift, and go to state 98
+
+
+State 164
+
+   79 expression: expression ',' . expression
+   97 sep_by_comma_expression: ',' . expression sep_by_comma_expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 179
+
+
+State 165
+
+   95 expression_list: expression sep_by_comma_expression .
+
+    $default  reduce using rule 95 (expression_list)
+
+
+State 166
+
+   59 expression: T_id '(' expression_list ')' .
+
+    $default  reduce using rule 59 (expression)
+
+
+State 167
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   90           | '(' type ')' expression .
+   91           | expression . '?' expression ':' expression
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "||"  shift, and go to state 80
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    "+="  shift, and go to state 83
+    "-="  shift, and go to state 84
+    "*="  shift, and go to state 85
+    "/="  shift, and go to state 86
+    "%="  shift, and go to state 87
+    ','   shift, and go to state 88
+    '='   shift, and go to state 89
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "=="      [reduce using rule 90 (expression)]
+    "!="      [reduce using rule 90 (expression)]
+    ">="      [reduce using rule 90 (expression)]
+    "<="      [reduce using rule 90 (expression)]
+    "&&"      [reduce using rule 90 (expression)]
+    "||"      [reduce using rule 90 (expression)]
+    "++"      [reduce using rule 90 (expression)]
+    "--"      [reduce using rule 90 (expression)]
+    "+="      [reduce using rule 90 (expression)]
+    "-="      [reduce using rule 90 (expression)]
+    "*="      [reduce using rule 90 (expression)]
+    "/="      [reduce using rule 90 (expression)]
+    "%="      [reduce using rule 90 (expression)]
+    ','       [reduce using rule 90 (expression)]
+    '='       [reduce using rule 90 (expression)]
+    '>'       [reduce using rule 90 (expression)]
+    '<'       [reduce using rule 90 (expression)]
+    '+'       [reduce using rule 90 (expression)]
+    '-'       [reduce using rule 90 (expression)]
+    '*'       [reduce using rule 90 (expression)]
+    '/'       [reduce using rule 90 (expression)]
+    '%'       [reduce using rule 90 (expression)]
+    '['       [reduce using rule 90 (expression)]
+    '?'       [reduce using rule 90 (expression)]
+    $default  reduce using rule 90 (expression)
+
+
+State 168
+
+   60 expression: expression '[' expression ']' .
+
+    $default  reduce using rule 60 (expression)
+
+
+State 169
+
+   91 expression: expression '?' expression ':' . expression
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    expression  go to state 180
+
+
+State 170
+
+    8 variable_declaration: type_id '[' constant_expression ']' sep_by_comma_declarator ';' .
+
+    $default  reduce using rule 8 (variable_declaration)
+
+
+State 171
+
+   28 sep_by_comma_parameter: ',' parameter sep_by_comma_parameter .
+
+    $default  reduce using rule 28 (sep_by_comma_parameter)
+
+
+State 172
+
+   43 statement: "break" T_id ';' .
+
+    $default  reduce using rule 43 (statement)
+
+
+State 173
+
+   41 statement: "continue" T_id ';' .
+
+    $default  reduce using rule 41 (statement)
+
+
+State 174
+
+   37 statement: "if" '(' expression . ')' statement
+   38          | "if" '(' expression . ')' statement "else" statement
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "||"  shift, and go to state 80
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    "+="  shift, and go to state 83
+    "-="  shift, and go to state 84
+    "*="  shift, and go to state 85
+    "/="  shift, and go to state 86
+    "%="  shift, and go to state 87
+    ','   shift, and go to state 88
+    '='   shift, and go to state 89
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    ')'   shift, and go to state 181
+    '?'   shift, and go to state 98
+
+
+State 175
+
+   44 statement: "return" expression_or_empty ';' .
+
+    $default  reduce using rule 44 (statement)
+
+
+State 176
+
+   36 statement: '{' statement_list '}' .
+
+    $default  reduce using rule 36 (statement)
+
+
+State 177
+
+   39 statement: label "for" '(' . expression_or_empty ';' expression_or_empty ';' expression_or_empty ')' statement
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    $default  reduce using rule 47 (expression_or_empty)
+
+    expression_or_empty  go to state 182
+    expression           go to state 155
+
+
+State 178
+
+   93 expression: "new" type '[' expression ']' .
+
+    $default  reduce using rule 93 (expression)
+
+
+State 179
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   79           | expression ',' expression .
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+   97 sep_by_comma_expression: ',' expression . sep_by_comma_expression
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "||"  shift, and go to state 80
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    "+="  shift, and go to state 83
+    "-="  shift, and go to state 84
+    "*="  shift, and go to state 85
+    "/="  shift, and go to state 86
+    "%="  shift, and go to state 87
+    '='   shift, and go to state 89
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "++"      [reduce using rule 79 (expression)]
+    "--"      [reduce using rule 79 (expression)]
+    '['       [reduce using rule 79 (expression)]
+    ')'       reduce using rule 79 (expression)
+    ')'       [reduce using rule 96 (sep_by_comma_expression)]
+    '?'       [reduce using rule 79 (expression)]
+    $default  reduce using rule 79 (expression)
+
+    sep_by_comma_expression  go to state 183
+
+
+State 180
+
+   60 expression: expression . '[' expression ']'
+   66           | expression . '*' expression
+   67           | expression . '/' expression
+   68           | expression . '%' expression
+   69           | expression . '+' expression
+   70           | expression . '-' expression
+   71           | expression . '<' expression
+   72           | expression . '>' expression
+   73           | expression . "<=" expression
+   74           | expression . ">=" expression
+   75           | expression . "==" expression
+   76           | expression . "!=" expression
+   77           | expression . "&&" expression
+   78           | expression . "||" expression
+   79           | expression . ',' expression
+   82           | expression . "++"
+   83           | expression . "--"
+   84           | expression . '=' expression
+   85           | expression . "*=" expression
+   86           | expression . "/=" expression
+   87           | expression . "%=" expression
+   88           | expression . "+=" expression
+   89           | expression . "-=" expression
+   91           | expression . '?' expression ':' expression
+   91           | expression '?' expression ':' expression .
+
+    "=="  shift, and go to state 75
+    "!="  shift, and go to state 76
+    ">="  shift, and go to state 77
+    "<="  shift, and go to state 78
+    "&&"  shift, and go to state 79
+    "||"  shift, and go to state 80
+    "++"  shift, and go to state 81
+    "--"  shift, and go to state 82
+    "+="  shift, and go to state 83
+    "-="  shift, and go to state 84
+    "*="  shift, and go to state 85
+    "/="  shift, and go to state 86
+    "%="  shift, and go to state 87
+    ','   shift, and go to state 88
+    '='   shift, and go to state 89
+    '>'   shift, and go to state 90
+    '<'   shift, and go to state 91
+    '+'   shift, and go to state 92
+    '-'   shift, and go to state 93
+    '*'   shift, and go to state 94
+    '/'   shift, and go to state 95
+    '%'   shift, and go to state 96
+    '['   shift, and go to state 97
+    '?'   shift, and go to state 98
+
+    "=="      [reduce using rule 91 (expression)]
+    "!="      [reduce using rule 91 (expression)]
+    ">="      [reduce using rule 91 (expression)]
+    "<="      [reduce using rule 91 (expression)]
+    "&&"      [reduce using rule 91 (expression)]
+    "||"      [reduce using rule 91 (expression)]
+    "++"      [reduce using rule 91 (expression)]
+    "--"      [reduce using rule 91 (expression)]
+    "+="      [reduce using rule 91 (expression)]
+    "-="      [reduce using rule 91 (expression)]
+    "*="      [reduce using rule 91 (expression)]
+    "/="      [reduce using rule 91 (expression)]
+    "%="      [reduce using rule 91 (expression)]
+    ','       [reduce using rule 91 (expression)]
+    '='       [reduce using rule 91 (expression)]
+    '>'       [reduce using rule 91 (expression)]
+    '<'       [reduce using rule 91 (expression)]
+    '+'       [reduce using rule 91 (expression)]
+    '-'       [reduce using rule 91 (expression)]
+    '*'       [reduce using rule 91 (expression)]
+    '/'       [reduce using rule 91 (expression)]
+    '%'       [reduce using rule 91 (expression)]
+    '['       [reduce using rule 91 (expression)]
+    '?'       [reduce using rule 91 (expression)]
+    $default  reduce using rule 91 (expression)
+
+
+State 181
+
+   37 statement: "if" '(' expression ')' . statement
+   38          | "if" '(' expression ')' . statement "else" statement
+
+    "break"         shift, and go to state 105
+    "continue"      shift, and go to state 106
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "if"            shift, and go to state 107
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "return"        shift, and go to state 108
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 109
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    ';'             shift, and go to state 110
+    '('             shift, and go to state 46
+    '{'             shift, and go to state 111
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    $default  reduce using rule 45 (label)
+
+    statement   go to state 184
+    label       go to state 114
+    expression  go to state 115
+
+
+State 182
+
+   39 statement: label "for" '(' expression_or_empty . ';' expression_or_empty ';' expression_or_empty ')' statement
+
+    ';'  shift, and go to state 185
+
+
+State 183
+
+   97 sep_by_comma_expression: ',' expression sep_by_comma_expression .
+
+    $default  reduce using rule 97 (sep_by_comma_expression)
+
+
+State 184
+
+   37 statement: "if" '(' expression ')' statement .
+   38          | "if" '(' expression ')' statement . "else" statement
+
+    "else"  shift, and go to state 186
+
+    "else"    [reduce using rule 37 (statement)]
+    $default  reduce using rule 37 (statement)
+
+
+State 185
+
+   39 statement: label "for" '(' expression_or_empty ';' . expression_or_empty ';' expression_or_empty ')' statement
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    $default  reduce using rule 47 (expression_or_empty)
+
+    expression_or_empty  go to state 187
+    expression           go to state 155
+
+
+State 186
+
+   38 statement: "if" '(' expression ')' statement "else" . statement
+
+    "break"         shift, and go to state 105
+    "continue"      shift, and go to state 106
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "if"            shift, and go to state 107
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "return"        shift, and go to state 108
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 109
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    ';'             shift, and go to state 110
+    '('             shift, and go to state 46
+    '{'             shift, and go to state 111
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    $default  reduce using rule 45 (label)
+
+    statement   go to state 188
+    label       go to state 114
+    expression  go to state 115
+
+
+State 187
+
+   39 statement: label "for" '(' expression_or_empty ';' expression_or_empty . ';' expression_or_empty ')' statement
+
+    ';'  shift, and go to state 189
+
+
+State 188
+
+   38 statement: "if" '(' expression ')' statement "else" statement .
+
+    $default  reduce using rule 38 (statement)
+
+
+State 189
+
+   39 statement: label "for" '(' expression_or_empty ';' expression_or_empty ';' . expression_or_empty ')' statement
+
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 36
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    '('             shift, and go to state 46
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    $default  reduce using rule 47 (expression_or_empty)
+
+    expression_or_empty  go to state 190
+    expression           go to state 155
+
+
+State 190
+
+   39 statement: label "for" '(' expression_or_empty ';' expression_or_empty ';' expression_or_empty . ')' statement
+
+    ')'  shift, and go to state 191
+
+
+State 191
+
+   39 statement: label "for" '(' expression_or_empty ';' expression_or_empty ';' expression_or_empty ')' . statement
+
+    "break"         shift, and go to state 105
+    "continue"      shift, and go to state 106
+    "delete"        shift, and go to state 31
+    "false"         shift, and go to state 32
+    "if"            shift, and go to state 107
+    "new"           shift, and go to state 33
+    "NULL"          shift, and go to state 34
+    "return"        shift, and go to state 108
+    "true"          shift, and go to state 35
+    T_id            shift, and go to state 109
+    T_int_const     shift, and go to state 37
+    T_double_const  shift, and go to state 38
+    T_char_const    shift, and go to state 39
+    T_string_const  shift, and go to state 40
+    "++"            shift, and go to state 41
+    "--"            shift, and go to state 42
+    '+'             shift, and go to state 43
+    '-'             shift, and go to state 44
+    '*'             shift, and go to state 45
+    ';'             shift, and go to state 110
+    '('             shift, and go to state 46
+    '{'             shift, and go to state 111
+    '&'             shift, and go to state 47
+    '!'             shift, and go to state 48
+
+    $default  reduce using rule 45 (label)
+
+    statement   go to state 192
+    label       go to state 114
+    expression  go to state 115
+
+
+State 192
+
+   39 statement: label "for" '(' expression_or_empty ';' expression_or_empty ';' expression_or_empty ')' statement .
+
+    $default  reduce using rule 39 (statement)
