@@ -24,6 +24,9 @@ lexertest: lexer.o
 	$(MAKE) -C ./tests/lexer
 	$(CXX) $(CXXFLAGS) -o ./tests/lexer/$@ ./tests/lexer/main.o $^
 
+test: lexertest
+	./tests/lexer/runner.sh
+
 
 # lexer.o: lexer.cpp lexer.hpp parser.hpp
 
