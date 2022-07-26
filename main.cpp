@@ -1,18 +1,19 @@
 #include <cstdio>
+#include <cstdlib>
+#include "lexer.hpp"
+#include "parser.hpp"
 
-extern int yylex();
 extern char* yytext;
 
-
+void yyerror(const char *msg)
+{
+	fprintf(stderr, "%s\n", msg);
+	exit(EXIT_FAILURE);
+}
 
 
 int main(){
-	int token;
-	do{
-		token = yylex();
-		printf("tokenId=%d, lexeme=\"%s\" ", token, yytext);
-	}while(token != 0);
 
-
-	return 0;
+	int ret = yyparse();
+	return ret;
 }

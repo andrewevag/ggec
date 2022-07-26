@@ -6,15 +6,23 @@ BINS=ggec lexertest
 
 default: $(BINS)
 
-ggec: lexer.o main.o
+ggec: lexer.o main.o parser.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 
 lexer.cpp: lexer.l
 	flex -s -o lexer.cpp lexer.l
 
-lexer.o: lexer.cpp
-	$(CXX) -c $(CXXFLAGS) -o $@ $^
+lexer.o: lexer.cpp parser.hpp
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
+
+parser.cpp parser.hpp: parser.y
+	bison -dv -o $@ $^	
+
+parser.o: parser.cpp parser.hpp
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
+
+
 
 %.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $^
@@ -40,10 +48,12 @@ test: lexertest
 
 clean:
 	$(RM) *.o $(BINS) lexer.cpp
+	$(RM) parser.hpp parser.output
 	$(MAKE) -C ./tests/lexer clean
+	
 
 distclean: clean
-	$(RM) 
+# $(RM) ??
 
 help:
 	@echo "make: "

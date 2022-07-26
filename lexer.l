@@ -1,5 +1,6 @@
 %{
-
+#include "parser.hpp"
+#include <cstdio>
 
 
 int lineno = 1;

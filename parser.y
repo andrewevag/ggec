@@ -1,4 +1,6 @@
-
+%{
+#include "lexer.hpp"
+%}
 
 %token T_bool          "bool"
 %token T_break         "break"
@@ -35,6 +37,19 @@
 %token T_multeq        "*="
 %token T_diveq         "/="
 %token T_modeq         "%="
+
+%left ','
+%right '=' "+=" "-=" "*=" "/=" "%="
+%left "||"
+%left "&&"
+%nonassoc "==" "!=" '>' '<' "<=" ">="
+%left '+' '-'
+%left '*' '/' '%'
+%right IPLUSPLUS IMINUSMINUS
+%right NEW DELETE
+%right ADDRESS DEREF PLUSIGN MINUSIGN NEGATION
+%left  PPLUSPLUS PMINUSMINUS
+
 
 
 
@@ -159,11 +174,11 @@ expression:
 |   T_id '(' ')' 
 |   T_id '(' expression_list ')'
 |   expression '[' expression ']'
-|   '&' expression
-|   '*' expression
-|   '+' expression
-|   '-' expression
-|   '!' expression
+|   '&' expression %prec ADDRESS
+|   '*' expression %prec DEREF
+|   '+' expression %prec PLUSIGN
+|   '-' expression %prec MINUSIGN
+|   '!' expression %prec NEGATION
 |   expression '*' expression
 |   expression '/' expression
 |   expression '%' expression
@@ -178,10 +193,10 @@ expression:
 |   expression "&&" expression
 |   expression "||" expression
 |   expression ',' expression
-|   "++" expression
-|   "--" expression
-|   expression "++"
-|   expression "--"
+|   "++" expression %prec IPLUSPLUS
+|   "--" expression %prec IMINUSMINUS
+|   expression "++" %prec PPLUSPLUS
+|   expression "--" %prec PMINUSMINUS
 |   expression '=' expression
 |   expression "*=" expression
 |   expression "/=" expression
@@ -190,9 +205,9 @@ expression:
 |   expression "-=" expression
 |   '(' type ')' expression
 |   expression '?' expression ':' expression
-|   "new" type
-|   "new" type '[' expression ']'
-|   "delete" expression
+|   "new" type %prec NEW
+|   "new" type '[' expression ']' %prec NEW
+|   "delete" expression %prec DELETE
 ;
 
 expression_list:
