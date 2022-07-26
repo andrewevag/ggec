@@ -1,43 +1,5 @@
 %{
 
-#define T_eof           0
-#define T_bool          1001
-#define T_break         1002
-#define T_byref         1003
-#define T_char          1004
-#define T_continue      1005
-#define T_delete        1006
-#define T_double        1007
-#define T_else          1008
-#define T_for           1009
-#define T_false         1010
-#define T_if            1011
-#define T_int           1012
-#define T_new           1013
-#define T_NULL          1014 
-#define T_return        1015
-#define T_true          1016
-#define T_void          1017
-#define T_id            1018
-#define T_int_const     1019
-#define T_double_const  1020
-#define T_char_const    1021
-#define T_string_const  1022
-#define T_eq            1023
-#define T_neq           1024
-#define T_geq           1025   
-#define T_leq           1026
-#define T_land          1027
-#define T_lor           1028
-#define T_plusplus      1029
-#define T_minusminus    1030
-#define T_pluseq        1031
-#define T_minuseq       1032
-#define T_multeq        1033
-#define T_diveq         1034
-#define T_modeq         1035
-
-
 
 
 int lineno = 1;
