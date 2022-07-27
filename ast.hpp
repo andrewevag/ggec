@@ -138,5 +138,120 @@ private:
 };
 
 
+class Expression : public AST {
+public:
+	virtual ~Expression() override = default;
+};
+
+class Id : public Expression {
+public:
+	virtual ~Id() override = default;
+private:
+	std::string _name;
+};
+
+class Constant : public Expression {
+public:
+	virtual ~Constant() override = default;
+	enum ConstantType { True, False, Null, Int, Char, Double, String };
+
+private:
+	ConstantType _ct;
+	int16_t _int;
+	char _char;
+	long double _double;
+	std::string _string;
+};
+
+class FunctionCall : public Expression {
+public:
+	virtual ~FunctionCall() override = default;
+private:
+	std::string _functionName;
+	std::vector<Expression*> _arguments;
+};
+
+class BracketedIndex : public Expression {
+public:
+	virtual ~BracketedIndex() override = default;
+private:
+	Expression* _in;
+	Expression* _out;
+};
+
+class UnaryOp : public Expression {
+public:
+	virtual ~UnaryOp() override = default;
+private:
+	int _UnOp;
+	Expression* _operand;
+};
+
+class BinaryOp : public Expression {
+public:
+	virtual ~BinaryOp() override = default;
+private:
+	int _BinOp;
+	Expression* _leftOperand;
+	Expression* _rightOperand;
+};
+
+class PrefixUnAss : public Expression {
+public:
+	virtual ~PrefixUnAss() override = default;
+private:
+	int _UnAss;
+	Expression* _operand;
+};
+// kalo einai na fygei to CP kanei kako || factoring
+class PostfixUnAss : public Expression {
+public:
+	virtual ~PostfixUnAss() override = default;
+private:
+	int _UnAss;
+	Expression* _operand;
+};
+
+
+class BinaryAss : public Expression {
+public:
+	virtual ~BinaryAss() override = default;
+private:
+	int _BinAss;
+	Expression* _leftOperand;
+	Expression* _rightOperand;
+};
+
+class TypeCast : public Expression {
+public:
+	virtual ~TypeCast() override = default;
+private:
+	TypeExpression* _type;
+	Expression* _expr;
+};
+
+class TernaryOp : public Expression {
+public:
+	virtual ~TernaryOp() override = default;
+private:
+	Expression* _condition;
+	Expression* _ifBody;
+	Expression* _elseBody;
+};
+
+class New : public Expression {
+public:
+	virtual ~New() override = default;
+private:
+	TypeExpression* _type;
+	Expression* _size;
+};
+
+class Delete : public Expression {
+public:
+	virtual ~Delete() override = default;
+private:
+	Expression* _expr;
+};
 
 #endif/*__AST_HPP__*/

@@ -13,7 +13,6 @@ void yyerror(const char *msg)
 
 
 int main(){
-
 	int ret = yyparse();
 	return ret;
 }
