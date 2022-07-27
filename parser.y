@@ -39,6 +39,7 @@
 %token T_modeq         "%="
 
 %left ','
+%precedence ARGLIST
 %right '=' "+=" "-=" "*=" "/=" "%="
 %nonassoc '?' ':'
 %left "||"
@@ -179,6 +180,12 @@ expression_or_empty:
 ;
 
 expression:
+    no_comma_expression
+|   no_comma_expression ',' expression 
+;
+
+
+no_comma_expression:
     T_id
 |   '(' expression ')'
 |   "true"
@@ -209,7 +216,6 @@ expression:
 |   expression "!=" expression
 |   expression "&&" expression
 |   expression "||" expression
-|   expression ',' expression
 |   "++" expression %prec IPLUSPLUS
 |   "--" expression %prec IMINUSMINUS
 |   expression "++" %prec PPLUSPLUS
@@ -228,12 +234,12 @@ expression:
 ;
 
 expression_list:
-    expression sep_by_comma_expression
+    no_comma_expression sep_by_comma_expression %prec ARGLIST
 ;
 
 sep_by_comma_expression:
     /* nothing */
-|   ',' expression sep_by_comma_expression
+|   ',' no_comma_expression sep_by_comma_expression
 ;
 
 constant_expression:
