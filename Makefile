@@ -48,7 +48,7 @@ test: lexertest
 
 clean:
 	$(RM) *.o $(BINS) lexer.cpp
-	$(RM) parser.hpp parser.output
+	$(RM) parser.hpp parser.output parser.cpp
 	$(MAKE) -C ./tests/lexer clean
 	
 

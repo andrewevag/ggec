@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include "lexer.hpp"
 #include "parser.hpp"
-
+#include "ast.hpp"
 extern char* yytext;
 
 void yyerror(const char *msg)
