@@ -85,15 +85,15 @@
 
 // %expect 1
 %union {
-    std::vector<Declaration*> decList;
+    DeclarationList* decList;
     Declaration* decl;
     TypeExpression* typeExpr;
     Parameter* par;
-    std::vector<Parameter*> parList;
+    ParameterList* parList;
     Statement* stmt;
-    std::vector<Statement*> stmtList;
+    StatementList* stmtList;
     Expression* expr;
-    std::vector<Expression*> exprList;
+    ExpressionList* exprList;
     Label* lbl;
 }
 

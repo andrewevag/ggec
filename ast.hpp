@@ -254,4 +254,43 @@ private:
 	Expression* _expr;
 };
 
+
+
+
+
+
+
+class StatementList : public AST {
+public:
+	virtual ~StatementList() override = default;
+private:
+	std::vector<Statement*> _stmts;
+};
+
+class ParameterList : public AST {
+public:
+	virtual ~ParameterList() override = default;
+private:
+	std::vector<Parameter*> _parameters;
+};
+
+class ExpressionList : public AST {
+public:
+	virtual ~ExpressionList() override = default;
+private:
+	std::vector<Expression*> _expressions;
+};
+
+class DeclarationList : public AST {
+public:
+	virtual ~DeclarationList() override = default;
+private:
+	std::vector<Declaration*> _decls;
+};
+
+
+
+
+
+
 #endif/*__AST_HPP__*/

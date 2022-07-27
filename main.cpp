@@ -2,8 +2,10 @@
 #include <cstdlib>
 #include <vector>
 #include "lexer.hpp"
-#include "parser.hpp"
 #include "ast.hpp"
+#include "parser.hpp"
+
+
 extern char* yytext;
 
 void yyerror(const char *msg)
