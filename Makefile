@@ -17,7 +17,7 @@ lexer.o: lexer.cpp parser.hpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 parser.cpp parser.hpp: parser.y
-	bison -dv -o $@ $^	
+	bison -dv -o parser.cpp $^	
 
 parser.o: parser.cpp parser.hpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<

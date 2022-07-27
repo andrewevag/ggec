@@ -40,18 +40,18 @@
 
 %left ','
 %right '=' "+=" "-=" "*=" "/=" "%="
-%nonassoc ':'
+%nonassoc '?' ':'
 %left "||"
 %left "&&"
 %nonassoc "==" "!=" '>' '<' "<=" ">="
 %left '+' '-'
 %left '*' '/' '%'
 %nonassoc TYPECAST
-%right IPLUSPLUS IMINUSMINUS
+%right IPLUSPLUS IMINUSMINUS "++" "--"
 %right NEW DELETE
 %right ADDRESS DEREF PLUSIGN MINUSIGN NEGATION
 %left  PPLUSPLUS PMINUSMINUS
-%nonassoc FUNCTIONCALL BRACTETINDEX /* remember to fix if not what we want */
+%nonassoc '(' ')' '[' ']' /* remember to fix if not what we want */
 
 
 
@@ -85,23 +85,22 @@ sep_by_comma_declarator:
 ;
 
 type:
-    basic_type 
-|   basic_type one_or_more_stars   
+    basic_type star_list
 ;
 
 type_id:
     type T_id
 ;
 
-// star_list:
-//     /* nothing */
-// |   one_or_more_stars
-// ;
-
-one_or_more_stars:
-    '*'
-|   '*' one_or_more_stars    
+star_list:
+    /* nothing */
+|   '*' star_list 
 ;
+
+// one_or_more_stars:
+//     '*'
+// |   '*' one_or_more_stars    
+// ;
 
 basic_type:
     "int"
@@ -189,9 +188,9 @@ expression:
 |   T_char_const
 |   T_double_const
 |   T_string_const
-|   T_id '(' ')' %prec FUNCTIONCALL
-|   T_id '(' expression_list ')' %prec FUNCTIONCALL
-|   expression '[' expression ']' %prec BRACTETINDEX
+|   T_id '(' ')'
+|   T_id '(' expression_list ')' 
+|   expression '[' expression ']'
 |   '&' expression %prec ADDRESS
 |   '*' expression %prec DEREF
 |   '+' expression %prec PLUSIGN

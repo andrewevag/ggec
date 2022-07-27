@@ -95,9 +95,7 @@ extern int yydebug;
     MINUSIGN = 301,
     NEGATION = 302,
     PPLUSPLUS = 303,
-    PMINUSMINUS = 304,
-    FUNCTIONCALL = 305,
-    BRACTETINDEX = 306
+    PMINUSMINUS = 304
   };
 #endif
 
