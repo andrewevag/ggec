@@ -1,6 +1,3 @@
-State 11 conflicts: 1 shift/reduce
-State 23 conflicts: 1 shift/reduce
-State 55 conflicts: 1 shift/reduce
 State 184 conflicts: 1 shift/reduce
 
 
@@ -192,98 +189,100 @@ Terminals, with rules where they appear
     "*=" (290) 86
     "/=" (291) 87
     "%=" (292) 88
-    ARGLIST (293)
-    TYPECAST (294)
-    IPLUSPLUS (295)
-    IMINUSMINUS (296)
-    NEW (297)
-    DELETE (298)
-    ADDRESS (299)
-    DEREF (300)
-    PLUSIGN (301)
-    MINUSIGN (302)
-    NEGATION (303)
-    PPLUSPLUS (304)
-    PMINUSMINUS (305)
+    NO_COMMA (293)
+    EMPTY_STAR (294)
+    ARGLIST (295)
+    TYPECAST (296)
+    IPLUSPLUS (297)
+    IMINUSMINUS (298)
+    NEW (299)
+    DELETE (300)
+    ADDRESS (301)
+    DEREF (302)
+    PLUSIGN (303)
+    MINUSIGN (304)
+    NEGATION (305)
+    PPLUSPLUS (306)
+    PMINUSMINUS (307)
 
 
 Nonterminals, with rules where they appear
 
-    $accept (71)
+    $accept (73)
         on left: 0
-    program (72)
+    program (74)
         on left: 1
         on right: 0
-    declaration_list (73)
+    declaration_list (75)
         on left: 2 3
         on right: 1 3 31
-    declaration (74)
+    declaration (76)
         on left: 4 5 6
         on right: 1 3
-    variable_declaration (75)
+    variable_declaration (77)
         on left: 7 8
         on right: 4
-    sep_by_comma_declarator (76)
+    sep_by_comma_declarator (78)
         on left: 9 10
         on right: 7 8 10
-    type (77)
+    type (79)
         on left: 11
         on right: 12 91 93 94
-    type_id (78)
+    type_id (80)
         on left: 12
         on right: 7 8 21 22 29 30
-    star_list (79)
+    star_list (81)
         on left: 13 14
         on right: 11 14
-    basic_type (80)
+    basic_type (82)
         on left: 15 16 17 18
         on right: 11
-    declarator (81)
+    declarator (83)
         on left: 19 20
         on right: 10
-    function_head (82)
+    function_head (84)
         on left: 21 22 23 24
         on right: 25 31
-    function_declaration (83)
+    function_declaration (85)
         on left: 25
         on right: 5
-    parameter_list (84)
+    parameter_list (86)
         on left: 26
         on right: 22 24
-    sep_by_comma_parameter (85)
+    sep_by_comma_parameter (87)
         on left: 27 28
         on right: 26 28
-    parameter (86)
+    parameter (88)
         on left: 29 30
         on right: 26 28
-    function_definition (87)
+    function_definition (89)
         on left: 31
         on right: 6
-    statement_list (88)
+    statement_list (90)
         on left: 32 33
         on right: 31 33 36
-    statement (89)
+    statement (91)
         on left: 34 35 36 37 38 39 40 41 42 43 44
         on right: 33 37 38 39
-    label (90)
+    label (92)
         on left: 45 46
         on right: 39
-    expression_or_empty (91)
+    expression_or_empty (93)
         on left: 47 48
         on right: 39 44
-    expression (92)
+    expression (94)
         on left: 49 50
         on right: 35 37 38 48 50 52 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 94 95 99
-    no_comma_expression (93)
+    no_comma_expression (95)
         on left: 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95
         on right: 49 50 96 98
-    expression_list (94)
+    expression_list (96)
         on left: 96
         on right: 61
-    sep_by_comma_expression (95)
+    sep_by_comma_expression (97)
         on left: 97 98
         on right: 96 98
-    constant_expression (96)
+    constant_expression (98)
         on left: 99
         on right: 8 20
 
@@ -397,7 +396,6 @@ State 11
 
     '*'  shift, and go to state 23
 
-    '*'       [reduce using rule 13 (star_list)]
     $default  reduce using rule 13 (star_list)
 
     star_list  go to state 24
@@ -540,7 +538,6 @@ State 23
 
     '*'  shift, and go to state 23
 
-    '*'       [reduce using rule 13 (star_list)]
     $default  reduce using rule 13 (star_list)
 
     star_list  go to state 58
@@ -1047,7 +1044,6 @@ State 55
 
     ','  shift, and go to state 103
 
-    ','       [reduce using rule 49 (expression)]
     $default  reduce using rule 49 (expression)
 
 

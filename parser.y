@@ -38,6 +38,7 @@
 %token T_diveq         "/="
 %token T_modeq         "%="
 
+%precedence NO_COMMA EMPTY_STAR
 %left ','
 %precedence ARGLIST
 %right '=' "+=" "-=" "*=" "/=" "%="
@@ -54,7 +55,7 @@
 %left  PPLUSPLUS PMINUSMINUS
 %nonassoc '(' ')' '[' ']' /* remember to fix if not what we want */
 
-
+// %expect 1
 
 
 %%
@@ -94,7 +95,7 @@ type_id:
 ;
 
 star_list:
-    /* nothing */
+    /* nothing */ %prec EMPTY_STAR
 |   '*' star_list 
 ;
 
@@ -180,7 +181,7 @@ expression_or_empty:
 ;
 
 expression:
-    no_comma_expression
+    no_comma_expression %prec NO_COMMA
 |   no_comma_expression ',' expression 
 ;
 
