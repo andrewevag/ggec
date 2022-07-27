@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
+#include <vector>
 #include "lexer.hpp"
 #include "parser.hpp"
 #include "ast.hpp"

@@ -1,5 +1,11 @@
 %{
+
+#include <string>
+#include <vector>
+#include "ast.hpp"
 #include "lexer.hpp"
+
+
 %}
 
 %token T_bool          "bool"
@@ -19,11 +25,11 @@
 %token T_return        "return"
 %token T_true          "true"
 %token T_void          "void"
-%token T_id            
-%token T_int_const     
-%token T_double_const  
-%token T_char_const    
-%token T_string_const  
+%token<std::string> T_id            
+%token<uint16_t> T_int_const     
+%token<long double> T_double_const  
+%token<char> T_char_const    
+%token<std::string> T_string_const  
 %token T_eq            "=="
 %token T_neq           "!="
 %token T_geq           ">="   
@@ -55,8 +61,41 @@
 %left  PPLUSPLUS PMINUSMINUS
 %nonassoc '(' ')' '[' ']' /* remember to fix if not what we want */
 
-// %expect 1
 
+
+%type<decList> declaration_list //??
+%type<decl> declaration
+%type<decl> variable_declaration
+%type<decl> function_declaration
+%type<decl> function_definition
+%type<typeExpr> type
+%type<par> parameter
+%type<parList> parameter_list //??
+%type<stmtList> statement_list //??
+%type<stmt> statement
+%type<lbl> label
+%type<expr> expression_or_empty
+%type<exprList> expression_list
+%type<expr> expression
+%type<expr> constant_expression
+%type<expr> no_comma_expression
+%type<decList> sep_by_comma_declarator
+%type<exprList> sep_by_comma_expression
+%type<parList> sep_by_comma_parameter
+
+// %expect 1
+%union {
+    std::vector<Declaration*> decList;
+    Declaration* decl;
+    TypeExpression* typeExpr;
+    Parameter* par;
+    std::vector<Parameter*> parList;
+    Statement* stmt;
+    std::vector<Statement*> stmtList;
+    Expression* expr;
+    std::vector<Expression*> exprList;
+    Label* lbl;
+}
 
 %%
 

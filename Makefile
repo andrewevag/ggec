@@ -10,14 +10,14 @@ ggec: lexer.o main.o parser.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 
-lexer.cpp: lexer.l
+lexer.cpp: lexer.l ast.hpp
 	flex -s -o lexer.cpp lexer.l
 
 lexer.o: lexer.cpp parser.hpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-parser.cpp parser.hpp: parser.y
-	bison -dv -o parser.cpp $^	
+parser.cpp parser.hpp: parser.y ast.hpp
+	bison -dv -o parser.cpp $<
 
 parser.o: parser.cpp parser.hpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<

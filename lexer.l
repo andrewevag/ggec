@@ -1,4 +1,6 @@
 %{
+#include <vector>
+#include "ast.hpp"
 #include "parser.hpp"
 #include <cstdio>
 
