@@ -2,11 +2,11 @@
 
 CXX=c++
 CXXFLAGS=-Wall
-BINS=ggec lexertest
+BINS=ggec
 
 default: $(BINS)
 
-ggec: lexer.o main.o parser.o
+ggec: lexer.o main.o parser.o error.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 
