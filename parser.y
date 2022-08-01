@@ -151,9 +151,9 @@ declarator:
 ;
 
 function_declaration:
-    type T_id '(' ')' ';'                   { $$ =  new FunctionDeclaration($1, $2, nullptr); }
+    type T_id '(' ')' ';'                   { $$ =  new FunctionDeclaration($1, $2, new ParameterList()); }
 |   type T_id '(' parameter_list ')' ';'    { $$ = new FunctionDeclaration($1, $2, $4); }
-|   "void" T_id '(' ')' ';'                 { $$ = new FunctionDeclaration(new BasicType("void"), $2, nullptr); }
+|   "void" T_id '(' ')' ';'                 { $$ = new FunctionDeclaration(new BasicType("void"), $2, new ParameterList()); }
 |   "void" T_id '(' parameter_list ')' ';'  { $$ = new FunctionDeclaration(new BasicType("void"), $2, $4); }
 ;
 

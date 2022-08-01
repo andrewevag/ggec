@@ -92,6 +92,7 @@ public:
 private:
 	TypeExpression* _resultType;
 	std::string _name;
+	/* this will be an empty list and not null ptr in case of no parameters */
 	ParameterList* _parameters;
 
 };
@@ -110,6 +111,7 @@ public:
 private:
 	TypeExpression* _resultType;
 	std::string _name;
+	/* this will be an empty list and not null ptr in case of no parameters */
 	ParameterList* _parameters;
 	DeclarationList* _decls;
 	StatementList* _statements;
@@ -356,7 +358,7 @@ public:
 		case Bool: out << "BoolConstant(" << (_bool ? "true" : "false") << ")"; break;
 		case Null: out << "NULL"; break;
 		case Int: out << "IntConstant(" << _int << ")"; break;
-		case Char : out << "CharConstant(" << (uint8_t) _char << ")"; break;
+		case Char : out << "CharConstant(" << (uint) _char << ")"; break;
 		case Double : out << "DoubleConstant(" << _double << ")"; break;
 		case String : out << "StringConstant(" << "\"" << _string << "\")"; break;
 		default: break;
