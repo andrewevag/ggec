@@ -56,7 +56,7 @@ P [^\x00-\x1f\x7f\\\'\"]
 "%="        { return T_modeq; }
 [\=\+\-\*\/\%\(\)\<\>\&\!\?\:\,\;\(\)\{\}\[\]]    { return yytext[0]; }
 
-{L}({L}|{D}|_)*	                    { char* s = new char[strlen(yytext)+1]; memcpy(s, yytext, strlen(yytext+1)); yylval.str = s; return T_id; }
+{L}({L}|{D}|_)*	                    { char* s = new char[strlen(yytext)+1]; memcpy(s, yytext, strlen(yytext)+1); yylval.str = s; return T_id; }
 {D}+	                            { yylval.i = atoi(yytext); return T_int_const; }
 {D}+(\.{D}+([eE][\-\+]?{D}+)?)      { yylval.d = strtold(yytext, NULL); return T_double_const; }
 

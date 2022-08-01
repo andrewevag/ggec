@@ -105,7 +105,7 @@
 
 
 program:
-    declaration declaration_list  { $2->_decls.push_front($1); Program* p = new Program($2); }
+    declaration declaration_list  { $2->_decls.push_front($1); Program* p = new Program($2); p->printTree(std::cout);}
 ;
 
 declaration_list:
