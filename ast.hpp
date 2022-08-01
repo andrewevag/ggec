@@ -3,10 +3,16 @@
 #include <vector>
 #include <string>
 #include <deque>
+#include "tree.hpp"
 
-class AST{
+class AST : public Tree{
 public:
 	virtual ~AST() = default;
+
+
+	/* Printing Syntax Tree Functions */
+	virtual std::vector<Tree*> getChildren() = 0;
+	virtual void printNode(std::ostream& out) = 0;
 };
 class Declaration;
 class TypeExpression;
@@ -25,6 +31,9 @@ class Program : public AST{
 public:
 	Program(DeclarationList* decls) : _decls(decls) {}
 	virtual ~Program() override {};
+	/* Printing Syntax Tree Functions */
+	virtual std::vector<Tree*> getChildren() override { return {this->_decls->_decls.begin(), this->_decls->_decls.end()} }
+	virtual void printNode(std::ostream& out) override { out << "Program"; } 
 private:
 	DeclarationList* _decls;
 };
@@ -34,6 +43,10 @@ public:
 	virtual ~Declaration() override = default;
 	//only interesting in variables || when parsed in line we later add the type of the first declared
 	virtual void embedType(TypeExpression*) = 0;
+
+	/* Printing Syntax Tree Functions */
+	virtual std::vector<Tree*> getChildren() = 0;
+	virtual void printNode(std::ostream& out) = 0;
 };
 
 
@@ -41,9 +54,13 @@ class VariableDeclaration : public Declaration {
 public:
 	VariableDeclaration(TypeExpression* typeExpr, std::string name) : _typeExpr(typeExpr), _name(name) {} 
 	virtual ~VariableDeclaration() override = default;
-	virtual void embedType(TypeExpression* type){
+	virtual void embedType(TypeExpression* type) override {
 		this->_typeExpr = type;
 	}
+
+	/* Printing Syntax Tree Functions */
+	virtual std::vector<Tree*> getChildren() override { return { _typeExpr }; } 
+	virtual void printNode(std::ostream& out) override { out << "VariableDeclaration(" << _name << ')';}
 protected:
 	TypeExpression* _typeExpr;
 	std::string _name;
@@ -54,6 +71,10 @@ public:
 	ArrayDeclaration(TypeExpression* typeExp, std::string name, Expression* expr)
 	:  VariableDeclaration(typeExp, name), _expr(expr) {}
 	virtual ~ArrayDeclaration() override = default;
+
+	/* Printing Syntax Tree Functions */
+	virtual std::vector<Tree*> getChildren() override { return {this->_typeExpr, this->_expr}; }
+	virtual void printNode(std::ostream& out) override { out << "ArrayDeclaration(" << _name << ')';  }
 private: 
 	Expression* _expr;
 };
@@ -63,7 +84,7 @@ public:
 	FunctionDeclaration(TypeExpression* typeExpr, std::string name, ParameterList* parameters) : 
 	_resultType(typeExpr), _name(name), _parameters(parameters) {}
 	virtual ~FunctionDeclaration() override = default;
-	virtual void embedType(TypeExpression* type) {}
+	virtual void embedType(TypeExpression* type) override {}
 private:
 	TypeExpression* _resultType;
 	std::string _name;
@@ -77,7 +98,7 @@ public:
 	DeclarationList* decls, StatementList* statements) : 
 	_resultType(typeExpr), _name(name), _parameters(parameters), _decls(decls), _statements(statements) {}
 	virtual ~FunctionDefinition() override = default;
-	virtual void embedType(TypeExpression* type) {}
+	virtual void embedType(TypeExpression* type) override {}
 private:
 	TypeExpression* _resultType;
 	std::string _name;
@@ -114,8 +135,8 @@ class BasicType : public TypeExpression {
 public:
 	BasicType(std::string name) : _name(name) {}
 	virtual ~BasicType() override = default;
-	std::string getName() { return this->_name; }
-	virtual void penetrate(TypeExpression* me){ this->_name = me->getName();	}
+	std::string getName() override { return this->_name; }
+	virtual void penetrate(TypeExpression* me) override { this->_name = me->getName();	}
 private:
 	std::string _name;
 };
@@ -124,8 +145,8 @@ class Pointer : public TypeExpression {
 public:
 	Pointer(TypeExpression* inner) : _inner(inner) {}
 	virtual ~Pointer() override = default;
-	virtual std::string getName() { return "*"; }
-	virtual void penetrate(TypeExpression* me){
+	virtual std::string getName() override { return "*"; }
+	virtual void penetrate(TypeExpression* me) override {
 		this->_inner->penetrate(me);
 	}
 public:
@@ -420,7 +441,7 @@ public:
 	DeclarationList(std::deque<Declaration*> decls) : _decls(decls) {}
 	virtual ~DeclarationList() override = default;
 	std::deque<Declaration*> _decls;
-	virtual void embedType(TypeExpression* t) {
+	virtual void embedType(TypeExpression* t) override {
 		for(auto& i : this->_decls)
 			i->embedType(t);
 	}
