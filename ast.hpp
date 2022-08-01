@@ -18,14 +18,15 @@ class StatementList;
 class ParameterList;
 class ExpressionList;
 class DeclarationList;
+class BasicType;
 
 
 class Program : public AST{
 public:
 	Program(std::vector<Declaration*> decls) : _decls(decls) {}
 	virtual ~Program() override {
-		for(auto &i : this->_decls)
-			delete i;
+		// for(auto &i : this->_decls)
+		// 	delete i;
 	};
 private:
 	std::vector<Declaration*> _decls;
@@ -34,13 +35,14 @@ private:
 class Declaration : public AST {
 public:
 	virtual ~Declaration() override = default;
+	//only interesting in variables || when parsed in line we later add the type of the first declared
 	virtual void embedType(TypeExpression*) = 0;
 };
 
 
 class VariableDeclaration : public Declaration {
 public:
-	VariableDeclaration(TypeExpression* typeExpr, std::string name) : _typeExpr(typeExpr), _names(name) {} 
+	VariableDeclaration(TypeExpression* typeExpr, std::string name) : _typeExpr(typeExpr), _name(name) {} 
 	virtual ~VariableDeclaration() override = default;
 	virtual void embedType(TypeExpression* type){
 		this->_typeExpr = type;
@@ -53,7 +55,7 @@ protected:
 class ArrayDeclaration : public VariableDeclaration {
 public:
 	ArrayDeclaration(TypeExpression* typeExp, std::string name, Expression* expr)
-	: _expr(expr), VariableDeclaration(typeExp, name) {}
+	:  VariableDeclaration(typeExp, name), _expr(expr) {}
 	virtual ~ArrayDeclaration() override = default;
 private: 
 	Expression* _expr;
@@ -86,10 +88,26 @@ private:
 	std::vector<Statement*> _statement;
 };
 
+
+class Parameter : public AST {
+public:
+	enum PassingWay { ByCall, ByRef };
+	
+	Parameter(PassingWay pw, TypeExpression* type, std::string name) 
+	: _pw(pw), _name(name), _type(type) {}
+	virtual ~Parameter() override = default;
+	
+private:
+	PassingWay _pw;
+	std::string _name;
+	TypeExpression* _type;
+};
+
 class TypeExpression : public AST {
 public:
 	virtual ~TypeExpression() override = default;
-	virtual void penetrate(BasicType*) = 0;
+	virtual void penetrate(TypeExpression*) = 0;
+	virtual std::string getName() = 0;
 private:
 };
 
@@ -98,9 +116,7 @@ public:
 	BasicType(std::string name) : _name(name) {}
 	virtual ~BasicType() override = default;
 	std::string getName() { return this->_name; }
-	virtual void penetrate(BasicType* me){
-		this->_name = me->getName();
-	}
+	virtual void penetrate(TypeExpression* me){ this->_name = me->getName();	}
 private:
 	std::string _name;
 };
@@ -109,7 +125,8 @@ class Pointer : public TypeExpression {
 public:
 	Pointer(TypeExpression* inner) : _inner(inner) {}
 	virtual ~Pointer() override = default;
-	virtual void penetrate(BasicType* me){
+	virtual std::string getName() { return "*"; }
+	virtual void penetrate(TypeExpression* me){
 		this->_inner->penetrate(me);
 	}
 public:
@@ -306,7 +323,7 @@ public:
 class BinaryAss : public Expression {
 public:
 	BinaryAss(int type, Expression* left, Expression* right)
-	: _leftOperand(left), _BinAss(type), _rightOperand(right) {}
+	: _BinAss(type), _leftOperand(left), _rightOperand(right) {}
 	virtual ~BinaryAss() override = default;
 private:
 	int _BinAss;
@@ -384,8 +401,9 @@ public:
 
 class ParameterList : public AST {
 public:
+	ParameterList() : _parameters(std::deque<Parameter*>()) {}
 	virtual ~ParameterList() override = default;
-	std::vector<Parameter*> _parameters;
+	std::deque<Parameter*> _parameters;
 };
 
 class ExpressionList : public AST {
@@ -403,6 +421,10 @@ public:
 	DeclarationList(std::deque<Declaration*> decls) : _decls(decls) {}
 	virtual ~DeclarationList() override = default;
 	std::deque<Declaration*> _decls;
+	virtual void embedType(TypeExpression* t) {
+		for(auto& i : this->_decls)
+			i->embedType(t);
+	}
 };
 
 

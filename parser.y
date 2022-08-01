@@ -68,10 +68,10 @@
 %type<decl> variable_declaration
 %type<decl> function_declaration
 %type<decl> function_definition
-%type<typeExpr> type star_list
+%type<typeExpr> type star_list basic_type
 %type<par> parameter
 %type<parList> parameter_list //??
-%type<stmt> statement_list //??
+%type<stmtList> statement_list //??
 %type<stmt> statement
 %type<lbl> label
 %type<expr> expression_or_empty
@@ -93,8 +93,9 @@
     Statement* stmt;
     Expression* expr;
     ExpressionList* exprList;
+    StatementList* stmtList;
     Label* lbl;
-    uint16_t i;
+    int16_t i;
     char* str;
     long double d;
     char c;
@@ -119,8 +120,8 @@ declaration:
 ;
 
 variable_declaration:
-    type T_id sep_by_comma_declarator ';'                               { $3->_decls.push_front(VariableDeclaration($1, $2)); for(auto &i : $3->_decls) i->embedType($1); $$ = $3;  }
-|   type T_id '[' constant_expression ']' sep_by_comma_declarator ';'   { $6->_decls.push_front(ArrayDeclaration($1, $2, $4)); for(auto &i : $6->_decls) i->embedType($1); $$ = $6; }
+    type T_id sep_by_comma_declarator ';'                               { $3->_decls.push_front(new VariableDeclaration($1, $2)); for(auto &i : $3->_decls) i->embedType($1); $$ = $3;  }
+|   type T_id '[' constant_expression ']' sep_by_comma_declarator ';'   { $6->_decls.push_front(new ArrayDeclaration($1, $2, $4)); for(auto &i : $6->_decls) i->embedType($1); $$ = $6; }
 ;
 
 sep_by_comma_declarator:
@@ -133,7 +134,7 @@ type:
 ;
 
 star_list:
-    /* nothing */ %prec EMPTY_STAR { $$ = nullptr }
+    /* nothing */ %prec EMPTY_STAR { $$ = nullptr; }
 |   '*' star_list { $$ = new Pointer($2); }
 ;
 
@@ -150,7 +151,7 @@ declarator:
 ;
 
 function_head:
-    type T_id '(' ')'
+    type T_id '(' ')'                   
 |   type T_id '(' parameter_list ')'
 |   "void" T_id '(' ')'
 |   "void" T_id '(' parameter_list ')'
@@ -162,17 +163,17 @@ function_declaration:
 ;
 
 parameter_list:
-    parameter sep_by_comma_parameter
+    parameter sep_by_comma_parameter        { $2->_parameters.push_front($1); $$ = $2; }
 ;
 
 sep_by_comma_parameter:
-    /* nothing */
-|   ',' parameter sep_by_comma_parameter
+    /* nothing */                            { $$ = new ParameterList(); }
+|   ',' parameter sep_by_comma_parameter     { $3->_parameters.push_front($2); $$ = $3;}
 ;
 
 parameter:
-    "byref" type T_id
-|   type T_id
+    "byref" type T_id       { $$ = new Parameter(Parameter::ByRef, $2, $3); }
+|   type T_id               { $$ = new Parameter(Parameter::ByCall, $1, $2); }
 ;
 
 function_definition:
@@ -225,7 +226,7 @@ no_comma_expression:
 |   T_double_const                              { $$ = new Constant($1); }
 |   T_string_const                              { $$ = new Constant($1); }
 |   T_id '(' ')'                                { $$ = new FunctionCall($1, nullptr); }
-|   T_id '(' expression_list ')'                { $$ = new FunctionCall($1, $3) }
+|   T_id '(' expression_list ')'                { $$ = new FunctionCall($1, $3); }
 |   expression '[' expression ']'               { $$ = new BracketedIndex($1, $3); }
 |   '&' expression %prec ADDRESS                { $$ = new UnaryOp('&', $2); }
 |   '*' expression %prec DEREF                  { $$ = new UnaryOp('*', $2); }
@@ -256,7 +257,7 @@ no_comma_expression:
 |   expression "+=" expression                  { $$ = new BinaryAss(T_pluseq, $1, $3); }
 |   expression "-=" expression                  { $$ = new BinaryAss(T_minuseq, $1, $3); }
 |   '(' type ')' expression %prec TYPECAST      { $$ = new TypeCast($2, $4); }
-|   expression '?' expression ':' expression    { $$ = new Ternary($1, $3, $5); }
+|   expression '?' expression ':' expression    { $$ = new TernaryOp($1, $3, $5); }
 |   "new" type %prec NEW                        { $$ = new New($2);}
 |   "new" type '[' expression ']' %prec NEW     { $$ = new New($2, $4); }
 |   "delete" expression %prec DELETE            { $$ = new Delete($2); }
