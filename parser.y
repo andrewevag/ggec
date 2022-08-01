@@ -146,8 +146,8 @@ basic_type:
 ;
 
 declarator:
-    T_id                                { new VariableDeclaration(nullptr, $1); }
-|   T_id '[' constant_expression ']'    { new ArrayDeclaration(nullptr, $1, $3); }
+    T_id                                { $$ = new VariableDeclaration(nullptr, $1); }
+|   T_id '[' constant_expression ']'    { $$ = new ArrayDeclaration(nullptr, $1, $3); }
 ;
 
 function_declaration:

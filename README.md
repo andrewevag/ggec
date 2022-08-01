@@ -6,4 +6,3 @@ A Compiler for the Edsger Programming Language
 - #include
 
 # Known bugs
-- Segmentation Fault on multiple variable declarations
