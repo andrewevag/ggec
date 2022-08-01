@@ -23,13 +23,10 @@ class BasicType;
 
 class Program : public AST{
 public:
-	Program(std::vector<Declaration*> decls) : _decls(decls) {}
-	virtual ~Program() override {
-		// for(auto &i : this->_decls)
-		// 	delete i;
-	};
+	Program(DeclarationList* decls) : _decls(decls) {}
+	virtual ~Program() override {};
 private:
-	std::vector<Declaration*> _decls;
+	DeclarationList* _decls;
 };
 
 class Declaration : public AST {
@@ -63,29 +60,31 @@ private:
 
 class FunctionDeclaration : public Declaration {
 public:
-	FunctionDeclaration(TypeExpression* typeExpr, std::string name, std::vector<Parameter*> parameters) : 
+	FunctionDeclaration(TypeExpression* typeExpr, std::string name, ParameterList* parameters) : 
 	_resultType(typeExpr), _name(name), _parameters(parameters) {}
 	virtual ~FunctionDeclaration() override = default;
 	virtual void embedType(TypeExpression* type) {}
 private:
 	TypeExpression* _resultType;
 	std::string _name;
-	std::vector<Parameter*> _parameters;
+	ParameterList* _parameters;
 
 };
 
 class FunctionDefinition : public Declaration {
 public:
-	FunctionDefinition(TypeExpression* typeExpr, std::string name, std::vector<Parameter*> parameters, 
-	std::vector<Statement*> statement) : 
-	_resultType(typeExpr), _name(name), _parameters(parameters), _statement(statement) {}
+	FunctionDefinition(TypeExpression* typeExpr, std::string name, ParameterList* parameters, 
+	DeclarationList* decls, StatementList* statements) : 
+	_resultType(typeExpr), _name(name), _parameters(parameters), _decls(decls), _statements(statements) {}
 	virtual ~FunctionDefinition() override = default;
 	virtual void embedType(TypeExpression* type) {}
 private:
 	TypeExpression* _resultType;
 	std::string _name;
-	std::vector<Parameter*> _parameters;
-	std::vector<Statement*> _statement;
+	ParameterList* _parameters;
+	DeclarationList* _decls;
+	StatementList* _statements;
+	
 };
 
 

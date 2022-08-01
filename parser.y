@@ -105,7 +105,7 @@
 
 
 program:
-    declaration declaration_list
+    declaration declaration_list  { $2->_decls.push_front($1); Program* p = new Program($2); }
 ;
 
 declaration_list:
@@ -150,16 +150,11 @@ declarator:
 |   T_id '[' constant_expression ']'    { new ArrayDeclaration(nullptr, $1, $3); }
 ;
 
-function_head:
-    type T_id '(' ')'                   
-|   type T_id '(' parameter_list ')'
-|   "void" T_id '(' ')'
-|   "void" T_id '(' parameter_list ')'
-;
-
-// thelei factoring
 function_declaration:
-    function_head ';'
+    type T_id '(' ')' ';'                   { $$ =  new FunctionDeclaration($1, $2, nullptr); }
+|   type T_id '(' parameter_list ')' ';'    { $$ = new FunctionDeclaration($1, $2, $4); }
+|   "void" T_id '(' ')' ';'                 { $$ = new FunctionDeclaration(new BasicType("void"), $2, nullptr); }
+|   "void" T_id '(' parameter_list ')' ';'  { $$ = new FunctionDeclaration(new BasicType("void"), $2, $4); }
 ;
 
 parameter_list:
@@ -177,8 +172,12 @@ parameter:
 ;
 
 function_definition:
-    function_head '{' declaration_list statement_list '}'
+    type T_id '(' ')' '{' declaration_list statement_list '}'                   { $$ = new FunctionDefinition($1, $2, nullptr, $6, $7); }
+|   type T_id '(' parameter_list ')' '{' declaration_list statement_list '}'    { $$ = new FunctionDefinition($1, $2, $4, $7, $8); }
+|   "void" T_id '(' ')' '{' declaration_list statement_list '}'                 { $$ = new FunctionDefinition(new BasicType("void"), $2, nullptr, $6, $7); }
+|   "void" T_id '(' parameter_list ')' '{' declaration_list statement_list '}'  { $$ = new FunctionDefinition(new BasicType("void"), $2, $4, $7, $8); }
 ;
+
 
 statement_list:
     /* nothing */                               { $$ = new StatementList(); }
