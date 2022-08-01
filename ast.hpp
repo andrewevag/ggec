@@ -403,36 +403,81 @@ private:
 
 class UnaryOp : public Expression {
 public:
-	UnaryOp(int unop, Expression* operand)
+	/* For Readbility And Being Easy to Print */
+	enum UnaryOpType { ADDRESS, DEREF, POS, NEG, NOT };
+	static std::string unaryOpTypeToString(UnaryOpType t){
+		switch (t){
+			case ADDRESS: return "ADDRESS";
+			case DEREF:   return "DEREF";
+			case POS: 	  return "POS";
+			case NEG: 	  return "NEG";
+			case NOT: 	  return "NOT";
+		}
+		std::cerr << "No such UnaryOpType" << std::endl;
+		return "";
+	}
+
+	UnaryOp(UnaryOpType unop, Expression* operand)
 	: _UnOp(unop), _operand(operand) {}
 	virtual ~UnaryOp() override = default;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_operand}; }
-	virtual void printNode(std::ostream& out) override { out << "UnaryOp(" << _UnOp << ")"; }
+	virtual void printNode(std::ostream& out) override { out << "UnaryOp(" << unaryOpTypeToString(_UnOp) << ")"; }
 private:
-	int _UnOp;
+	UnaryOpType _UnOp;
 	Expression* _operand;
 };
 
 class BinaryOp : public Expression {
 public:
-	BinaryOp(int binop, Expression* left, Expression* right)
+	enum BinaryOpType { MULT, DIV, MOD, PLUS, MINUS, LESS, GREATER, LESSEQ, GREATEREQ, EQUALS, NOTEQ, LAND, LOR, COMMA };
+	static std::string binaryOpTypeToString(BinaryOpType t){
+		switch (t){
+		case MULT: return "MULT";
+		case DIV: return "DIV";
+		case MOD: return "MOD";
+		case PLUS: return "PLUS";
+		case MINUS: return "MINUS";
+		case LESS: return "LESS";
+		case GREATER: return "GREATER";
+		case LESSEQ: return "LESSEQ";
+		case GREATEREQ: return "GREATEREQ";
+		case EQUALS: return "EQUALS";
+		case NOTEQ: return "NOTEQ";
+		case LAND: return "LAND";
+		case LOR: return "LOR";
+		case COMMA: return "COMMA";
+		}
+		std::cerr << "No such BinaryOpType" << std::endl;
+		return "";
+	}
+
+	BinaryOp(BinaryOpType binop, Expression* left, Expression* right)
 	: _BinOp(binop), _leftOperand(left), _rightOperand(right) {}
 	virtual ~BinaryOp() override = default;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_leftOperand, _rightOperand}; }
-	virtual void printNode(std::ostream& out) override { out << "BinaryOp(" << _BinOp << ")"; }
+	virtual void printNode(std::ostream& out) override { out << "BinaryOp(" << binaryOpTypeToString(_BinOp) << ")"; }
 private:
-	int _BinOp;
+	BinaryOpType _BinOp;
 	Expression* _leftOperand;
 	Expression* _rightOperand;
 };
 
 class UnAss : public Expression {
 public:
-	UnAss(int unass, Expression* operand)
+	enum UnAssType { PLUSPLUS, MINUSMINUS };
+	static std::string UnAssTypeToString(UnAssType t){
+		switch (t) {
+			case PLUSPLUS: return "PLUSPLUS";
+			case MINUSMINUS: return "MINUSMINUS";
+		}
+		std::cerr << "No such UnAssType" << std::endl;
+		return "";
+	}
+	UnAss(UnAssType unass, Expression* operand)
 	: _Unass(unass), _operand(operand) {}
 	virtual ~UnAss() = default;
 
@@ -440,45 +485,58 @@ public:
 	virtual std::vector<Tree*> getChildren() = 0;
 	virtual void printNode(std::ostream& out) = 0;
 protected:
-	int _Unass;
+	UnAssType _Unass;
 	Expression* _operand;
 };
 
 class PrefixUnAss : public UnAss {
 public:	
-	PrefixUnAss(int unass, Expression* operand) 
+	PrefixUnAss(UnAss::UnAssType unass, Expression* operand) 
 	: UnAss(unass, operand) {}
 	virtual ~PrefixUnAss() override = default;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {this->_operand}; }
-	virtual void printNode(std::ostream& out) override { out << "PrefixUnAss(" << this->_Unass << ")"; }
+	virtual void printNode(std::ostream& out) override { out << "PrefixUnAss(" << UnAss::UnAssTypeToString(this->_Unass) << ")"; }
 
 };
 // kalo einai na fygei to CP kanei kako || factoring
 class PostfixUnAss : public UnAss {
 public:
-	PostfixUnAss(int unass, Expression* operand) 
+	PostfixUnAss(UnAss::UnAssType unass, Expression* operand) 
 	: UnAss(unass, operand) {}
 	virtual ~PostfixUnAss() override = default;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {this->_operand}; }
-	virtual void printNode(std::ostream& out) override { out << "PostfixUnAss(" << this->_Unass << ")"; }
+	virtual void printNode(std::ostream& out) override { out << "PostfixUnAss(" << UnAss::UnAssTypeToString(this->_Unass) << ")"; }
 };
 
 
 class BinaryAss : public Expression {
 public:
-	BinaryAss(int type, Expression* left, Expression* right)
+	enum BinaryAssType { ASS, MULTASS, DIVASS, MODASS, PLUSASS, MINUSASS };
+	static std::string binaryAssTypeToString(BinaryAssType t){
+		switch (t){
+			case ASS: return "ASS";
+			case MULTASS: return "MULTASS";
+			case DIVASS: return "DIVASS";
+			case MODASS: return "MODASS";
+			case PLUSASS: return "PLUSASS";
+			case MINUSASS: return "MINUSASS";
+		}
+		std::cerr << "No such BinaryAssType" << std::endl;
+		return "";
+	}
+	BinaryAss(BinaryAssType type, Expression* left, Expression* right)
 	: _BinAss(type), _leftOperand(left), _rightOperand(right) {}
 	virtual ~BinaryAss() override = default;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_leftOperand, _rightOperand}; }
-	virtual void printNode(std::ostream& out) override { out << "BinaryAss(" << this->_BinAss << ")"; }
+	virtual void printNode(std::ostream& out) override { out << "BinaryAss(" << binaryAssTypeToString(this->_BinAss) << ")"; }
 private:
-	int _BinAss;
+	BinaryAssType _BinAss;
 	Expression* _leftOperand;
 	Expression* _rightOperand;
 };
