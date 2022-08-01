@@ -141,7 +141,7 @@ public:
 	virtual ~TypeExpression() override = default;
 	virtual void penetrate(TypeExpression*) = 0;
 	virtual std::string getName() = 0;
-
+	virtual TypeExpression* copy() = 0;
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
 	virtual void printNode(std::ostream& out) = 0;
@@ -152,8 +152,13 @@ class BasicType : public TypeExpression {
 public:
 	BasicType(std::string name) : _name(name) {}
 	virtual ~BasicType() override = default;
-	std::string getName() override { return this->_name; }
-	virtual void penetrate(TypeExpression* me) override { this->_name = me->getName();	}
+	virtual std::string getName() override { return this->_name; }
+	virtual void penetrate(TypeExpression* me) override { 
+		this->_name = me->getName();
+	}
+	virtual TypeExpression* copy() override {
+		return new BasicType(_name);
+	}
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override {return {};};
@@ -169,6 +174,9 @@ public:
 	virtual std::string getName() override { return "*"; }
 	virtual void penetrate(TypeExpression* me) override {
 		this->_inner->penetrate(me);
+	}
+	virtual TypeExpression* copy() override {
+		return new Pointer(this->_inner->copy());
 	}
 
 	/* Printing Syntax Tree Functions */
@@ -600,7 +608,7 @@ public:
 	virtual ~DeclarationList() override = default;
 	std::deque<Declaration*> _decls;
 	virtual void embedType(TypeExpression* t) override {
-		for(auto& i : this->_decls)
+		for(Declaration* i : this->_decls)
 			i->embedType(t);
 	}
 

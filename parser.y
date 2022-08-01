@@ -120,8 +120,8 @@ declaration:
 ;
 
 variable_declaration:
-    type T_id sep_by_comma_declarator ';'                               { $3->_decls.push_front(new VariableDeclaration($1, $2)); for(auto &i : $3->_decls) i->embedType($1); $$ = $3;  }
-|   type T_id '[' constant_expression ']' sep_by_comma_declarator ';'   { $6->_decls.push_front(new ArrayDeclaration($1, $2, $4)); for(auto &i : $6->_decls) i->embedType($1); $$ = $6; }
+    type T_id sep_by_comma_declarator ';'                               { $3->_decls.push_front(new VariableDeclaration($1, $2)); for(auto &i : $3->_decls) i->embedType($1->copy()); $$ = $3;  }
+|   type T_id '[' constant_expression ']' sep_by_comma_declarator ';'   { $6->_decls.push_front(new ArrayDeclaration($1, $2, $4)); for(auto &i : $6->_decls) i->embedType($1->copy()); $$ = $6; }
 ;
 
 sep_by_comma_declarator:
@@ -130,19 +130,19 @@ sep_by_comma_declarator:
 ;
 
 type:
-    basic_type star_list { if($2 == nullptr) $$ = $1; else {$2->penetrate($1); $$ = $2;} }
+    basic_type star_list { $2->penetrate($1); delete $1; $$ = $2; }
 ;
 
 star_list:
-    /* nothing */ %prec EMPTY_STAR { $$ = nullptr; }
+    /* nothing */ %prec EMPTY_STAR { $$ = new BasicType(""); }
 |   '*' star_list { $$ = new Pointer($2); }
 ;
 
 basic_type:
-    "int"       { new BasicType("int");  }
-|   "char"      { new BasicType("char"); }
-|   "bool"      { new BasicType("bool"); }
-|   "double"    { new BasicType("double"); }
+    "int"       { $$ = new BasicType("int");  }
+|   "char"      { $$ = new BasicType("char"); }
+|   "bool"      { $$ = new BasicType("bool"); }
+|   "double"    { $$ = new BasicType("double"); }
 ;
 
 declarator:
