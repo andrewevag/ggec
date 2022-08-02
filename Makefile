@@ -8,7 +8,7 @@ DEPSOURCE=$(wildcard src/*.cpp)
 DEPOBJECTS=$(patsubst %.cpp, %.o, $(DEPSOURCE))
 default: $(BINS)
 
-ggec: lexer.o main.o parser.o error.o $(DEPOBJECTS)
+ggec: lexer.o main.o parser.o error.o ast.o $(DEPOBJECTS)
 	$(CXX) $(INCLUDE) $(CXXFLAGS) -o $@ $^
 
 

@@ -30,7 +30,7 @@ class BasicType;
 class Program : public AST {
 public:
 	Program(DeclarationList* decls) : _decls(decls) {}
-	virtual ~Program() override { delete _decls; } /* edw to decls ti to kanw??*/
+	virtual ~Program();
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)_decls}; }
 	virtual void printNode(std::ostream& out) override { out << "Program"; } 
@@ -610,10 +610,6 @@ public:
 	virtual std::vector<Tree*> getChildren() override { return {_decls.begin(), _decls.end()}; }
 	virtual void printNode(std::ostream& out) override { out << "DeclarationList"; }
 };
-
-
-
-
 
 
 #endif/*__AST_HPP__*/
