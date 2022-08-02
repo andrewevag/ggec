@@ -4,11 +4,12 @@ CXX=c++
 CXXFLAGS=-Wall -std=c++14
 BINS=ggec
 INCLUDE=-I$(PWD)/inc
+INCLUDE+= -I$(PWD)
 DEPSOURCE=$(wildcard src/*.cpp)
 DEPOBJECTS=$(patsubst %.cpp, %.o, $(DEPSOURCE))
 default: $(BINS)
 
-ggec: lexer.o main.o parser.o error.o $(DEPOBJECTS)
+ggec: lexer.o main.o parser.o error.o  tojsonstring.o $(DEPOBJECTS)
 	$(CXX) $(INCLUDE) $(CXXFLAGS) -o $@ $^
 
 
@@ -30,9 +31,11 @@ parser.o: parser.cpp parser.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $^
 
 
-lexertest: lexer.o 
-	$(MAKE) -C ./tests/lexer
+lexertest: lexer.o ./tests/lexer/main.o error.o tojsonstring.o parser.o
 	$(CXX) $(CXXFLAGS) -o ./tests/lexer/$@ ./tests/lexer/main.o $^
+
+parsertest: ./tests/parser/main.o tojsonstring.o
+	$(CXX) $(CXXFLAGS) -o ./tests/parser/$@ $^
 
 test: lexertest
 	./tests/lexer/runner.sh

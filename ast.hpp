@@ -8,7 +8,7 @@
 class AST : public Tree {
 public:
 	virtual ~AST() = default;
-
+	virtual std::string toJSONString() = 0;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
@@ -31,6 +31,9 @@ class Program : public AST {
 public:
 	Program(DeclarationList* decls) : _decls(decls) {}
 	virtual ~Program() override {};
+	virtual std::string toJSONString() override;
+
+
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)_decls}; }
 	virtual void printNode(std::ostream& out) override { out << "Program"; } 
@@ -43,6 +46,8 @@ public:
 	virtual ~Declaration() override = default;
 	//only interesting in variables || when parsed in line we later add the type of the first declared
 	virtual void embedType(TypeExpression*) = 0;
+	virtual std::string toJSONString() = 0;
+
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
@@ -57,6 +62,8 @@ public:
 	virtual void embedType(TypeExpression* type) override {
 		this->_typeExpr = type;
 	}
+	virtual std::string toJSONString() override;
+
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*) _typeExpr }; } 
@@ -71,6 +78,7 @@ public:
 	ArrayDeclaration(TypeExpression* typeExp, std::string name, Expression* expr)
 	:  VariableDeclaration(typeExp, name), _expr(expr) {}
 	virtual ~ArrayDeclaration() override = default;
+	virtual std::string toJSONString() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)this->_typeExpr, (Tree*)this->_expr}; }
@@ -85,6 +93,7 @@ public:
 	_resultType(typeExpr), _name(name), _parameters(parameters) {}
 	virtual ~FunctionDeclaration() override = default;
 	virtual void embedType(TypeExpression* type) override {}
+	virtual std::string toJSONString() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)this->_resultType, (Tree*)this->_parameters}; };
@@ -104,6 +113,8 @@ public:
 	_resultType(typeExpr), _name(name), _parameters(parameters), _decls(decls), _statements(statements) {}
 	virtual ~FunctionDefinition() override = default;
 	virtual void embedType(TypeExpression* type) override {}
+	virtual std::string toJSONString() override;
+
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)this->_resultType, (Tree*)this->_parameters, (Tree*)this->_decls, (Tree*)this->_statements}; }
@@ -126,7 +137,9 @@ public:
 	Parameter(PassingWay pw, TypeExpression* type, std::string name) 
 	: _pw(pw), _name(name), _type(type) {}
 	virtual ~Parameter() override = default;
+	virtual std::string toJSONString() override;
 	
+
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return { (Tree*)this->_type }; };
 	virtual void printNode(std::ostream& out) override { 
@@ -144,6 +157,7 @@ public:
 	virtual void penetrate(TypeExpression*) = 0;
 	virtual std::string getName() = 0;
 	virtual TypeExpression* copy() = 0;
+	virtual std::string toJSONString() = 0;
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
 	virtual void printNode(std::ostream& out) = 0;
@@ -161,6 +175,8 @@ public:
 	virtual TypeExpression* copy() override {
 		return new BasicType(_name);
 	}
+	virtual std::string toJSONString() override;
+
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override {return {};};
@@ -180,6 +196,8 @@ public:
 	virtual TypeExpression* copy() override {
 		return new Pointer(this->_inner->copy());
 	}
+	virtual std::string toJSONString() override;
+
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)_inner}; };
@@ -191,13 +209,15 @@ public:
 class Statement : public AST {
 public:
 	virtual ~Statement() override = default;
+	virtual std::string toJSONString() = 0;
 };
 
 class EmptyStatement : public Statement {
 public:
 	EmptyStatement() {}
 	virtual ~EmptyStatement() override = default;
-	
+	virtual std::string toJSONString() override;
+
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {}; };
 	virtual void printNode(std::ostream& out) override { out << "EmptyStatement"; };
@@ -671,6 +691,7 @@ public:
 		for(Declaration* i : this->_decls)
 			i->embedType(t);
 	}
+	virtual std::string toJSONString() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_decls.begin(), _decls.end()}; }

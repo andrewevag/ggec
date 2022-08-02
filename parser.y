@@ -224,7 +224,7 @@ no_comma_expression:
 |   T_char_const                                { $$ = new Constant($1); }
 |   T_double_const                              { $$ = new Constant($1); }
 |   T_string_const                              { $$ = new Constant($1); }
-|   T_id '(' ')'                                { $$ = new FunctionCall($1, nullptr); } //SEE IF IT IS BETTER TO CHANGRE
+|   T_id '(' ')'                                { $$ = new FunctionCall($1, new ParameterList()); } 
 |   T_id '(' expression_list ')'                { $$ = new FunctionCall($1, $3); }
 |   expression '[' expression ']'               { $$ = new BracketedIndex($1, $3); }
 |   '&' expression %prec ADDRESS                { $$ = new UnaryOp(UnaryOp::UnaryOpType::ADDRESS, $2); }

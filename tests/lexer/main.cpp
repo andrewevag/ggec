@@ -1,8 +1,8 @@
 #include <cstdio>
+#include <lexer.hpp>
 
-extern int yylex();
+
 extern char* yytext;
-
 
 int main(){
 	int token;
