@@ -37,7 +37,7 @@ lexertest: lexer.o ./tests/lexer/main.o error.o tojsonstring.o parser.o
 parsertest: ./tests/parser/main.o tojsonstring.o
 	$(CXX) $(CXXFLAGS) -o ./tests/parser/$@ $^
 
-test: lexertest
+test: lexertest 
 	./tests/lexer/runner.sh
 
 
@@ -56,6 +56,7 @@ clean:
 	$(RM) parser.hpp parser.output parser.cpp
 	$(RM) ./src/*.o
 	$(MAKE) -C ./tests/lexer clean
+	$(MAKE) -C ./tests/parser clean
 	
 
 distclean: clean
