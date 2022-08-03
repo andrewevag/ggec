@@ -3,17 +3,22 @@
 
 Program::~Program(){
 	delete _decls;
+	std::cout << "Deleting Program\n";
 }
 
-Declaration::~Declaration(){}
+Declaration::~Declaration(){
+	std::cout << "Deleting Declaration\n";
+}
 
 VariableDeclaration::~VariableDeclaration(){ 
-	delete _typeExpr; 
+	delete _typeExpr;
+	std::cout << "Variable Declaration\n";
 }
 
 ArrayDeclaration::~ArrayDeclaration(){ 
 	delete this->_typeExpr;
 	delete _expr;
+	std::cout << "Deleting Array Declaration\n";
 }
 
 FunctionDeclaration::~FunctionDeclaration() { 
