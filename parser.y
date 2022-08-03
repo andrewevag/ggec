@@ -172,9 +172,9 @@ parameter:
 ;
 
 function_definition:
-    type T_id '(' ')' '{' declaration_list statement_list '}'                   { $$ = new FunctionDefinition($1, $2, nullptr, $6, $7); }
+    type T_id '(' ')' '{' declaration_list statement_list '}'                   { $$ = new FunctionDefinition($1, $2, new ParameterList(), $6, $7); }
 |   type T_id '(' parameter_list ')' '{' declaration_list statement_list '}'    { $$ = new FunctionDefinition($1, $2, $4, $7, $8); }
-|   "void" T_id '(' ')' '{' declaration_list statement_list '}'                 { $$ = new FunctionDefinition(new BasicType("void"), $2, nullptr, $6, $7); }
+|   "void" T_id '(' ')' '{' declaration_list statement_list '}'                 { $$ = new FunctionDefinition(new BasicType("void"), $2, new ParameterList(), $6, $7); }
 |   "void" T_id '(' parameter_list ')' '{' declaration_list statement_list '}'  { $$ = new FunctionDefinition(new BasicType("void"), $2, $4, $7, $8); }
 ;
 
