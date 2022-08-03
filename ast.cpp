@@ -12,11 +12,10 @@ Declaration::~Declaration(){
 
 VariableDeclaration::~VariableDeclaration(){ 
 	delete _typeExpr;
-	std::cout << "Variable Declaration\n";
+	std::cout << "Deleting Variable Declaration\n";
 }
 
 ArrayDeclaration::~ArrayDeclaration(){ 
-	delete this->_typeExpr;
 	delete _expr;
 	std::cout << "Deleting Array Declaration\n";
 }
@@ -107,13 +106,9 @@ UnAss::~UnAss(){
 	delete _operand;
 }
 
-PrefixUnAss::~PrefixUnAss(){
-	delete this->_operand;
-}
+PrefixUnAss::~PrefixUnAss(){}
 
-PostfixUnAss::~PostfixUnAss(){
-	delete this->_operand;
-}
+PostfixUnAss::~PostfixUnAss(){}
 
 
 BinaryAss::~BinaryAss(){

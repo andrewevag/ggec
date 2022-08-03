@@ -152,12 +152,7 @@ private:
 class BasicType : public TypeExpression {
 public:
 	BasicType(std::string name) : _name(name) {}
-<<<<<<< HEAD
 	~BasicType();
-	std::string getName() override { return this->_name; }
-	virtual void penetrate(TypeExpression* me) override { this->_name = me->getName();	}
-=======
-	virtual ~BasicType() override = default;
 	virtual std::string getName() override { return this->_name; }
 	virtual void penetrate(TypeExpression* me) override { 
 		this->_name = me->getName();
@@ -165,7 +160,6 @@ public:
 	virtual TypeExpression* copy() override {
 		return new BasicType(_name);
 	}
->>>>>>> origin/parser
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override {return {};};
