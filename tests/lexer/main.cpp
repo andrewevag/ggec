@@ -1,6 +1,12 @@
 #include <cstdio>
-#include <lexer.hpp>
+#include <cstdlib>
+#include <vector>
+#include "ast.hpp"
+#include "parser.hpp"
+#include "lexer.hpp"
+#include <string>
 
+AST* syntaxTree = nullptr;
 
 extern char* yytext;
 

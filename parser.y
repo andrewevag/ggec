@@ -5,7 +5,7 @@
 #include "ast.hpp"
 #include "lexer.hpp"
 
-
+extern AST* syntaxTree;
 %}
 
 %token T_bool          "bool"
@@ -105,7 +105,7 @@
 
 
 program:
-    declaration declaration_list  { $2->_decls.push_front($1); Program* p = new Program($2); p->printTree(std::cout);}
+    declaration declaration_list  { $2->_decls.push_front($1); Program *p = new Program($2); syntaxTree = p;}
 ;
 
 declaration_list:

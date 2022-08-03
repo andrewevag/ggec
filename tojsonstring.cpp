@@ -59,6 +59,7 @@ std::string FunctionDeclaration::toJSONString(){
 }
 
 std::string FunctionDefinition::toJSONString(){
+	std::cout << "got here" << std::endl;
 	return 
 	obj_head("FunctionDefinition")
 		+ this->_resultType->toJSONString() +

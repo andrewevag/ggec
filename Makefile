@@ -31,10 +31,10 @@ parser.o: parser.cpp parser.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $^
 
 
-lexertest: lexer.o ./tests/lexer/main.o error.o tojsonstring.o parser.o
-	$(CXX) $(CXXFLAGS) -o ./tests/lexer/$@ ./tests/lexer/main.o $^
+lexertest: lexer.o ./tests/lexer/main.o error.o tojsonstring.o parser.o $(DEPOBJECTS)
+	$(CXX) $(CXXFLAGS) -o ./tests/lexer/$@ $^
 
-parsertest: ./tests/parser/main.o tojsonstring.o
+parsertest: lexer.o ./tests/parser/main.o parser.o error.o tojsonstring.o $(DEPOBJECTS)
 	$(CXX) $(CXXFLAGS) -o ./tests/parser/$@ $^
 
 test: lexertest 
