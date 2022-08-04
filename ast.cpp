@@ -3,21 +3,21 @@
 
 Program::~Program(){
 	delete _decls;
-	std::cout << "Deleting Program\n";
+//	std::cout << "Deleting Program\n";
 }
 
 Declaration::~Declaration(){
-	std::cout << "Deleting Declaration\n";
+//	std::cout << "Deleting Declaration\n";
 }
 
 VariableDeclaration::~VariableDeclaration(){ 
 	delete _typeExpr;
-	std::cout << "Deleting Variable Declaration\n";
+//	std::cout << "Deleting Variable Declaration\n";
 }
 
 ArrayDeclaration::~ArrayDeclaration(){ 
 	delete _expr;
-	std::cout << "Deleting Array Declaration\n";
+//	std::cout << "Deleting Array Declaration\n";
 }
 
 FunctionDeclaration::~FunctionDeclaration() { 
@@ -56,7 +56,7 @@ IfStatement::~IfStatement(){
 	delete _condition; 
 	delete _ifbody;
 }
-
+// to condition mporei na einai nullptr
 IfElseStatement::~IfElseStatement() {
 	delete _condition;
 	delete _ifbody; 
@@ -64,11 +64,19 @@ IfElseStatement::~IfElseStatement() {
 }
 
 ForStatement::~ForStatement(){ 
-	delete _label; 
-	delete _first; 
-	delete _second; 
-	delete _third; 
-	delete _body;
+	if(_label != nullptr){
+		delete _label;
+	}
+	if(_first != nullptr){
+		delete _first;
+	}
+	if(_second != nullptr){
+		delete _second;
+	}
+	if(_third != nullptr){
+		delete _third;
+	}
+	
 }
 
 ContinueStatement::~ContinueStatement(){}
@@ -76,7 +84,9 @@ ContinueStatement::~ContinueStatement(){}
 BreakStatement::~BreakStatement(){}
 
 ReturnStatement::~ReturnStatement(){
-	delete _expr;
+	if(_expr != nullptr){
+		delete _expr;
+	}
 }
 
 Expression::~Expression(){}
@@ -129,12 +139,18 @@ TernaryOp::~TernaryOp(){
 }
 
 New::~New(){
-	delete _size;
-	delete _type;
+	if(_size != nullptr){
+		delete _size;
+		delete _type;
+	}else{
+		delete _type;
+	}
 }
 
 Delete::~Delete(){
-	delete _expr;
+	if(_expr != nullptr){
+		delete _expr;
+	}
 }
 
 CommaExpr::~CommaExpr(){

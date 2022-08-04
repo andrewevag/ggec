@@ -26,3 +26,14 @@ A Compiler for the Edsger Programming Language
             │       └──VariableDeclaration(y)
             │           └──BasicType(int)
             └──StatementList
+
+
+
+# Destructors under condition at:
+-new
+-delete
+-for
+-label
+
+
+# We should check ifs and ternary conditions at nullptr
