@@ -38,4 +38,5 @@ int main(){
 	 * 	Comma tests
 	 */
 	x*2, y, z;
+	main(y, z, w, x), y(3), 32++;
 }

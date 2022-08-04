@@ -44,8 +44,8 @@ extern AST* syntaxTree;
 %token T_diveq         "/="
 %token T_modeq         "%="
 
-%precedence NO_COMMA EMPTY_STAR
-%right ','
+%precedence EMPTY_STAR
+%right ',' NO_COMMA
 %precedence ARGLIST
 %right '=' "+=" "-=" "*=" "/=" "%="
 %nonassoc '?' ':'
@@ -78,12 +78,14 @@ extern AST* syntaxTree;
 %type<exprList> expression_list
 %type<expr> expression
 %type<expr> constant_expression
-%type<expr> no_comma_expression
+/* %type<expr> no_comma_expression */
 %type<decList> sep_by_comma_declarator
-%type<exprList> sep_by_comma_expression
+/* %type<exprList> sep_by_comma_expression */
 %type<parList> sep_by_comma_parameter
 
-// %expect 1
+%expect 1
+
+
 %union {
     DeclarationList* decList;
     Declaration* decl;
@@ -169,7 +171,7 @@ sep_by_comma_parameter:
 parameter:
     "byref" type T_id       { $$ = new Parameter(Parameter::ByRef, $2, $3); }
 |   type T_id               { $$ = new Parameter(Parameter::ByCall, $1, $2); }
-;
+;   
 
 function_definition:
     type T_id '(' ')' '{' declaration_list statement_list '}'                   { $$ = new FunctionDefinition($1, $2, new ParameterList(), $6, $7); }
@@ -208,13 +210,22 @@ expression_or_empty:
 |   expression                                  { $$ = $1; }
 ;
 
-expression:
+/* expression:
     no_comma_expression %prec NO_COMMA          { $$ = $1; }
 |   no_comma_expression ',' expression          { $$ = new CommaExpr($1, $3); }
+; */
+
+/* sep_by_comma_expression: */
+//    /* nothing */                           %prec NO_COMMA         { $$ = new ExpressionList; }
+//|   ',' expression sep_by_comma_expression  %prec NO_COMMA        { $3->_expressions.push_front($2); $$ = $3; }
+/* ; */
+expression_list:
+    expression                     %prec ARGLIST { $$ = new ExpressionList({$1}); }
+|   expression ',' expression_list %prec ARGLIST { $3->_expressions.push_front($1); $$ = $3; }
 ;
 
 
-no_comma_expression:
+expression:
     T_id                                        { $$ = new Id($1); }
 |   '(' expression ')'                          { $$ = $2; }
 |   "true"                                      { $$ = new Constant(true); }
@@ -260,16 +271,10 @@ no_comma_expression:
 |   "new" type %prec NEW                        { $$ = new New($2);}
 |   "new" type '[' expression ']' %prec NEW     { $$ = new New($2, $4); }
 |   "delete" expression %prec DELETE            { $$ = new Delete($2); }
+|   expression ',' expression       %prec NO_COMMA { $$ = new CommaExpr($1, $3); }
 ;
 
-expression_list:
-    no_comma_expression sep_by_comma_expression %prec ARGLIST { $2->_expressions.push_front($1); $$ = $2; }
-;
 
-sep_by_comma_expression:
-    /* nothing */                                   { $$ = new ExpressionList; }
-|   ',' no_comma_expression sep_by_comma_expression { $3->_expressions.push_front($2); $$ = $3; }
-;
 
 constant_expression:
     expression          { $$ = $1; }
