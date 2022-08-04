@@ -220,10 +220,10 @@ no_comma_expression:
 |   "true"                                      { $$ = new Constant(true); }
 |   "false"                                     { $$ = new Constant(false); }
 |   "NULL"                                      { $$ = new Constant(); }
-|   T_int_const                                 { $$ = new Constant($1); }
-|   T_char_const                                { $$ = new Constant($1); }
-|   T_double_const                              { $$ = new Constant($1); }
-|   T_string_const                              { $$ = new Constant($1); }
+|   T_int_const                                 { $$ = new Constant((int16_t)$1); }
+|   T_char_const                                { $$ = new Constant((char)$1); }
+|   T_double_const                              { $$ = new Constant((long double)$1); }
+|   T_string_const                              { $$ = new Constant((std::string)$1); }
 |   T_id '(' ')'                                { $$ = new FunctionCall($1, new ExpressionList()); } 
 |   T_id '(' expression_list ')'                { $$ = new FunctionCall($1, $3); }
 |   expression '[' expression ']'               { $$ = new BracketedIndex($1, $3); }

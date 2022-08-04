@@ -37,8 +37,11 @@ lexertest: lexer.o ./tests/lexer/main.o error.o tojsonstring.o parser.o $(DEPOBJ
 parsertest: lexer.o ./tests/parser/main.o parser.o error.o tojsonstring.o $(DEPOBJECTS)
 	$(CXX) $(CXXFLAGS) -o ./tests/parser/$@ $^
 
-test: lexertest 
-	./tests/lexer/runner.sh
+test: lexertest parsertest
+	@echo "🧪 Running Lexer Suite :"
+	@./tests/lexer/runner.sh
+	@echo "🧪 Running Parser Suite :"
+	@./tests/parser/runner.sh
 
 
 # lexer.o: lexer.cpp lexer.hpp parser.hpp

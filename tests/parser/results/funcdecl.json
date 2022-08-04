@@ -1,0 +1,89 @@
+{
+	"Program" : [
+		{
+			"DeclarationList" : [
+				{
+					"FunctionDeclaration" : [
+						{ 
+							"Pointer" :  [
+								{ "BasicType" : [
+									{
+										"name" : "int"
+									}
+								] 
+								}
+							]
+						},
+						{
+							"name" : "func"
+						},
+						{
+							"ParameterList" : [
+								{
+									"Parameter" : [
+										{ "PassingWay" : "ByCall" },
+										{ "name" : "x" },
+										{ "BasicType" : [{"name" : "int"}]}
+									]
+								},
+								{
+									"Parameter" : [
+										{"PassingWay" : "ByRef" },
+										{ "name" : "y"},
+										{"Pointer" : [
+											{"BasicType" : [
+												{"name" : "int"}
+											]}
+										]}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"FunctionDeclaration" : [
+						{ 
+							"BasicType" : [{ "name" : "void" }]
+						},
+						{
+							"name" : "toString"
+						},
+						{
+							"ParameterList" : [
+								{
+									"Parameter" : [
+										{ "PassingWay" : "ByRef" },
+										{ "name" : "x_12" },
+										{ "BasicType" : [{"name" : "double"}]}
+									]
+								},
+								{
+									"Parameter" : [
+										{"PassingWay" : "ByRef" },
+										{ "name" : "flag12"},
+										{
+											"Pointer" : [
+												{
+													"Pointer" : [
+														{
+															"Pointer" : [
+																{"BasicType" : [
+																	{"name" : "bool"}
+																]}
+															]
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]	
+}

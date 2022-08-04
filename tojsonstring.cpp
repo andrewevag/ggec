@@ -59,10 +59,10 @@ std::string FunctionDeclaration::toJSONString(){
 }
 
 std::string FunctionDefinition::toJSONString(){
-	std::cout << "got here" << std::endl;
 	return 
 	obj_head("FunctionDefinition")
 		+ this->_resultType->toJSONString() +
+		newvalue
 		immediate_attribute("name", this->_name)
 		newvalue
 		+ this->_parameters->toJSONString() +
@@ -123,7 +123,7 @@ std::string IfStatement::toJSONString(){
 
 std::string IfElseStatement::toJSONString(){
 	return
-	obj_head("IfStatement")
+	obj_head("IfElseStatement")
 		+ this->_condition->toJSONString() +
 		newvalue
 		+ this->_ifbody->toJSONString() +
@@ -135,14 +135,10 @@ std::string IfElseStatement::toJSONString(){
 std::string ForStatement::toJSONString(){
 	return
 	obj_head("ForStatement")
-		+ (this->_label == nullptr ? "" : this->_label->toJSONString()) +
-		newvalue
-		+ (this->_first == nullptr ? "" : this->_first->toJSONString()) +
-		newvalue
-		+ (this->_second == nullptr ? "" : this->_second->toJSONString()) +
-		newvalue
-		+ (this->_third == nullptr ? "" : this->_third->toJSONString()) + 
-		newvalue
+		+ (this->_label == nullptr ? "" : this->_label->toJSONString() + newvalue)
+		+ (this->_first == nullptr ? "" : this->_first->toJSONString() + newvalue)
+		+ (this->_second == nullptr ? "" : this->_second->toJSONString() + newvalue)
+		+ (this->_third == nullptr ? "" : this->_third->toJSONString() + newvalue) 
 		+ this->_body->toJSONString() + 
 	obj_tail;
 }

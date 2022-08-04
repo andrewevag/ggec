@@ -1,0 +1,146 @@
+{
+	"Program" : [
+		{
+			"DeclarationList" : [
+				{
+					"DeclarationList" : [
+						{
+							"VariableDeclaration" : [
+								{ "name" : "x" },
+								{ "BasicType" : [{"name" : "char"}] }
+							]	
+						}
+							
+					]
+				},
+				{
+					"DeclarationList" : [
+						{
+							"VariableDeclaration" : [
+								{ "name" : "y" },
+								{ "Pointer" : [
+									{ "BasicType" : [{"name" : "double"}] }
+								] }
+							]	
+						},
+						{
+							"VariableDeclaration" : [
+								{ "name" : "z2" },
+								{ "Pointer" : [
+									{ "BasicType" : [{"name" : "double"}] }
+								] }
+							]
+						}
+							
+					]
+				},
+				{
+					"DeclarationList" : [
+						{
+							"VariableDeclaration" : [
+								{ "name" : "z" },
+								{ "BasicType" : [{"name" : "char"}] }
+							]
+						}
+					]
+				},
+				{
+					"DeclarationList" : [
+						{
+							"VariableDeclaration" : [
+								{ "name" : "z" },
+								{
+									"Pointer" : [
+										{ "BasicType" : [{"name" : "char"}] }
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"DeclarationList" : [
+						{
+							"VariableDeclaration" : [
+								{ "name" : "f" },
+								{ "BasicType" : [{"name" : "bool"}] }
+							]
+						}
+					]
+				},
+				{
+					"DeclarationList" : [
+						{
+							"VariableDeclaration" : [
+								{ "name" : "g" },
+								{
+									"Pointer" : [
+										{ "BasicType" : [{"name" : "bool"}] }
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"DeclarationList" : [
+						{
+							"VariableDeclaration" : [
+								{ "name" : "x_2" },
+								{ "BasicType" : [{"name" : "int"}] }
+							]
+						}
+					]
+				},
+				{
+					"DeclarationList" : [
+						{
+							"VariableDeclaration" : [
+								{ "name" : "x_3" },
+								{
+									"Pointer" : [
+										{
+											"Pointer" : [
+												{
+													"Pointer" : [
+														{
+															"Pointer" : [
+																{ "BasicType" : [{"name" : "int"}] }
+															]
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"VariableDeclaration" : [
+								{ "name" : "x_4" },
+								{
+									"Pointer" : [
+										{
+											"Pointer" : [
+												{
+													"Pointer" : [
+														{
+															"Pointer" : [
+																{ "BasicType" : [{"name" : "int"}] }
+															]
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}

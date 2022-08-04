@@ -12,12 +12,11 @@
 AST* syntaxTree;
 int main(){
 	int ret = yyparse();
-	std::cout << "After parsing\n" << (syntaxTree != nullptr) << std::endl;
+
 	if(syntaxTree==nullptr){
 		std::cerr << "Got back nullptr" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	syntaxTree->printTree(std::cout);
 	print(syntaxTree->toJSONString());
 	// Program *p = new Program(new DeclarationList());
 

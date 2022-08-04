@@ -4,7 +4,8 @@ A Compiler for the Edsger Programming Language
 
 # Tasks do not forget:
 - #include
-
+- Do not forget to take a look at dynamically allocated
+  objects in the lexer
 # Known bugs
 
 # Warnings to take into account
@@ -15,14 +16,14 @@ A Compiler for the Edsger Programming Language
 		int x, y;
 	}
   ```
-  └──Program
-    └──DeclarationList
-        └──FunctionDefinition(main)
-            ├──BasicType(void)
-            ├──DeclarationList
-            │   └──DeclarationList
-            │       ├──VariableDeclaration(x)
-            │       │   └──BasicType(int)
-            │       └──VariableDeclaration(y)
-            │           └──BasicType(int)
-            └──StatementList
+  └──Program <br />
+    └──DeclarationList <br />
+        └──FunctionDefinition(main) <br />
+            ├──BasicType(void) <br />
+            ├──DeclarationList <br />
+            │   └──DeclarationList <br />
+            │       ├──VariableDeclaration(x) <br />
+            │       │   └──BasicType(int) <br />
+            │       └──VariableDeclaration(y) <br />
+            │           └──BasicType(int) <br />
+            └──StatementList <br />
