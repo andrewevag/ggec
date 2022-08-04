@@ -45,7 +45,7 @@ extern AST* syntaxTree;
 %token T_modeq         "%="
 
 %precedence NO_COMMA EMPTY_STAR
-%left ','
+%right ','
 %precedence ARGLIST
 %right '=' "+=" "-=" "*=" "/=" "%="
 %nonassoc '?' ':'
@@ -55,10 +55,10 @@ extern AST* syntaxTree;
 %left '+' '-'
 %left '*' '/' '%'
 %nonassoc TYPECAST
-%right IPLUSPLUS IMINUSMINUS "++" "--"
+%right IPLUSPLUS IMINUSMINUS
 %right NEW DELETE
-%right ADDRESS DEREF PLUSIGN MINUSIGN NEGATION
-%left  PPLUSPLUS PMINUSMINUS
+%right ADDRESS DEREF PLUSIGN MINUSIGN NEGATION 
+%left  PPLUSPLUS PMINUSMINUS  "++" "--"
 %nonassoc '(' ')' '[' ']' /* remember to fix if not what we want */
 
 

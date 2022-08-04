@@ -1,7 +1,7 @@
 .PHONY: clean distclean default help
 
 CXX=c++
-CXXFLAGS=-Wall -std=c++14
+CXXFLAGS=-g -Wall -std=c++14
 BINS=ggec
 INCLUDE=-I$(PWD)/inc
 INCLUDE+= -I$(PWD)
