@@ -616,7 +616,7 @@ public:
 	virtual ~New() override = default;
 
 	/* Printing Syntax Tree Functions */
-	virtual std::vector<Tree*> getChildren() override { return {_type, _size}; }
+	virtual std::vector<Tree*> getChildren() override { if (this->_size != nullptr) return {_type, _size}; else return {_type}; }
 	virtual void printNode(std::ostream& out) override { out << "New"; }
 	virtual std::string toJSONString() override;
 

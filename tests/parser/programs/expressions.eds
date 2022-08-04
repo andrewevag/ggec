@@ -1,0 +1,35 @@
+int main(){
+	//mashup
+	
+	x;
+	(x);
+	true;
+	false;
+	NULL;
+	32;
+	'c';
+	12.63;
+	"hello ma boys\r\t";
+	main();
+	main("hello", 3+2);
+	a[32] = 12;
+	+-!*&x;
+	3+2%8*7-12/x >= 21 && 12;
+	++x;
+	y++;
+	++x--;
+	x %= 2 /= 12;
+	y += 13;
+	k -= y;
+	y *= 132;
+	(int) 'c';
+	new int* [2];
+	x = new int;
+	delete x;
+	x, y * 2;
+	y = 2 == 2 ? 10 : 12;
+	// precedences
+
+	+func()++ * &a[3]-- / -++main() % --*b[64] + new int*++ / delete x++;
+	delete x++;
+}
