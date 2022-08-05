@@ -34,7 +34,8 @@ while True:
 	print('Save Json file: save')
 	print('Delete Last Node: delete')
 	print('IndexedDelete: index delete')
-	print('NextLine: next')
+	print('Next Source Line: next')
+	print('Previous Source Line : prev')
 	print('Show Class Body: show')
 	print('Show all classes: list')
 	print('Show precedencies : prec')
@@ -173,6 +174,9 @@ while True:
 			print('\033[91m','@ ', source[line], '\033[00m')
 			print('Enter A Line to Continue')
 			input()
+		if inp == 'prev':
+			if line > 0:
+				line -= 1
 	except:
 		pass
 
