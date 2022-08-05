@@ -44,9 +44,9 @@ extern AST* syntaxTree;
 %token T_diveq         "/="
 %token T_modeq         "%="
 
-%precedence EMPTY_STAR
-%right ',' NO_COMMA
-%precedence ARGLIST
+%precedence NO_COMMA EMPTY_STAR 
+%left ',' 
+%precedence ARGLIST 
 %right '=' "+=" "-=" "*=" "/=" "%="
 %nonassoc '?' ':'
 %left "||"
@@ -59,7 +59,7 @@ extern AST* syntaxTree;
 %right NEW DELETE
 %right ADDRESS DEREF PLUSIGN MINUSIGN NEGATION 
 %left  PPLUSPLUS PMINUSMINUS  "++" "--"
-%nonassoc '(' ')' '[' ']' /* remember to fix if not what we want */
+%nonassoc '(' ')' '[' ']' 
 
 
 
@@ -78,12 +78,11 @@ extern AST* syntaxTree;
 %type<exprList> expression_list
 %type<expr> expression
 %type<expr> constant_expression
-/* %type<expr> no_comma_expression */
+%type<expr> no_comma_expression
 %type<decList> sep_by_comma_declarator
-/* %type<exprList> sep_by_comma_expression */
 %type<parList> sep_by_comma_parameter
 
-%expect 1
+/* %expect 1 */
 
 
 %union {
@@ -210,24 +209,21 @@ expression_or_empty:
 |   expression                                  { $$ = $1; }
 ;
 
-/* expression:
-    no_comma_expression %prec NO_COMMA          { $$ = $1; }
-|   no_comma_expression ',' expression          { $$ = new CommaExpr($1, $3); }
-; */
-
-/* sep_by_comma_expression: */
-//    /* nothing */                           %prec NO_COMMA         { $$ = new ExpressionList; }
-//|   ',' expression sep_by_comma_expression  %prec NO_COMMA        { $3->_expressions.push_front($2); $$ = $3; }
-/* ; */
-expression_list:
-    expression                     %prec ARGLIST { $$ = new ExpressionList({$1}); }
-|   expression ',' expression_list %prec ARGLIST { $3->_expressions.push_front($1); $$ = $3; }
+expression:
+    no_comma_expression           %prec NO_COMMA           { $$ = $1; }
+|   expression ',' no_comma_expression       { $$ = new CommaExpr($1, $3); }
 ;
 
 
-expression:
+expression_list:
+    no_comma_expression                     %prec ARGLIST { $$ = new ExpressionList({$1}); }
+|   no_comma_expression ',' expression_list %prec ARGLIST { $3->_expressions.push_front($1); $$ = $3; }
+;
+
+
+no_comma_expression:
     T_id                                        { $$ = new Id($1); }
-|   '(' expression ')'                          { $$ = $2; }
+|   '(' no_comma_expression ')'                          { $$ = $2; }
 |   "true"                                      { $$ = new Constant(true); }
 |   "false"                                     { $$ = new Constant(false); }
 |   "NULL"                                      { $$ = new Constant(); }
@@ -237,41 +233,40 @@ expression:
 |   T_string_const                              { $$ = new Constant((std::string)$1); }
 |   T_id '(' ')'                                { $$ = new FunctionCall($1, new ExpressionList()); } 
 |   T_id '(' expression_list ')'                { $$ = new FunctionCall($1, $3); }
-|   expression '[' expression ']'               { $$ = new BracketedIndex($1, $3); }
-|   '&' expression %prec ADDRESS                { $$ = new UnaryOp(UnaryOp::UnaryOpType::ADDRESS, $2); }
-|   '*' expression %prec DEREF                  { $$ = new UnaryOp(UnaryOp::UnaryOpType::DEREF, $2); }
-|   '+' expression %prec PLUSIGN                { $$ = new UnaryOp(UnaryOp::UnaryOpType::POS, $2); }
-|   '-' expression %prec MINUSIGN               { $$ = new UnaryOp(UnaryOp::UnaryOpType::NEG, $2); }
-|   '!' expression %prec NEGATION               { $$ = new UnaryOp(UnaryOp::UnaryOpType::NOT, $2); }               
-|   expression '*' expression                   { $$ = new BinaryOp(BinaryOp::BinaryOpType::MULT, $1, $3); }
-|   expression '/' expression                   { $$ = new BinaryOp(BinaryOp::BinaryOpType::DIV, $1, $3); }
-|   expression '%' expression                   { $$ = new BinaryOp(BinaryOp::BinaryOpType::MOD, $1, $3); }
-|   expression '+' expression                   { $$ = new BinaryOp(BinaryOp::BinaryOpType::PLUS, $1, $3); }
-|   expression '-' expression                   { $$ = new BinaryOp(BinaryOp::BinaryOpType::MINUS, $1, $3); }
-|   expression '<' expression                   { $$ = new BinaryOp(BinaryOp::BinaryOpType::LESS, $1, $3); }
-|   expression '>' expression                   { $$ = new BinaryOp(BinaryOp::BinaryOpType::GREATER, $1, $3); }
-|   expression "<=" expression                  { $$ = new BinaryOp(BinaryOp::BinaryOpType::LESSEQ, $1, $3); }                  
-|   expression ">=" expression                  { $$ = new BinaryOp(BinaryOp::BinaryOpType::GREATEREQ, $1, $3); }
-|   expression "==" expression                  { $$ = new BinaryOp(BinaryOp::BinaryOpType::EQUALS, $1, $3); }
-|   expression "!=" expression                  { $$ = new BinaryOp(BinaryOp::BinaryOpType::NOTEQ, $1, $3); }
-|   expression "&&" expression                  { $$ = new BinaryOp(BinaryOp::BinaryOpType::LAND, $1, $3); }
-|   expression "||" expression                  { $$ = new BinaryOp(BinaryOp::BinaryOpType::LOR, $1, $3); }
-|   "++" expression %prec IPLUSPLUS             { $$ = new PrefixUnAss(UnAss::UnAssType::PLUSPLUS, $2); }
-|   "--" expression %prec IMINUSMINUS           { $$ = new PrefixUnAss(UnAss::UnAssType::MINUSMINUS, $2); }
-|   expression "++" %prec PPLUSPLUS             { $$ = new PostfixUnAss(UnAss::UnAssType::PLUSPLUS, $1); }
-|   expression "--" %prec PMINUSMINUS           { $$ = new PostfixUnAss(UnAss::UnAssType::MINUSMINUS, $1); }
-|   expression '=' expression                   { $$ = new BinaryAss(BinaryAss::BinaryAssType::ASS, $1, $3); }
-|   expression "*=" expression                  { $$ = new BinaryAss(BinaryAss::BinaryAssType::MULTASS, $1, $3); }
-|   expression "/=" expression                  { $$ = new BinaryAss(BinaryAss::BinaryAssType::DIVASS, $1, $3); }
-|   expression "%=" expression                  { $$ = new BinaryAss(BinaryAss::BinaryAssType::MODASS, $1, $3); }
-|   expression "+=" expression                  { $$ = new BinaryAss(BinaryAss::BinaryAssType::PLUSASS, $1, $3); }
-|   expression "-=" expression                  { $$ = new BinaryAss(BinaryAss::BinaryAssType::MINUSASS, $1, $3); }
-|   '(' type ')' expression %prec TYPECAST      { $$ = new TypeCast($2, $4); }
-|   expression '?' expression ':' expression    { $$ = new TernaryOp($1, $3, $5); }
+|   no_comma_expression '[' no_comma_expression ']'               { $$ = new BracketedIndex($1, $3); }
+|   '&' no_comma_expression %prec ADDRESS                { $$ = new UnaryOp(UnaryOp::UnaryOpType::ADDRESS, $2); }
+|   '*' no_comma_expression %prec DEREF                  { $$ = new UnaryOp(UnaryOp::UnaryOpType::DEREF, $2); }
+|   '+' no_comma_expression %prec PLUSIGN                { $$ = new UnaryOp(UnaryOp::UnaryOpType::POS, $2); }
+|   '-' no_comma_expression %prec MINUSIGN               { $$ = new UnaryOp(UnaryOp::UnaryOpType::NEG, $2); }
+|   '!' no_comma_expression %prec NEGATION               { $$ = new UnaryOp(UnaryOp::UnaryOpType::NOT, $2); }               
+|   no_comma_expression '*' no_comma_expression                   { $$ = new BinaryOp(BinaryOp::BinaryOpType::MULT, $1, $3); }
+|   no_comma_expression '/' no_comma_expression                   { $$ = new BinaryOp(BinaryOp::BinaryOpType::DIV, $1, $3); }
+|   no_comma_expression '%' no_comma_expression                   { $$ = new BinaryOp(BinaryOp::BinaryOpType::MOD, $1, $3); }
+|   no_comma_expression '+' no_comma_expression                   { $$ = new BinaryOp(BinaryOp::BinaryOpType::PLUS, $1, $3); }
+|   no_comma_expression '-' no_comma_expression                   { $$ = new BinaryOp(BinaryOp::BinaryOpType::MINUS, $1, $3); }
+|   no_comma_expression '<' no_comma_expression                   { $$ = new BinaryOp(BinaryOp::BinaryOpType::LESS, $1, $3); }
+|   no_comma_expression '>' no_comma_expression                   { $$ = new BinaryOp(BinaryOp::BinaryOpType::GREATER, $1, $3); }
+|   no_comma_expression "<=" no_comma_expression                  { $$ = new BinaryOp(BinaryOp::BinaryOpType::LESSEQ, $1, $3); }                  
+|   no_comma_expression ">=" no_comma_expression                  { $$ = new BinaryOp(BinaryOp::BinaryOpType::GREATEREQ, $1, $3); }
+|   no_comma_expression "==" no_comma_expression                  { $$ = new BinaryOp(BinaryOp::BinaryOpType::EQUALS, $1, $3); }
+|   no_comma_expression "!=" no_comma_expression                  { $$ = new BinaryOp(BinaryOp::BinaryOpType::NOTEQ, $1, $3); }
+|   no_comma_expression "&&" no_comma_expression                  { $$ = new BinaryOp(BinaryOp::BinaryOpType::LAND, $1, $3); }
+|   no_comma_expression "||" no_comma_expression                  { $$ = new BinaryOp(BinaryOp::BinaryOpType::LOR, $1, $3); }
+|   "++" no_comma_expression %prec IPLUSPLUS             { $$ = new PrefixUnAss(UnAss::UnAssType::PLUSPLUS, $2); }
+|   "--" no_comma_expression %prec IMINUSMINUS           { $$ = new PrefixUnAss(UnAss::UnAssType::MINUSMINUS, $2); }
+|   no_comma_expression "++" %prec PPLUSPLUS             { $$ = new PostfixUnAss(UnAss::UnAssType::PLUSPLUS, $1); }
+|   no_comma_expression "--" %prec PMINUSMINUS           { $$ = new PostfixUnAss(UnAss::UnAssType::MINUSMINUS, $1); }
+|   no_comma_expression '=' no_comma_expression                   { $$ = new BinaryAss(BinaryAss::BinaryAssType::ASS, $1, $3); }
+|   no_comma_expression "*=" no_comma_expression                  { $$ = new BinaryAss(BinaryAss::BinaryAssType::MULTASS, $1, $3); }
+|   no_comma_expression "/=" no_comma_expression                  { $$ = new BinaryAss(BinaryAss::BinaryAssType::DIVASS, $1, $3); }
+|   no_comma_expression "%=" no_comma_expression                  { $$ = new BinaryAss(BinaryAss::BinaryAssType::MODASS, $1, $3); }
+|   no_comma_expression "+=" no_comma_expression                  { $$ = new BinaryAss(BinaryAss::BinaryAssType::PLUSASS, $1, $3); }
+|   no_comma_expression "-=" no_comma_expression                  { $$ = new BinaryAss(BinaryAss::BinaryAssType::MINUSASS, $1, $3); }
+|   '(' type ')' no_comma_expression %prec TYPECAST      { $$ = new TypeCast($2, $4); }
+|   no_comma_expression '?' no_comma_expression ':' no_comma_expression    { $$ = new TernaryOp($1, $3, $5); }
 |   "new" type %prec NEW                        { $$ = new New($2);}
-|   "new" type '[' expression ']' %prec NEW     { $$ = new New($2, $4); }
-|   "delete" expression %prec DELETE            { $$ = new Delete($2); }
-|   expression ',' expression       %prec NO_COMMA { $$ = new CommaExpr($1, $3); }
+|   "new" type '[' no_comma_expression ']' %prec NEW     { $$ = new New($2, $4); }
+|   "delete" no_comma_expression %prec DELETE            { $$ = new Delete($2); }
 ;
 
 

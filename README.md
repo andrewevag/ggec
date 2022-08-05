@@ -7,7 +7,7 @@ A Compiler for the Edsger Programming Language
 - Do not forget to take a look at dynamically allocated
   objects in the lexer
 # Known bugs
-- Comma expressions bind wrong!!
+- Comma expressions bind wrong!! (FIXED IT NO_COMMA_EXPRESSIONS IN STRONGER BOUNDING EXPRESSIONS)
 # Warnings to take into account
 - parser.y: 227 see if it better to return an empty parameter list instead of nullptr
 - Διπλού βάθους declaration list on functions

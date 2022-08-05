@@ -9,7 +9,7 @@ int main(){
 	32;
 	'c';
 	12.63;
-	"hello ma boys\r\t";
+	"hello ma boys";
 	main();
 	main("hello", 3+2);
 	a[32] = 12;
@@ -27,16 +27,4 @@ int main(){
 	x = new int;
 	delete x;
 	x, y * 2, 3;
-	y = 2 == 2 ? 10 : 12+2 >= 90 && 38 || true;
-	// precedences
-	
-	+func()++ * &a[3]-- / -++main() % --*b[64] + new int*++ / delete x++;
-	delete x++;
-	x %= 12 /= 13 ? 10 : 9, x += 3;
-
-	/*
-	 * 	Comma tests
-	 */
-	x*2, y, z;
-	main(y, z, w, x), y(3), 32++;
 }
