@@ -406,6 +406,42 @@
                                             ]
                                         }
                                     ]
+                                },
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "CommaExpr": [
+                                                {
+                                                    "BinaryAss(ASS)": [
+                                                        {
+                                                            "Id": [
+                                                                {
+                                                                    "name": "x"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "IntConstant(2)": []
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "BinaryAss(ASS)": [
+                                                        {
+                                                            "Id": [
+                                                                {
+                                                                    "name": "y"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "IntConstant(12)": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
                                 }
                             ]
                         }

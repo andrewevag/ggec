@@ -1,6 +1,11 @@
 #!/usr/bin/python3
 
+from asyncio import subprocess
+import enum
 import json
+from pygments import highlight
+import subprocess
+
 def prRed(skk): print("\033[91m {}\033[00m" .format(skk))
 def prGreen(skk): print("\033[92m {}\033[00m" .format(skk))
 def prYellow(skk): print("\033[93m {}\033[00m" .format(skk))
@@ -24,6 +29,10 @@ allfile = f.read()
 source = allfile.splitlines()
 f.close()
 line = 0
+p = subprocess.run('pygmentize ../../tojsonstring.cpp'.split(" "), stdout=subprocess.PIPE)
+res = p.stdout.decode('utf-8')
+jsonlines = res.splitlines()
+
 
 while True:
 	print('===========Commands:===========\n\nNewNode : n')
@@ -46,8 +55,25 @@ while True:
 	print('Prev Stack')
 	for i, val in enumerate(prevs):
 		print('--', val)
-	print('\033[93m','>>', state, '\033[00m')
-	print('\033[91m','@ ', source[line], '\033[00m')
+	try:
+		if prevs != [{ "Program" : []}]:
+			val = list(prevs[-1][-1].keys())[-1]
+			print(f'\033[95m↑ : {val}\033[00m')
+			flag1 = False
+			for i, val1 in enumerate(jsonlines):
+				if str(val) in val1:
+					flag1 = True
+				if flag1:
+					print(f'\033[95m>\033[00m', val1)
+					if val1.startswith('}'):
+						flag1 = False
+	except:
+		pass
+		
+
+		
+	print(f'\033[93m{len(state)}', '>>', state, '\033[00m')
+	print('\033[91m@ ', source[line], '\033[00m')
 	print('Command> ', end='')
 	try:
 

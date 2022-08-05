@@ -127,7 +127,7 @@ variable_declaration:
 
 sep_by_comma_declarator:
     /* nothing */                           { $$ = new DeclarationList(); }
-|   ',' declarator sep_by_comma_declarator  { $3->_decls.push_back($2); $$ = $3; }
+|   ',' declarator sep_by_comma_declarator  { $3->_decls.push_front($2); $$ = $3; }
 ;
 
 type:
@@ -223,7 +223,7 @@ expression_list:
 
 no_comma_expression:
     T_id                                        { $$ = new Id($1); }
-|   '(' no_comma_expression ')'                          { $$ = $2; }
+|   '(' expression ')'                          { $$ = $2; }
 |   "true"                                      { $$ = new Constant(true); }
 |   "false"                                     { $$ = new Constant(false); }
 |   "NULL"                                      { $$ = new Constant(); }
