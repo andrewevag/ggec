@@ -5,7 +5,7 @@ import enum
 import json
 from pygments import highlight
 import subprocess
-
+import sys
 def prRed(skk): print("\033[91m {}\033[00m" .format(skk))
 def prGreen(skk): print("\033[92m {}\033[00m" .format(skk))
 def prYellow(skk): print("\033[93m {}\033[00m" .format(skk))
@@ -32,7 +32,7 @@ line = 0
 p = subprocess.run('pygmentize ../../tojsonstring.cpp'.split(" "), stdout=subprocess.PIPE)
 res = p.stdout.decode('utf-8')
 jsonlines = res.splitlines()
-
+previousNode = ''
 
 while True:
 	print('===========Commands:===========\n\nNewNode : n')
@@ -45,7 +45,9 @@ while True:
 	print('IndexedDelete: index delete')
 	print('Next Source Line: next')
 	print('Previous Source Line : prev')
-	print('Show Class Body: show')
+	print('Show AST Class Body: show')
+	print('Show JSON Format for Parent Class : show format')
+	print('Show Souce Code +-5 lines : show code')
 	print('Show all classes: list')
 	print('Show precedencies : prec')
 	print('Exit: exit')
@@ -57,16 +59,8 @@ while True:
 		print('--', val)
 	try:
 		if prevs != [{ "Program" : []}]:
-			val = list(prevs[-1][-1].keys())[-1]
-			print(f'\033[95m↑ : {val}\033[00m')
-			flag1 = False
-			for i, val1 in enumerate(jsonlines):
-				if str(val) in val1:
-					flag1 = True
-				if flag1:
-					print(f'\033[95m>\033[00m', val1)
-					if val1.startswith('}'):
-						flag1 = False
+			previousNode = list(prevs[-1][-1].keys())[-1]
+			print(f'\033[95m↑ : {previousNode}\033[00m')	
 	except:
 		pass
 		
@@ -75,6 +69,7 @@ while True:
 	print(f'\033[93m{len(state)}', '>>', state, '\033[00m')
 	print('\033[91m@ ', source[line], '\033[00m')
 	print('Command> ', end='')
+	
 	try:
 
 		inp = input()
@@ -171,8 +166,8 @@ while True:
 					print(i, lines[i])
 					if lines[i].startswith('};'):
 						flag = False	
-			print('Enter A Line to Continue')
-			input()
+			print('Enter Any Key to Continue')
+			sys.stdin.read(1)
 		if inp == "list":
 			g = open("../../ast.hpp", 'r')
 			lines = g.read().splitlines()
@@ -180,8 +175,8 @@ while True:
 			for i in range(len(lines)):
 				if lines[i].startswith(f'class'):
 					print(lines[i])
-			print('Enter A Line to Continue')
-			input()
+			print('Enter Any Key to Continue')
+			sys.stdin.read(1)
 		if inp == 'prec':
 			print('[ ] ( )')
 			print('++ -- postfix')
@@ -198,11 +193,25 @@ while True:
 			print('= += -= *= /= %= infix right')
 			print(', infix left')
 			print('\033[91m','@ ', source[line], '\033[00m')
-			print('Enter A Line to Continue')
-			input()
+			print('Enter A Char to Continue')
+			sys.stdin.read(1)
 		if inp == 'prev':
 			if line > 0:
 				line -= 1
+		if inp == "show format":
+			flag1 = False
+			for i, val1 in enumerate(jsonlines):
+				if str(previousNode) in val1:
+					flag1 = True
+				if flag1:
+					print(f'\033[95m>\033[00m', val1)
+					if val1.startswith('}'):
+						flag1 = False
+			sys.stdin.read(1)
+		if inp == "show code":
+			for i in range(max(line-5, 0),min(line+5, len(source))):
+				print(f'\033[91m{"@" if i == line else ">"}', source[i], '\033[00m')
+			sys.stdin.read(1)
 	except:
 		pass
 
