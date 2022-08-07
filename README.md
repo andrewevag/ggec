@@ -8,10 +8,9 @@ A Compiler for the Edsger Programming Language
   objects in the lexer
 - https://stackoverflow.com/questions/62115979/how-to-implement-better-error-messages-for-flex-bison
 # Known bugs
-- Comma expressions bind wrong!! (FIXED IT NO_COMMA_EXPRESSIONS IN STRONGER BOUNDING EXPRESSIONS)
+
 # Warnings to take into account
-- SOS IN EXPRESSION COULD BE TOTAL EXPRESSION AND NOT NO_COMMA_EXPRESSION TRY IT IN C
-- parser.y: 227 see if it better to return an empty parameter list instead of nullptr
+- SOS IN EXPRESSION COULD BE TOTAL EXPRESSION AND NOT NO_COMMA_EXPRESSION TRY IT IN C (Tried it works in C and switched it to take into account commas in parenthsis)
 - Διπλού βάθους declaration list on functions
   ``` C
 	void main(){

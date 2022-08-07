@@ -1,9 +1,9 @@
 
 PROGSDIR=progs
 GENSCIRPT=./gen.sh
-NUMOFGENPROGS?=10
+GEN?=10
 generate:
-	@$(GENSCIRPT) $(NUMOFGENPROGS)
+	@$(GENSCIRPT) $(GEN)
 
 clean:
 	$(RM) *.beam
