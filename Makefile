@@ -7,6 +7,7 @@ INCLUDE=-I$(PWD)/inc
 INCLUDE+= -I$(PWD)
 DEPSOURCE=$(wildcard src/*.cpp)
 DEPOBJECTS=$(patsubst %.cpp, %.o, $(DEPSOURCE))
+NUMOFGENPROGS?=100
 default: $(BINS)
 
 ggec: lexer.o main.o parser.o error.o  tojsonstring.o $(DEPOBJECTS)
@@ -42,6 +43,12 @@ test: lexertest parsertest
 	@./tests/lexer/runner.sh
 	@echo "🧪 Running Parser Suite :"
 	@./tests/parser/runner.sh
+	@echo "🧪 Running Randomly Generated Edsger Programs :"
+	@echo "Generating the input files : ⛏️"
+	@$(MAKE) -C examples/syntax_gen generate NUMOFGENPROGS="$(NUMOFGENPROGS)"
+	@echo "Running the input files on the parser : ⛏️"
+	@./tests/parser/runner_gen.sh $(NUMOFGENPROGS)
+	
 
 
 # lexer.o: lexer.cpp lexer.hpp parser.hpp
@@ -60,7 +67,7 @@ clean:
 	$(RM) ./src/*.o
 	$(MAKE) -C ./tests/lexer clean
 	$(MAKE) -C ./tests/parser clean
-	
+	$(MAKE) -C ./examples/syntax_gen clean
 
 distclean: clean
 # $(RM) ??
