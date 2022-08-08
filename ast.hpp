@@ -7,7 +7,7 @@
 
 class AST : public Tree {
 public:
-	virtual ~AST() = default;
+	virtual ~AST();
 	virtual std::string toJSONString() = 0;
 
 	/* Printing Syntax Tree Functions */
@@ -354,7 +354,7 @@ public:
 class Id : public Expression {
 public:
 	Id(std::string name) : _name(name) {}
-	~Id() override = default;
+	virtual ~Id() = default;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {}; };

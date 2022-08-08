@@ -1,5 +1,6 @@
 #include "ast.hpp"
 
+AST::~AST(){}
 
 Program::~Program(){
 	delete _decls;
@@ -38,6 +39,7 @@ Parameter::~Parameter(){
 
 TypeExpression::~TypeExpression(){}
 
+
 BasicType::~BasicType(){}
 
 Pointer::~Pointer(){
@@ -64,19 +66,11 @@ IfElseStatement::~IfElseStatement() {
 }
 
 ForStatement::~ForStatement(){ 
-	if(_label != nullptr){
-		delete _label;
-	}
-	if(_first != nullptr){
-		delete _first;
-	}
-	if(_second != nullptr){
-		delete _second;
-	}
-	if(_third != nullptr){
-		delete _third;
-	}
 	
+	delete _label;
+	delete _first;
+	delete _second;
+	delete _third;
 }
 
 ContinueStatement::~ContinueStatement(){}
@@ -84,9 +78,7 @@ ContinueStatement::~ContinueStatement(){}
 BreakStatement::~BreakStatement(){}
 
 ReturnStatement::~ReturnStatement(){
-	if(_expr != nullptr){
-		delete _expr;
-	}
+	delete _expr;
 }
 
 Expression::~Expression(){}
@@ -139,18 +131,13 @@ TernaryOp::~TernaryOp(){
 }
 
 New::~New(){
-	if(_size != nullptr){
-		delete _size;
-		delete _type;
-	}else{
-		delete _type;
-	}
+	delete _size;
+	delete _type;
+	delete _type;
 }
 
 Delete::~Delete(){
-	if(_expr != nullptr){
-		delete _expr;
-	}
+	delete _expr;
 }
 
 CommaExpr::~CommaExpr(){
