@@ -1,0 +1,565 @@
+{
+    "Program": [
+        {
+            "DeclarationList": [
+                {
+                    "FunctionDefinition": [
+                        {
+                            "BasicType": [
+                                {
+                                    "name": "void"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "main"
+                        },
+                        {
+                            "ParameterList": []
+                        },
+                        {
+                            "DeclarationList": [
+                                {
+                                    "DeclarationList": [
+                                        {
+                                            "VariableDeclaration": [
+                                                {
+                                                    "name": "numberOfRings"
+                                                },
+                                                {
+                                                    "BasicType": [
+                                                        {
+                                                            "name": "int"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "FunctionDefinition": [
+                                        {
+                                            "BasicType": [
+                                                {
+                                                    "name": "void"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "name": "hanoi"
+                                        },
+                                        {
+                                            "ParameterList": [
+                                                {
+                                                    "Parameter": [
+                                                        {
+                                                            "PassingWay": "ByCall"
+                                                        },
+                                                        {
+                                                            "name": "source"
+                                                        },
+                                                        {
+                                                            "Pointer": [
+                                                                {
+                                                                    "BasicType": [
+                                                                        {
+                                                                            "name": "char"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "Parameter": [
+                                                        {
+                                                            "PassingWay": "ByCall"
+                                                        },
+                                                        {
+                                                            "name": "target"
+                                                        },
+                                                        {
+                                                            "Pointer": [
+                                                                {
+                                                                    "BasicType": [
+                                                                        {
+                                                                            "name": "char"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "Parameter": [
+                                                        {
+                                                            "PassingWay": "ByCall"
+                                                        },
+                                                        {
+                                                            "name": "auxiliary"
+                                                        },
+                                                        {
+                                                            "Pointer": [
+                                                                {
+                                                                    "BasicType": [
+                                                                        {
+                                                                            "name": "char"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "Parameter": [
+                                                        {
+                                                            "PassingWay": "ByCall"
+                                                        },
+                                                        {
+                                                            "name": "rings"
+                                                        },
+                                                        {
+                                                            "BasicType": [
+                                                                {
+                                                                    "name": "int"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "DeclarationList": [
+                                                {
+                                                    "FunctionDefinition": [
+                                                        {
+                                                            "BasicType": [
+                                                                {
+                                                                    "name": "void"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "name": "move"
+                                                        },
+                                                        {
+                                                            "ParameterList": [
+                                                                {
+                                                                    "Parameter": [
+                                                                        {
+                                                                            "PassingWay": "ByCall"
+                                                                        },
+                                                                        {
+                                                                            "name": "source"
+                                                                        },
+                                                                        {
+                                                                            "Pointer": [
+                                                                                {
+                                                                                    "BasicType": [
+                                                                                        {
+                                                                                            "name": "char"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "Parameter": [
+                                                                        {
+                                                                            "PassingWay": "ByCall"
+                                                                        },
+                                                                        {
+                                                                            "name": "target"
+                                                                        },
+                                                                        {
+                                                                            "Pointer": [
+                                                                                {
+                                                                                    "BasicType": [
+                                                                                        {
+                                                                                            "name": "char"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "DeclarationList": []
+                                                        },
+                                                        {
+                                                            "StatementList": [
+                                                                {
+                                                                    "SingleExpression": [
+                                                                        {
+                                                                            "FunctionCall": [
+                                                                                {
+                                                                                    "name": "writeString"
+                                                                                },
+                                                                                {
+                                                                                    "ExpressionList": [
+                                                                                        {
+                                                                                            "StringConstant(Move from )": []
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "SingleExpression": [
+                                                                        {
+                                                                            "FunctionCall": [
+                                                                                {
+                                                                                    "name": "writeString"
+                                                                                },
+                                                                                {
+                                                                                    "ExpressionList": [
+                                                                                        {
+                                                                                            "Id": [
+                                                                                                {
+                                                                                                    "name": "source"
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "SingleExpression": [
+                                                                        {
+                                                                            "FunctionCall": [
+                                                                                {
+                                                                                    "name": "writeString"
+                                                                                },
+                                                                                {
+                                                                                    "ExpressionList": [
+                                                                                        {
+                                                                                            "StringConstant( to )": []
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "SingleExpression": [
+                                                                        {
+                                                                            "FunctionCall": [
+                                                                                {
+                                                                                    "name": "writeString"
+                                                                                },
+                                                                                {
+                                                                                    "ExpressionList": [
+                                                                                        {
+                                                                                            "Id": [
+                                                                                                {
+                                                                                                    "name": "target"
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "SingleExpression": [
+                                                                        {
+                                                                            "FunctionCall": [
+                                                                                {
+                                                                                    "name": "writeString"
+                                                                                },
+                                                                                {
+                                                                                    "ExpressionList": [
+                                                                                        {
+                                                                                            "StringConstant(.\n)": []
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "StatementList": [
+                                                {
+                                                    "IfStatement": [
+                                                        {
+                                                            "BinaryOp(GREATEREQ)": [
+                                                                {
+                                                                    "Id": [
+                                                                        {
+                                                                            "name": "rings"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "IntConstant(1)": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "StatementList": [
+                                                                {
+                                                                    "SingleExpression": [
+                                                                        {
+                                                                            "FunctionCall": [
+                                                                                {
+                                                                                    "name": "hanoi"
+                                                                                },
+                                                                                {
+                                                                                    "ExpressionList": [
+                                                                                        {
+                                                                                            "Id": [
+                                                                                                {
+                                                                                                    "name": "source"
+                                                                                                }
+                                                                                            ]
+                                                                                        },
+                                                                                        {
+                                                                                            "Id": [
+                                                                                                {
+                                                                                                    "name": "auxiliary"
+                                                                                                }
+                                                                                            ]
+                                                                                        },
+                                                                                        {
+                                                                                            "Id": [
+                                                                                                {
+                                                                                                    "name": "target"
+                                                                                                }
+                                                                                            ]
+                                                                                        },
+                                                                                        {
+                                                                                            "BinaryOp(MINUS)": [
+                                                                                                {
+                                                                                                    "Id": [
+                                                                                                        {
+                                                                                                            "name": "rings"
+                                                                                                        }
+                                                                                                    ]
+                                                                                                },
+                                                                                                {
+                                                                                                    "IntConstant(1)": []
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "SingleExpression": [
+                                                                        {
+                                                                            "FunctionCall": [
+                                                                                {
+                                                                                    "name": "move"
+                                                                                },
+                                                                                {
+                                                                                    "ExpressionList": [
+                                                                                        {
+                                                                                            "Id": [
+                                                                                                {
+                                                                                                    "name": "source"
+                                                                                                }
+                                                                                            ]
+                                                                                        },
+                                                                                        {
+                                                                                            "Id": [
+                                                                                                {
+                                                                                                    "name": "target"
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "SingleExpression": [
+                                                                        {
+                                                                            "FunctionCall": [
+                                                                                {
+                                                                                    "name": "hanoi"
+                                                                                },
+                                                                                {
+                                                                                    "ExpressionList": [
+                                                                                        {
+                                                                                            "Id": [
+                                                                                                {
+                                                                                                    "name": "auxiliary"
+                                                                                                }
+                                                                                            ]
+                                                                                        },
+                                                                                        {
+                                                                                            "Id": [
+                                                                                                {
+                                                                                                    "name": "target"
+                                                                                                }
+                                                                                            ]
+                                                                                        },
+                                                                                        {
+                                                                                            "Id": [
+                                                                                                {
+                                                                                                    "name": "source"
+                                                                                                }
+                                                                                            ]
+                                                                                        },
+                                                                                        {
+                                                                                            "BinaryOp(MINUS)": [
+                                                                                                {
+                                                                                                    "Id": [
+                                                                                                        {
+                                                                                                            "name": "rings"
+                                                                                                        }
+                                                                                                    ]
+                                                                                                },
+                                                                                                {
+                                                                                                    "IntConstant(1)": []
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "StatementList": [
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "FunctionCall": [
+                                                {
+                                                    "name": "writeString"
+                                                },
+                                                {
+                                                    "ExpressionList": [
+                                                        {
+                                                            "StringConstant(Please, give the number of rings: )": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "BinaryAss(ASS)": [
+                                                {
+                                                    "Id": [
+                                                        {
+                                                            "name": "numberOfRings"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "FunctionCall": [
+                                                        {
+                                                            "name": "readInteger"
+                                                        },
+                                                        {
+                                                            "ExpressionList": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "FunctionCall": [
+                                                {
+                                                    "name": "writeString"
+                                                },
+                                                {
+                                                    "ExpressionList": [
+                                                        {
+                                                            "StringConstant(\nHere is the solution:\n\n)": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "FunctionCall": [
+                                                {
+                                                    "name": "hanoi"
+                                                },
+                                                {
+                                                    "ExpressionList": [
+                                                        {
+                                                            "StringConstant(left)": []
+                                                        },
+                                                        {
+                                                            "StringConstant(right)": []
+                                                        },
+                                                        {
+                                                            "StringConstant(middle)": []
+                                                        },
+                                                        {
+                                                            "Id": [
+                                                                {
+                                                                    "name": "numberOfRings"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

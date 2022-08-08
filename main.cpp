@@ -6,6 +6,7 @@
 #include "lexer.hpp"
 #include <string>
 
+AST* syntaxTree = nullptr;
 
 int main(){
 	
@@ -13,5 +14,6 @@ int main(){
 	//delete v;
 
 	int ret = yyparse();
+	syntaxTree->printTree(std::cout);
 	return ret;
 }
