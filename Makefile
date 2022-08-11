@@ -10,7 +10,7 @@ DEPOBJECTS=$(patsubst %.cpp, %.o, $(DEPSOURCE))
 GEN?=100
 default: $(BINS)
 
-ggec: lexer.o main.o parser.o error.o  tojsonstring.o $(DEPOBJECTS)
+ggec: lexer.o main.o parser.o error.o ast.o tojsonstring.o $(DEPOBJECTS)
 	$(CXX) $(INCLUDE) $(CXXFLAGS) -o $@ $^
 
 
@@ -32,10 +32,10 @@ parser.o: parser.cpp parser.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $^
 
 
-lexertest: lexer.o ./tests/lexer/main.o error.o tojsonstring.o parser.o $(DEPOBJECTS)
+lexertest: lexer.o ./tests/lexer/main.o error.o ast.o tojsonstring.o parser.o $(DEPOBJECTS)
 	$(CXX) $(CXXFLAGS) -o ./tests/lexer/$@ $^
 
-parsertest: lexer.o ./tests/parser/main.o parser.o error.o tojsonstring.o $(DEPOBJECTS)
+parsertest: lexer.o ./tests/parser/main.o parser.o error.o ast.o tojsonstring.o $(DEPOBJECTS)
 	$(CXX) $(CXXFLAGS) -o ./tests/parser/$@ $^
 
 test: lexertest parsertest

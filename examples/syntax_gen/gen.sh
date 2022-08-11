@@ -10,8 +10,8 @@
 # apt-get install erlang
 # git clone https://github.com/proper-testing/proper.git
 #   make all
-ERL=/usr/bin/erl
-export ERL_LIBS=/home/andreas/other/proper
+ERL=/opt/homebrew/bin/erl
+export ERL_LIBS=/opt/homebrew/opt/proper/proper-1.4
 
 ${ERL}c -pa ${ERL_LIBS}/ebin +debug_info *.erl
 

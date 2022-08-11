@@ -1,9 +1,11 @@
 #include "ast.hpp"
+#define nullsafedelete(ptr) if(ptr != nullptr) delete ptr
+
 
 AST::~AST(){}
 
 Program::~Program(){
-	delete _decls;
+	nullsafedelete(_decls);
 //	std::cout << "Deleting Program\n";
 }
 
@@ -12,29 +14,29 @@ Declaration::~Declaration(){
 }
 
 VariableDeclaration::~VariableDeclaration(){ 
-	delete _typeExpr;
+	nullsafedelete(_typeExpr);
 //	std::cout << "Deleting Variable Declaration\n";
 }
 
 ArrayDeclaration::~ArrayDeclaration(){ 
-	delete _expr;
+	nullsafedelete(_expr);
 //	std::cout << "Deleting Array Declaration\n";
 }
 
 FunctionDeclaration::~FunctionDeclaration() { 
-	delete _resultType;
-	delete _parameters;
+	nullsafedelete(_resultType);
+	nullsafedelete(_parameters);
  }
 
 FunctionDefinition::~FunctionDefinition(){ 
-	delete _resultType;
-	delete _parameters;
-	delete _decls;
-	delete _statements;
+	nullsafedelete(_resultType);
+	nullsafedelete(_parameters);
+	nullsafedelete(_decls);
+	nullsafedelete(_statements);
 }
 
 Parameter::~Parameter(){
-	delete _type; 
+	nullsafedelete(_type); 
 }
 
 TypeExpression::~TypeExpression(){}
@@ -43,7 +45,7 @@ TypeExpression::~TypeExpression(){}
 BasicType::~BasicType(){}
 
 Pointer::~Pointer(){
-	delete _inner;
+	nullsafedelete(_inner);
 }
 
 Statement::~Statement(){}
@@ -51,26 +53,26 @@ Statement::~Statement(){}
 EmptyStatement::~EmptyStatement(){}
 
 SingleExpression::~SingleExpression(){
-	delete _expr;
+	nullsafedelete(_expr);
 }
 
 IfStatement::~IfStatement(){
-	delete _condition; 
-	delete _ifbody;
+	nullsafedelete(_condition); 
+	nullsafedelete(_ifbody);
 }
 // to condition mporei na einai nullptr
 IfElseStatement::~IfElseStatement() {
-	delete _condition;
-	delete _ifbody; 
-	delete _elsebody;
+	nullsafedelete(_condition);
+	nullsafedelete(_ifbody); 
+	nullsafedelete(_elsebody);
 }
 
 ForStatement::~ForStatement(){ 
 	
-	delete _label;
-	delete _first;
-	delete _second;
-	delete _third;
+	nullsafedelete(_label);
+	nullsafedelete(_first);
+	nullsafedelete(_second);
+	nullsafedelete(_third);
 }
 
 ContinueStatement::~ContinueStatement(){}
@@ -78,7 +80,7 @@ ContinueStatement::~ContinueStatement(){}
 BreakStatement::~BreakStatement(){}
 
 ReturnStatement::~ReturnStatement(){
-	delete _expr;
+	nullsafedelete(_expr);
 }
 
 Expression::~Expression(){}
@@ -86,26 +88,26 @@ Expression::~Expression(){}
 Constant::~Constant(){};
 
 FunctionCall::~FunctionCall(){
-	delete _arguments;
+	nullsafedelete(_arguments);
 }
 
 BracketedIndex::~BracketedIndex(){
-	delete _in; 
-	delete _out;
+	nullsafedelete(_in); 
+	nullsafedelete(_out);
 }
 
 UnaryOp::~UnaryOp(){
-	delete _operand;
+	nullsafedelete(_operand);
 }
 
 BinaryOp::~BinaryOp(){
-	delete _leftOperand; 
-	delete _rightOperand;
+	nullsafedelete(_leftOperand); 
+	nullsafedelete(_rightOperand);
 }
 
 
 UnAss::~UnAss(){
-	delete _operand;
+	nullsafedelete(_operand);
 }
 
 PrefixUnAss::~PrefixUnAss(){}
@@ -114,55 +116,54 @@ PostfixUnAss::~PostfixUnAss(){}
 
 
 BinaryAss::~BinaryAss(){
-	delete _rightOperand; 
-	delete _leftOperand;
+	nullsafedelete(_rightOperand); 
+	nullsafedelete(_leftOperand);
 }
 
 TypeCast::~TypeCast(){
-	delete _expr; 
-	delete _type;
+	nullsafedelete(_expr); 
+	nullsafedelete(_type);
 }
 
 
 TernaryOp::~TernaryOp(){
-	delete _condition;
-	delete _ifBody; 
-	delete _elseBody;
+	nullsafedelete(_condition);
+	nullsafedelete(_ifBody); 
+	nullsafedelete(_elseBody);
 }
 
 New::~New(){
-	delete _size;
-	delete _type;
-	delete _type;
+	nullsafedelete(_size);
+	nullsafedelete(_type);
 }
 
 Delete::~Delete(){
-	delete _expr;
+	nullsafedelete(_expr);
 }
 
 CommaExpr::~CommaExpr(){
-	delete _left;
-	delete _right;
+	nullsafedelete(_left);
+	nullsafedelete(_right);
 }
 
 Label::~Label(){}
 
 StatementList::~StatementList(){
 	for(auto& i : this->_stmts) 
-		delete i;
+		nullsafedelete(i);
 }
 
 ParameterList::~ParameterList() {
 	for(auto& i : this->_parameters)
-		delete i;
+		nullsafedelete(i);
 }
 
 ExpressionList::~ExpressionList(){
 	for(auto& i : this->_expressions)
-		delete i;
+		nullsafedelete(i);
 }
 
 DeclarationList::~DeclarationList(){
 	for(auto& i : this->_decls)
-		delete i;
+		nullsafedelete(i);
 }

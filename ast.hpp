@@ -637,7 +637,8 @@ private:
 
 class CommaExpr : public Expression {
 public:
-	CommaExpr(Expression* left, Expression* right) {}
+	CommaExpr(Expression* left, Expression* right)
+	: _left(left), _right(right) {}
 	virtual ~CommaExpr();
 
 	/* Printing Syntax Tree Functions */

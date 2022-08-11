@@ -15,5 +15,6 @@ int main(){
 
 	int ret = yyparse();
 	syntaxTree->printTree(std::cout);
+	delete syntaxTree;
 	return ret;
 }
