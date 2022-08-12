@@ -1,10 +1,11 @@
-#!/opt/homebrew/bin/python3
 
+import os
 import sys
 import subprocess
 from tqdm import tqdm
-syntaxGenScriptPath='/Users/nicole/Documents/ggec/examples/syntax_gen/gen.sh'
-progsdir = '/Users/nicole/Documents/ggec/examples/syntax_gen/progs'
+
+syntaxGenScriptPath=f'{os.getcwd()}/examples/syntax_gen/gen.sh'
+progsdir = f'{os.getcwd()}/examples/syntax_gen/progs'
 
 if len(sys.argv) < 2:
 	print('Usage: ./runner_gen number_of_programs')
