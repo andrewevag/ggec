@@ -1,0 +1,30 @@
+{
+	"Program": [
+		{
+			"DeclarationList" : [
+				{
+					"FunctionDefinition" : [
+						{
+							"BasicType" : [
+								{
+								"name" : "void"
+								}
+							]
+						},
+						{
+							"name" : "main"
+						},
+						{
+							"ParameterList" : []
+						},
+						{
+							"DeclarationList" : []
+						},
+						{
+							"StatementList" : []
+						}
+					]
+				}
+			]}
+	]
+}

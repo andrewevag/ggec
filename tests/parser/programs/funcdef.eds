@@ -1,0 +1,19 @@
+
+int* main(int argc, char** argv){
+	int x;
+	char y;
+	y = 'a';
+	return 0;
+}
+
+
+void routine(double** table){
+
+}
+
+
+char* getName(char* PATHNAME){
+	char* str;
+	str = "hello people\n\t";
+	return;
+}

@@ -1,0 +1,453 @@
+{
+    "Program": [
+        {
+            "DeclarationList": [
+                {
+                    "FunctionDefinition": [
+                        {
+                            "BasicType": [
+                                {
+                                    "name": "int"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "main"
+                        },
+                        {
+                            "ParameterList": []
+                        },
+                        {
+                            "DeclarationList": []
+                        },
+                        {
+                            "StatementList": [
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "BinaryAss(ASS)": [
+                                                {
+                                                    "Id": [
+                                                        {
+                                                            "name": "y"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "TernaryOp": [
+                                                        {
+                                                            "BinaryOp(EQUALS)": [
+                                                                {
+                                                                    "IntConstant(2)": []
+                                                                },
+                                                                {
+                                                                    "IntConstant(2)": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "IntConstant(10)": []
+                                                        },
+                                                        {
+                                                            "BinaryOp(LOR)": [
+                                                                {
+                                                                    "BinaryOp(LAND)": [
+                                                                        {
+                                                                            "BinaryOp(GREATEREQ)": [
+                                                                                {
+                                                                                    "BinaryOp(PLUS)": [
+                                                                                        {
+                                                                                            "IntConstant(12)": []
+                                                                                        },
+                                                                                        {
+                                                                                            "IntConstant(2)": []
+                                                                                        }
+                                                                                    ]
+                                                                                },
+                                                                                {
+                                                                                    "IntConstant(90)": []
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "IntConstant(38)": []
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "BoolConstant(true)" : []
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "BinaryOp(PLUS)": [
+                                                {
+                                                    "BinaryOp(MOD)": [
+                                                        {
+                                                            "BinaryOp(DIV)": [
+                                                                {
+                                                                    "BinaryOp(MULT)": [
+                                                                        {
+                                                                            "UnOp(POS)": [
+                                                                                {
+                                                                                    "PostfixUnAss(PLUSPLUS)": [
+                                                                                        {
+                                                                                            "FunctionCall": [
+                                                                                                {
+                                                                                                    "name": "func"
+                                                                                                },
+                                                                                                {
+                                                                                                    "ExpressionList": []
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "UnOp(ADDRESS)": [
+                                                                                {
+                                                                                    "PostfixUnAss(MINUSMINUS)": [
+                                                                                        {
+                                                                                            "BracketedIndex": [
+                                                                                                {
+                                                                                                    "Id": [
+                                                                                                        {
+                                                                                                            "name": "a"
+                                                                                                        }
+                                                                                                    ]
+                                                                                                },
+                                                                                                {
+                                                                                                    "IntConstant(3)": []
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "UnOp(NEG)": [
+                                                                        {
+                                                                            "PrefixUnAss(PLUSPLUS)": [
+                                                                                {
+                                                                                    "FunctionCall": [
+                                                                                        {
+                                                                                            "name": "main"
+                                                                                        },
+                                                                                        {
+                                                                                            "ExpressionList": []
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "PrefixUnAss(MINUSMINUS)": [
+                                                                {
+                                                                    "UnOp(DEREF)": [
+                                                                        {
+                                                                            "BracketedIndex": [
+                                                                                {
+                                                                                    "Id": [
+                                                                                        {
+                                                                                            "name": "b"
+                                                                                        }
+                                                                                    ]
+                                                                                },
+                                                                                {
+                                                                                    "IntConstant(64)": []
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "BinaryOp(DIV)": [
+                                                        {
+                                                            "PostfixUnAss(PLUSPLUS)": [
+                                                                {
+                                                                    "New": [
+                                                                        {
+                                                                            "Pointer": [
+                                                                                {
+                                                                                    "BasicType": [
+                                                                                        {
+                                                                                            "name": "int"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "Delete": [
+                                                                {
+                                                                    "PostfixUnAss(PLUSPLUS)": [
+                                                                        {
+                                                                            "Id": [
+                                                                                {
+                                                                                    "name": "x"
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "Delete": [
+                                                {
+                                                    "PostfixUnAss(PLUSPLUS)": [
+                                                        {
+                                                            "Id": [
+                                                                {
+                                                                    "name": "x"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression" : [
+                                        {
+                                            "CommaExpr": [
+                                                {
+                                                    "BinaryAss(MODASS)": [
+                                                        {
+                                                            "Id": [
+                                                                {
+                                                                    "name": "x"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "BinaryAss(DIVASS)": [
+                                                                {
+                                                                    "IntConstant(12)": []
+                                                                },
+                                                                {
+                                                                    "TernaryOp": [
+                                                                        {
+                                                                            "IntConstant(13)": []
+                                                                        },
+                                                                        {
+                                                                            "IntConstant(10)": []
+                                                                        },
+                                                                        {
+                                                                            "IntConstant(9)": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "BinaryAss(PLUSASS)": [
+                                                        {
+                                                            "Id": [
+                                                                {
+                                                                    "name": "x"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "IntConstant(3)": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression" : [
+                                        {
+                                            "CommaExpr": [
+                                                {
+                                                    "CommaExpr": [
+                                                        {
+                                                            "BinaryOp(MULT)": [
+                                                                {
+                                                                    "Id": [
+                                                                        {
+                                                                            "name": "x"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "IntConstant(2)": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "Id": [
+                                                                {
+                                                                    "name": "y"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "Id": [
+                                                        {
+                                                            "name": "z"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression" : [
+                                        {
+                                            "CommaExpr": [
+                                                {
+                                                    "CommaExpr": [
+                                                        {
+                                                            "FunctionCall": [
+                                                                {
+                                                                    "name": "main"
+                                                                },
+                                                                {
+                                                                    "ExpressionList": [
+                                                                        {
+                                                                            "Id": [
+                                                                                {
+                                                                                    "name": "y"
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "Id": [
+                                                                                {
+                                                                                    "name": "z"
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "Id": [
+                                                                                {
+                                                                                    "name": "w"
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "Id": [
+                                                                                {
+                                                                                    "name": "x"
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "FunctionCall": [
+                                                                {
+                                                                    "name": "y"
+                                                                },
+                                                                {
+                                                                    "ExpressionList": [
+                                                                        {
+                                                                            "IntConstant(3)": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "PostfixUnAss(PLUSPLUS)": [
+                                                        {
+                                                            "IntConstant(32)": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "CommaExpr": [
+                                                {
+                                                    "BinaryAss(ASS)": [
+                                                        {
+                                                            "Id": [
+                                                                {
+                                                                    "name": "x"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "IntConstant(2)": []
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "BinaryAss(ASS)": [
+                                                        {
+                                                            "Id": [
+                                                                {
+                                                                    "name": "y"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "IntConstant(12)": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

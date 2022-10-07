@@ -111,6 +111,9 @@ uint8_t getCharFromString(char* s){
             case 'r' :
                 c = '\r';
                 break;
+            case '0':
+                c = '\0';
+                break;
             case 'x':
                 if (strlen(s) < 4){
                     yyerror("getCharFromString: got \\x but no 2 digit hecadecimal number afterwards");

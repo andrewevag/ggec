@@ -1,0 +1,238 @@
+{
+	"Program" : [
+		{
+			"DeclarationList" : [
+				{
+					"FunctionDefinition" : [
+						{
+							"Pointer" : [
+								{"BasicType" : [{ "name" : "int" }]}
+							]
+						},
+						{
+							"name" : "main"
+						},
+						{
+							"ParameterList" : [
+								{
+									"Parameter" : [
+										{
+											"PassingWay" : "ByCall"
+										},
+										{
+											"name" : "argc"
+										},
+										{
+											"BasicType" : [{ "name" : "int" }]
+										}
+									]
+								},
+								{
+									"Parameter" : [
+										{
+											"PassingWay" : "ByCall"
+										},
+										{
+											"name" : "argv"
+										},
+										{
+											"Pointer" : [
+												{
+													"Pointer" : [
+														{
+															"BasicType" : [
+																{"name" : "char"}
+															]
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"DeclarationList" : [
+								{
+									"DeclarationList" : [
+										{
+											"VariableDeclaration" : [
+												{ "name" : "x" },
+												{ "BasicType" : [
+													{"name" : "int"}
+												] }
+											]
+										}
+									]
+								},
+								{
+									"DeclarationList" : [
+										{
+											"VariableDeclaration" : [
+												{"name": "y"},
+												{"BasicType": [
+													{ "name" : "char" }
+												]}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"StatementList" : [
+								{
+									"SingleExpression" : [
+										{
+											"BinaryAss(ASS)" : [
+												{
+													"Id" : [
+														{ "name" : "y" }
+													]
+												},
+												{
+													"CharConstant(97)" : []
+												}
+											]
+										}
+									]
+								},
+								{
+									"ReturnStatement" : [
+										{
+										"IntConstant(0)" : []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"FunctionDefinition" : [
+						{
+							"BasicType" : [
+								{"name" : "void"}
+							]
+						},
+						{
+							"name" : "routine"
+						},
+						{
+							"ParameterList" : [
+								{
+									"Parameter" : [
+										{ "PassingWay" : "ByCall" },
+										{ "name" : "table" },
+										{
+											"Pointer" : [
+												{
+													"Pointer" : [
+														{
+															"BasicType" : [
+																{ "name" : "double" }
+															]
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"DeclarationList" : []
+						},
+						{
+							"StatementList" : []
+						}
+					]
+				},
+				{
+					"FunctionDefinition" : [
+						{
+							"Pointer" : [
+								{
+									"BasicType" : [
+										{"name" : "char"}
+									]
+								}
+							]
+						},
+						{
+							"name" : "getName"
+						},
+						{
+							"ParameterList" : [
+								{
+									"Parameter" : [
+										{ "PassingWay" : "ByCall" },
+										{"name" : "PATHNAME"},
+										{
+											"Pointer" : [
+												{
+													"BasicType" : [
+														{ "name" : "char" }
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"DeclarationList" : [
+								{
+									"DeclarationList"  : [
+										{
+											"VariableDeclaration" : [
+												{ "name" : "str" },
+												{
+													"Pointer" : [
+														{
+															"BasicType" : [
+																{
+																	"name" : "char"
+																}
+															]
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"StatementList" : [
+								{
+									"SingleExpression" : [
+										{
+											"BinaryAss(ASS)" : [
+												{
+													"Id" : [
+														{"name" : "str"}
+													]
+												},
+												{
+													"StringConstant(hello people\n\t)" : []
+												}
+											]
+										}
+									]
+								},
+								{
+									"ReturnStatement" : []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}

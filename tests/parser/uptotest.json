@@ -1,0 +1,919 @@
+{
+    "Program": [
+        {
+            "DeclarationList": [
+                {
+                    "FunctionDefinition": [
+                        {
+                            "BasicType": [
+                                {
+                                    "name": "void"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "main"
+                        },
+                        {
+                            "ParameterList": []
+                        },
+                        {
+                            "DeclarationList": [
+                                {
+                                    "DeclarationList": [
+                                        {
+                                            "VariableDeclaration": [
+                                                {
+                                                    "name": "limit"
+                                                },
+                                                {
+                                                    "BasicType": [
+                                                        {
+                                                            "name": "int"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "VariableDeclaration": [
+                                                {
+                                                    "name": "number"
+                                                },
+                                                {
+                                                    "BasicType": [
+                                                        {
+                                                            "name": "int"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "VariableDeclaration": [
+                                                {
+                                                    "name": "counter"
+                                                },
+                                                {
+                                                    "BasicType": [
+                                                        {
+                                                            "name": "int"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "FunctionDefinition": [
+                                        {
+                                            "BasicType": [
+                                                {
+                                                    "name": "bool"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "name": "prime"
+                                        },
+                                        {
+                                            "ParameterList": [
+                                                {
+                                                    "Parameter": [
+                                                        {
+                                                            "PassingWay": "ByCall"
+                                                        },
+                                                        {
+                                                            "name": "n"
+                                                        },
+                                                        {
+                                                            "BasicType": [
+                                                                {
+                                                                    "name": "int"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "DeclarationList": [
+                                                {
+                                                    "DeclarationList": [
+                                                        {
+                                                            "VariableDeclaration": [
+                                                                {
+                                                                    "name": "i"
+                                                                },
+                                                                {
+                                                                    "BasicType": [
+                                                                        {
+                                                                            "name": "int"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "StatementList": [
+                                                {
+                                                    "IfStatement": [
+                                                        {
+                                                            "BinaryOp(LESS)": [
+                                                                {
+                                                                    "Id": [
+                                                                        {
+                                                                            "name": "n"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "IntConstant(0)": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "ReturnStatement": [
+                                                                {
+                                                                    "FunctionCall": [
+                                                                        {
+                                                                            "name": "prime"
+                                                                        },
+                                                                        {
+                                                                            "ExpressionList": [
+                                                                                {
+                                                                                    "UnOp(NEG)": [
+                                                                                        {
+                                                                                            "Id": [
+                                                                                                {
+                                                                                                    "name": "n"
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "IfStatement": [
+                                                        {
+                                                            "BinaryOp(LESS)": [
+                                                                {
+                                                                    "Id": [
+                                                                        {
+                                                                            "name": "n"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "IntConstant(2)": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "ReturnStatement": [
+                                                                {
+                                                                    "BoolConstant(false)": []
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "IfStatement": [
+                                                        {
+                                                            "BinaryOp(EQUALS)": [
+                                                                {
+                                                                    "Id": [
+                                                                        {
+                                                                            "name": "n"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "IntConstant(2)": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "ReturnStatement": [
+                                                                {
+                                                                    "BoolConstant(true)": []
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "IfStatement": [
+                                                        {
+                                                            "BinaryOp(EQUALS)": [
+                                                                {
+                                                                    "BinaryOp(MOD)": [
+                                                                        {
+                                                                            "Id": [
+                                                                                {
+                                                                                    "name": "n"
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "IntConstant(2)": []
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "IntConstant(0)": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "ReturnStatement": [
+                                                                {
+                                                                    "BoolConstant(false)": []
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "ForStatement": [
+                                                        {
+                                                            "BinaryAss(ASS)": [
+                                                                {
+                                                                    "Id": [
+                                                                        {
+                                                                            "name": "i"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "IntConstant(3)": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "BinaryOp(LESSEQ)": [
+                                                                {
+                                                                    "Id": [
+                                                                        {
+                                                                            "name": "i"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "BinaryOp(DIV)": [
+                                                                        {
+                                                                            "Id": [
+                                                                                {
+                                                                                    "name": "n"
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "IntConstant(2)": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "BinaryAss(PLUSASS)": [
+                                                                {
+                                                                    "Id": [
+                                                                        {
+                                                                            "name": "i"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "IntConstant(2)": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "IfStatement": [
+                                                                {
+                                                                    "BinaryOp(EQUALS)": [
+                                                                        {
+                                                                            "BinaryOp(MOD)": [
+                                                                                {
+                                                                                    "Id": [
+                                                                                        {
+                                                                                            "name": "n"
+                                                                                        }
+                                                                                    ]
+                                                                                },
+                                                                                {
+                                                                                    "Id": [
+                                                                                        {
+                                                                                            "name": "i"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "IntConstant(0)": []
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "ReturnStatement": [
+                                                                        {
+                                                                            "BoolConstant(false)": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "ReturnStatement": [
+                                                        {
+                                                            "BoolConstant(true)": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "StatementList": [
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "FunctionCall": [
+                                                {
+                                                    "name": "writeString"
+                                                },
+                                                {
+                                                    "ParameterList": [
+                                                        {
+                                                            "StringConstant(Please, give the upper limit: )": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "BinaryAss(ASS)": [
+                                                {
+                                                    "Id": [
+                                                        {
+                                                            "name": "limit"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "FunctionCall": [
+                                                        {
+                                                            "name": "readInteger"
+                                                        },
+                                                        {
+                                                            "ExpressionList": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "FunctionCall": [
+                                                {
+                                                    "name": "writeString"
+                                                },
+                                                {
+                                                    "ExpressionList": [
+                                                        {
+                                                            "StringConstant(Prime numbers between 0 and )": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "FunctionCall": [
+                                                {
+                                                    "name": "writeInteger"
+                                                },
+                                                {
+                                                    "ExpressionList": [
+                                                        {
+                                                            "Id": [
+                                                                {
+                                                                    "name": "limit"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "FunctionCall": [
+                                                {
+                                                    "name": "writeString"
+                                                },
+                                                {
+                                                    "ExpressionList": [
+                                                        {
+                                                            "StringConstant(\n\n)": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "BinaryAss(ASS)": [
+                                                {
+                                                    "Id": [
+                                                        {
+                                                            "name": "counter"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "IntConstant(0)": []
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "IfStatement": [
+                                        {
+                                            "BinaryOp(GREATEREQ)": [
+                                                {
+                                                    "Id": [
+                                                        {
+                                                            "name": "limit"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "IntConstant(2)": []
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "StatementList": [
+                                                {
+                                                    "SingleExpression": [
+                                                        {
+                                                            "PostfixUnAss(PLUSPLUS)": [
+                                                                {
+                                                                    "Id": [
+                                                                        {
+                                                                            "name": "counter"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "SingleExpression": [
+                                                        {
+                                                            "FunctionCall": [
+                                                                {
+                                                                    "name": "writeString"
+                                                                },
+                                                                {
+                                                                    "ExpressionList": [
+                                                                        {
+                                                                            "StringConstant(2\n)": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "IfStatement": [
+                                        {
+                                            "BinaryOp(GREATEREQ)": [
+                                                {
+                                                    "Id": [
+                                                        {
+                                                            "name": "limit"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "IntConstant(3)": []
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "StatementList": [
+                                                {
+                                                    "SingleExpression": [
+                                                        {
+                                                            "PostfixUnAss(PLUSPLUS)": [
+                                                                {
+                                                                    "Id": [
+                                                                        {
+                                                                            "name": "counter"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "SingleExpression": [
+                                                        {
+                                                            "FunctionCall": [
+                                                                {
+                                                                    "name": "writeString"
+                                                                },
+                                                                {
+                                                                    "ExpressionList": [
+                                                                        {
+                                                                            "StringConstant(3\n)": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "ForStatement": [
+                                        {
+                                            "BinaryAss(ASS)": [
+                                                {
+                                                    "Id": [
+                                                        {
+                                                            "name": "number"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "IntConstant(6)": []
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "BinaryOp(LESSEQ)": [
+                                                {
+                                                    "Id": [
+                                                        {
+                                                            "name": "number"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "Id": [
+                                                        {
+                                                            "name": "limit"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "BinaryAss(PLUSASS)": [
+                                                {
+                                                    "Id": [
+                                                        {
+                                                            "name": "number"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "IntConstant(6)": []
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "StatementList": [
+                                                {
+                                                    "IfStatement": [
+                                                        {
+                                                            "FunctionCall": [
+                                                                {
+                                                                    "name": "prime"
+                                                                },
+                                                                {
+                                                                    "ExpressionList": [
+                                                                        {
+                                                                            "BinaryOp(MINUS)": [
+                                                                                {
+                                                                                    "Id": [
+                                                                                        {
+                                                                                            "name": "number"
+                                                                                        }
+                                                                                    ]
+                                                                                },
+                                                                                {
+                                                                                    "IntConstant(1)": []
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "StatementList": [
+                                                                {
+                                                                    "SingleExpression": [
+                                                                        {
+                                                                            "PostfixUnAss(PLUSPLUS)": [
+                                                                                {
+                                                                                    "Id": [
+                                                                                        {
+                                                                                            "name": "counter"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "SingleExpression": [
+                                                                        {
+                                                                            "FunctionCall": [
+                                                                                {
+                                                                                    "name": "writeInteger"
+                                                                                },
+                                                                                {
+                                                                                    "ExpressionList": [
+                                                                                        {
+                                                                                            "BinaryOp(MINUS)": [
+                                                                                                {
+                                                                                                    "Id": [
+                                                                                                        {
+                                                                                                            "name": "number"
+                                                                                                        }
+                                                                                                    ]
+                                                                                                },
+                                                                                                {
+                                                                                                    "IntConstant(1)": []
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "SingleExpression": [
+                                                                        {
+                                                                            "FunctionCall": [
+                                                                                {
+                                                                                    "name": "writeString"
+                                                                                },
+                                                                                {
+                                                                                    "ExpressionList": [
+                                                                                        {
+                                                                                            "StringConstant(\n)": []
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "IfStatement": [
+                                                        {
+                                                            "BinaryOp(LAND)": [
+                                                                {
+                                                                    "BinaryOp(NOTEQ)": [
+                                                                        {
+                                                                            "Id": [
+                                                                                {
+                                                                                    "name": "number"
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "Id": [
+                                                                                {
+                                                                                    "name": "limit"
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "FunctionCall": [
+                                                                        {
+                                                                            "name": "prime"
+                                                                        },
+                                                                        {
+                                                                            "ExpressionList": [
+                                                                                {
+                                                                                    "BinaryOp(PLUS)": [
+                                                                                        {
+                                                                                            "Id": [
+                                                                                                {
+                                                                                                    "name": "number"
+                                                                                                }
+                                                                                            ]
+                                                                                        },
+                                                                                        {
+                                                                                            "IntConstant(1)": []
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "StatementList": [
+                                                                {
+                                                                    "SingleExpression": [
+                                                                        {
+                                                                            "PostfixUnAss(PLUSPLUS)": [
+                                                                                {
+                                                                                    "Id": [
+                                                                                        {
+                                                                                            "name": "counter"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "SingleExpression": [
+                                                                        {
+                                                                            "FunctionCall": [
+                                                                                {
+                                                                                    "name": "writeInteger"
+                                                                                },
+                                                                                {
+                                                                                    "ExpressionList": [
+                                                                                        {
+                                                                                            "BinaryOp(PLUS)": [
+                                                                                                {
+                                                                                                    "Id": [
+                                                                                                        {
+                                                                                                            "name": "number"
+                                                                                                        }
+                                                                                                    ]
+                                                                                                },
+                                                                                                {
+                                                                                                    "IntConstant(1)": []
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "SingleExpression": [
+                                                                        {
+                                                                            "FunctionCall": [
+                                                                                {
+                                                                                    "name": "writeString"
+                                                                                },
+                                                                                {
+                                                                                    "ExpressionList": [
+                                                                                        {
+                                                                                            "StringConstant(\\n)": []
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "FunctionCall": [
+                                                {
+                                                    "name": "writeString"
+                                                },
+                                                {
+                                                    "ExpressionList": [
+                                                        {
+                                                            "StringConstant(\n)": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "FunctionCall": [
+                                                {
+                                                    "name": "writeInteger"
+                                                },
+                                                {
+                                                    "ExpressionList": [
+                                                        {
+                                                            "Id": [
+                                                                {
+                                                                    "name": "counter"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "FunctionCall": [
+                                                {
+                                                    "name": "writeString"
+                                                },
+                                                {
+                                                    "ExpressionList": [
+                                                        {
+                                                            "StringConstant( prime number(s) were found.\n)": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
