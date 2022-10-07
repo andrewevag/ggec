@@ -21,7 +21,7 @@ int main(){
 	// Program *p = new Program(new DeclarationList());
 
 	
-
+	delete syntaxTree;
 	// Declaration* v = new VariableDeclaration(new Pointer(new BasicType("int")), "x2");
 	// print(v->toJSONString());
 

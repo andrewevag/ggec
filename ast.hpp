@@ -7,7 +7,7 @@
 
 class AST : public Tree {
 public:
-	virtual ~AST() = default;
+	virtual ~AST();
 	virtual std::string toJSONString() = 0;
 
 	/* Printing Syntax Tree Functions */
@@ -30,9 +30,7 @@ class BasicType;
 class Program : public AST {
 public:
 	Program(DeclarationList* decls) : _decls(decls) {}
-	virtual ~Program() override {};
-
-
+	virtual ~Program();
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)_decls}; }
 	virtual void printNode(std::ostream& out) override { out << "Program"; } 
@@ -43,7 +41,7 @@ private:
 
 class Declaration : public AST {
 public:
-	virtual ~Declaration() override = default;
+	virtual ~Declaration();
 	//only interesting in variables || when parsed in line we later add the type of the first declared
 	virtual void embedType(TypeExpression*) = 0;
 
@@ -58,7 +56,7 @@ public:
 class VariableDeclaration : public Declaration {
 public:
 	VariableDeclaration(TypeExpression* typeExpr, std::string name) : _typeExpr(typeExpr), _name(name) {} 
-	virtual ~VariableDeclaration() override = default;
+	~VariableDeclaration();
 	virtual void embedType(TypeExpression* type) override {
 		this->_typeExpr = type;
 	}
@@ -77,9 +75,8 @@ class ArrayDeclaration : public VariableDeclaration {
 public:
 	ArrayDeclaration(TypeExpression* typeExp, std::string name, Expression* expr)
 	:  VariableDeclaration(typeExp, name), _expr(expr) {}
-	virtual ~ArrayDeclaration() override = default;
-
-	/* Printing Syntax Tree Functions */
+	~ArrayDeclaration();
+	/* Printing Syntax Tree Functiontgs */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)this->_typeExpr, (Tree*)this->_expr}; }
 	virtual void printNode(std::ostream& out) override { out << "ArrayDeclaration(" << _name << ')';  }
 	virtual std::string toJSONString() override;
@@ -91,7 +88,7 @@ class FunctionDeclaration : public Declaration {
 public:
 	FunctionDeclaration(TypeExpression* typeExpr, std::string name, ParameterList* parameters) : 
 	_resultType(typeExpr), _name(name), _parameters(parameters) {}
-	virtual ~FunctionDeclaration() override = default;
+	~FunctionDeclaration();
 	virtual void embedType(TypeExpression* type) override {}
 
 	/* Printing Syntax Tree Functions */
@@ -111,7 +108,7 @@ public:
 	FunctionDefinition(TypeExpression* typeExpr, std::string name, ParameterList* parameters, 
 	DeclarationList* decls, StatementList* statements) : 
 	_resultType(typeExpr), _name(name), _parameters(parameters), _decls(decls), _statements(statements) {}
-	virtual ~FunctionDefinition() override = default;
+	~FunctionDefinition();
 	virtual void embedType(TypeExpression* type) override {}
 
 
@@ -136,7 +133,7 @@ public:
 	static std::string passingWayToString(PassingWay pw) { return pw == PassingWay::ByCall ? "ByCall" : "ByRef"; }
 	Parameter(PassingWay pw, TypeExpression* type, std::string name) 
 	: _pw(pw), _name(name), _type(type) {}
-	virtual ~Parameter() override = default;
+	virtual ~Parameter();
 	
 
 	/* Printing Syntax Tree Functions */
@@ -153,7 +150,7 @@ private:
 
 class TypeExpression : public AST {
 public:
-	virtual ~TypeExpression() override = default;
+	virtual ~TypeExpression();
 	virtual void penetrate(TypeExpression*) = 0;
 	virtual std::string getName() = 0;
 	virtual TypeExpression* copy() = 0;
@@ -167,7 +164,7 @@ private:
 class BasicType : public TypeExpression {
 public:
 	BasicType(std::string name) : _name(name) {}
-	virtual ~BasicType() override = default;
+	~BasicType();
 	virtual std::string getName() override { return this->_name; }
 	virtual void penetrate(TypeExpression* me) override { 
 		this->_name = me->getName();
@@ -188,7 +185,7 @@ private:
 class Pointer : public TypeExpression {
 public:
 	Pointer(TypeExpression* inner) : _inner(inner) {}
-	virtual ~Pointer() override = default;
+	~Pointer();
 	virtual std::string getName() override { return "*"; }
 	virtual void penetrate(TypeExpression* me) override {
 		this->_inner->penetrate(me);
@@ -208,15 +205,14 @@ public:
 
 class Statement : public AST {
 public:
-	virtual ~Statement() override = default;
-	virtual std::string toJSONString() = 0;
+	virtual ~Statement();
 };
 
 class EmptyStatement : public Statement {
 public:
 	EmptyStatement() {}
-	virtual ~EmptyStatement() override = default;
-
+	virtual ~EmptyStatement();
+	
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {}; };
 	virtual void printNode(std::ostream& out) override { out << "EmptyStatement"; };
@@ -228,7 +224,7 @@ class SingleExpression : public Statement {
 public: 
 	SingleExpression(Expression* expr)
 	: _expr(expr) {}
-	virtual ~SingleExpression() override = default;
+	virtual ~SingleExpression();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)_expr}; }
@@ -242,7 +238,7 @@ class IfStatement : public Statement {
 public:
 	IfStatement(Expression* cond, Statement* ifbody)
 	: _condition(cond), _ifbody(ifbody) {}
-	virtual ~IfStatement() override = default;
+	virtual ~IfStatement();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)_condition, (Tree*)_ifbody}; }
@@ -257,7 +253,7 @@ class IfElseStatement : public Statement {
 public:
 	IfElseStatement(Expression* cond, Statement* ifbody, Statement* elsebody)
 	: _condition(cond), _ifbody(ifbody), _elsebody(elsebody) {}
-	virtual ~IfElseStatement() override = default;
+	virtual ~IfElseStatement();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)_condition, (Tree*) _ifbody, (Tree*)_elsebody}; };
@@ -274,8 +270,7 @@ public:
 	// label can be null and expressions
 	ForStatement(Label* lbl, Expression* first, Expression* second, Expression* third, Statement* body)
 	: _label(lbl), _first(first), _second(second), _third(third), _body(body) {}
-	virtual ~ForStatement() override = default;
-
+	virtual ~ForStatement();
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { 
 		if (_label == nullptr) return {(Tree*)_first, (Tree*)_second, (Tree*)_third, (Tree*)_body};
@@ -294,7 +289,7 @@ public:
 	// can be "" indicating no target label
 	ContinueStatement() : _target("") {}
 	ContinueStatement(std::string target) : _target(target) {}
-	virtual ~ContinueStatement() override = default;
+	virtual ~ContinueStatement();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {}; };
@@ -313,7 +308,7 @@ public:
 	// can be "" indicating no target label
 	BreakStatement() : _target("") {}
 	BreakStatement(std::string target) : _target(target) {}
-	virtual ~BreakStatement() override = default;
+	virtual ~BreakStatement();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {}; };
@@ -331,7 +326,8 @@ class ReturnStatement : public Statement {
 public:
 	//the expression can be null indicating no return expression
 	ReturnStatement(Expression* expr) : _expr(expr) {}
-	virtual ~ReturnStatement() override = default;
+	virtual ~ReturnStatement();
+	
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override {
 		if (_expr == nullptr) return {};
@@ -347,7 +343,7 @@ private:
 
 class Expression : public AST {
 public:
-	virtual ~Expression() override = default;
+	virtual ~Expression();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
@@ -358,7 +354,7 @@ public:
 class Id : public Expression {
 public:
 	Id(std::string name) : _name(name) {}
-	virtual ~Id() override = default;
+	virtual ~Id() = default;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {}; };
@@ -376,7 +372,7 @@ public:
 	Constant(std::string s) : _ct(ConstantType::String), _string(s) {}
 	Constant(bool f) : _ct(ConstantType::Bool), _bool(f) {}
 	Constant() : _ct(ConstantType::Null) {}
-	virtual ~Constant() override = default;
+	virtual ~Constant();
 	enum ConstantType { Bool, Null, Int, Char, Double, String };
 
 	/* Printing Syntax Tree Functions */
@@ -406,7 +402,7 @@ class FunctionCall : public Expression {
 public:
 	FunctionCall(std::string name, ExpressionList* args) 
 	: _functionName(name), _arguments(args) {}
-	virtual ~FunctionCall() override = default;
+	virtual ~FunctionCall();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)_arguments}; };
@@ -421,7 +417,7 @@ class BracketedIndex : public Expression {
 public:
 	BracketedIndex(Expression* in, Expression* out)
 	: _in(in), _out(out) {} 
-	virtual ~BracketedIndex() override = default;
+	virtual ~BracketedIndex();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_in, _out}; };
@@ -450,7 +446,7 @@ public:
 
 	UnaryOp(UnaryOpType unop, Expression* operand)
 	: _UnOp(unop), _operand(operand) {}
-	virtual ~UnaryOp() override = default;
+	virtual ~UnaryOp();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_operand}; }
@@ -487,7 +483,7 @@ public:
 
 	BinaryOp(BinaryOpType binop, Expression* left, Expression* right)
 	: _BinOp(binop), _leftOperand(left), _rightOperand(right) {}
-	virtual ~BinaryOp() override = default;
+	virtual ~BinaryOp();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_leftOperand, _rightOperand}; }
@@ -512,7 +508,7 @@ public:
 	}
 	UnAss(UnAssType unass, Expression* operand)
 	: _Unass(unass), _operand(operand) {}
-	virtual ~UnAss() = default;
+	virtual ~UnAss();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
@@ -527,7 +523,7 @@ class PrefixUnAss : public UnAss {
 public:	
 	PrefixUnAss(UnAss::UnAssType unass, Expression* operand) 
 	: UnAss(unass, operand) {}
-	virtual ~PrefixUnAss() override = default;
+	virtual ~PrefixUnAss();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {this->_operand}; }
@@ -540,7 +536,7 @@ class PostfixUnAss : public UnAss {
 public:
 	PostfixUnAss(UnAss::UnAssType unass, Expression* operand) 
 	: UnAss(unass, operand) {}
-	virtual ~PostfixUnAss() override = default;
+	virtual ~PostfixUnAss();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {this->_operand}; }
@@ -566,7 +562,7 @@ public:
 	}
 	BinaryAss(BinaryAssType type, Expression* left, Expression* right)
 	: _BinAss(type), _leftOperand(left), _rightOperand(right) {}
-	virtual ~BinaryAss() override = default;
+	virtual ~BinaryAss();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_leftOperand, _rightOperand}; }
@@ -582,7 +578,7 @@ class TypeCast : public Expression {
 public:
 	TypeCast(TypeExpression* type, Expression* expr)
 	: _type(type), _expr(expr) {}
-	virtual ~TypeCast() override = default;
+	virtual ~TypeCast();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return { _type, _expr }; }
@@ -597,7 +593,7 @@ class TernaryOp : public Expression {
 public:
 	TernaryOp(Expression* cond, Expression* ifbody, Expression* elsebody)
 	: _condition(cond), _ifBody(ifbody), _elseBody(elsebody) {}
-	virtual ~TernaryOp() override = default;
+	virtual ~TernaryOp();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_condition, _ifBody, _elseBody}; }
@@ -613,7 +609,7 @@ class New : public Expression {
 public:
 	New(TypeExpression* type) : _type(type), _size(nullptr) {}
 	New(TypeExpression* type, Expression* size) : _type(type), _size(size) {}
-	virtual ~New() override = default;
+	virtual ~New();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { if (this->_size != nullptr) return {_type, _size}; else return {_type}; }
@@ -628,7 +624,7 @@ private:
 class Delete : public Expression {
 public:
 	Delete(Expression* expr) : _expr(expr) {} 
-	virtual ~Delete() override = default;
+	virtual ~Delete();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_expr}; }
@@ -641,9 +637,9 @@ private:
 
 class CommaExpr : public Expression {
 public:
-	CommaExpr(Expression* left, Expression* right) 
+	CommaExpr(Expression* left, Expression* right)
 	: _left(left), _right(right) {}
-	virtual ~CommaExpr() override = default;
+	virtual ~CommaExpr();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_left, _right}; }
@@ -657,7 +653,7 @@ private:
 class Label : public AST {
 public:
 	Label(std::string lblname) : _lblname(lblname) {}
-	virtual ~Label() = default;
+	virtual ~Label();
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {}; }
@@ -677,7 +673,7 @@ public:
 	StatementList() : _stmts(std::deque<Statement*>()) {}
 	StatementList(std::deque<Statement*> stmts) 
 	: _stmts(stmts) {}
-	virtual ~StatementList() override = default;
+	virtual ~StatementList();
 	std::deque<Statement*> _stmts;
 
 	/* Printing Syntax Tree Functions */
@@ -690,7 +686,7 @@ public:
 class ParameterList : public AST {
 public:
 	ParameterList() : _parameters(std::deque<Parameter*>()) {}
-	virtual ~ParameterList() override = default;
+	virtual ~ParameterList();
 	std::deque<Parameter*> _parameters;
 
 	/* Printing Syntax Tree Functions */
@@ -704,7 +700,7 @@ public:
 
 	ExpressionList() : _expressions(std::deque<Expression*>()) {}
 	ExpressionList(std::deque<Expression*> expressions) : _expressions(expressions) {}
-	virtual ~ExpressionList() override = default;
+	virtual ~ExpressionList();
 	std::deque<Expression*> _expressions;
 
 	/* Printing Syntax Tree Functions */
@@ -718,7 +714,7 @@ class DeclarationList : public Declaration {
 public:
 	DeclarationList() : _decls(std::deque<Declaration*>()) {}
 	DeclarationList(std::deque<Declaration*> decls) : _decls(decls) {}
-	virtual ~DeclarationList() override = default;
+	virtual ~DeclarationList();
 	std::deque<Declaration*> _decls;
 	virtual void embedType(TypeExpression* t) override {
 		for(Declaration* i : this->_decls)
@@ -730,10 +726,6 @@ public:
 	virtual std::vector<Tree*> getChildren() override { return {_decls.begin(), _decls.end()}; }
 	virtual void printNode(std::ostream& out) override { out << "DeclarationList"; }
 };
-
-
-
-
 
 
 #endif/*__AST_HPP__*/

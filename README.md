@@ -28,3 +28,8 @@ A Compiler for the Edsger Programming Language
             │       └──VariableDeclaration(y) <br />
             │           └──BasicType(int) <br />
             └──StatementList <br />
+
+---
+# DO NOT FORGET
+- Να καθορίσουμε στο makefile ακριβως ποιες version χρησιμοποιούμε 
+- τα paths στα .sh αρχεια είναι για το mac 

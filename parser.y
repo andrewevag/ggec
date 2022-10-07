@@ -121,8 +121,8 @@ declaration:
 ;
 
 variable_declaration:
-    type T_id sep_by_comma_declarator ';'                               { $3->_decls.push_front(new VariableDeclaration($1, $2)); for(auto &i : $3->_decls) i->embedType($1->copy()); $$ = $3;  }
-|   type T_id '[' constant_expression ']' sep_by_comma_declarator ';'   { $6->_decls.push_front(new ArrayDeclaration($1, $2, $4)); for(auto &i : $6->_decls) i->embedType($1->copy()); $$ = $6; }
+    type T_id sep_by_comma_declarator ';'                               { for(auto &i : $3->_decls) i->embedType($1->copy()); $3->_decls.push_front(new VariableDeclaration($1, $2));; $$ = $3; delete[] $2; }
+|   type T_id '[' constant_expression ']' sep_by_comma_declarator ';'   { for(auto &i : $6->_decls) i->embedType($1->copy()); $6->_decls.push_front(new ArrayDeclaration($1, $2, $4)); $$ = $6; delete[] $2; }
 ;
 
 sep_by_comma_declarator:
@@ -147,15 +147,15 @@ basic_type:
 ;
 
 declarator:
-    T_id                                { $$ = new VariableDeclaration(nullptr, $1); }
-|   T_id '[' constant_expression ']'    { $$ = new ArrayDeclaration(nullptr, $1, $3); }
+    T_id                                { $$ = new VariableDeclaration(nullptr, $1); delete[] $1;}
+|   T_id '[' constant_expression ']'    { $$ = new ArrayDeclaration(nullptr, $1, $3); delete[] $1; }
 ;
 
 function_declaration:
-    type T_id '(' ')' ';'                   { $$ =  new FunctionDeclaration($1, $2, new ParameterList()); }
-|   type T_id '(' parameter_list ')' ';'    { $$ = new FunctionDeclaration($1, $2, $4); }
-|   "void" T_id '(' ')' ';'                 { $$ = new FunctionDeclaration(new BasicType("void"), $2, new ParameterList()); }
-|   "void" T_id '(' parameter_list ')' ';'  { $$ = new FunctionDeclaration(new BasicType("void"), $2, $4); }
+    type T_id '(' ')' ';'                   { $$ =  new FunctionDeclaration($1, $2, new ParameterList()); delete[] $2; }
+|   type T_id '(' parameter_list ')' ';'    { $$ = new FunctionDeclaration($1, $2, $4); delete[] $2; }
+|   "void" T_id '(' ')' ';'                 { $$ = new FunctionDeclaration(new BasicType("void"), $2, new ParameterList()); delete[] $2;}
+|   "void" T_id '(' parameter_list ')' ';'  { $$ = new FunctionDeclaration(new BasicType("void"), $2, $4); delete[] $2; }
 ;
 
 parameter_list:
@@ -168,15 +168,15 @@ sep_by_comma_parameter:
 ;
 
 parameter:
-    "byref" type T_id       { $$ = new Parameter(Parameter::ByRef, $2, $3); }
-|   type T_id               { $$ = new Parameter(Parameter::ByCall, $1, $2); }
+    "byref" type T_id       { $$ = new Parameter(Parameter::ByRef, $2, $3); delete[] $3;}
+|   type T_id               { $$ = new Parameter(Parameter::ByCall, $1, $2); delete[] $2; }
 ;   
 
 function_definition:
-    type T_id '(' ')' '{' declaration_list statement_list '}'                   { $$ = new FunctionDefinition($1, $2, new ParameterList(), $6, $7); }
-|   type T_id '(' parameter_list ')' '{' declaration_list statement_list '}'    { $$ = new FunctionDefinition($1, $2, $4, $7, $8); }
-|   "void" T_id '(' ')' '{' declaration_list statement_list '}'                 { $$ = new FunctionDefinition(new BasicType("void"), $2, new ParameterList(), $6, $7); }
-|   "void" T_id '(' parameter_list ')' '{' declaration_list statement_list '}'  { $$ = new FunctionDefinition(new BasicType("void"), $2, $4, $7, $8); }
+    type T_id '(' ')' '{' declaration_list statement_list '}'                   { $$ = new FunctionDefinition($1, $2, new ParameterList(), $6, $7); delete[] $2;}
+|   type T_id '(' parameter_list ')' '{' declaration_list statement_list '}'    { $$ = new FunctionDefinition($1, $2, $4, $7, $8); delete[] $2;}
+|   "void" T_id '(' ')' '{' declaration_list statement_list '}'                 { $$ = new FunctionDefinition(new BasicType("void"), $2, new ParameterList(), $6, $7); delete[] $2;}
+|   "void" T_id '(' parameter_list ')' '{' declaration_list statement_list '}'  { $$ = new FunctionDefinition(new BasicType("void"), $2, $4, $7, $8); delete[] $2; }
 ;
 
 
@@ -193,15 +193,15 @@ statement:
 |   "if" '(' expression ')' statement "else" statement  { $$ = new IfElseStatement($3, $5, $7); }
 |   label "for" '(' expression_or_empty ';' expression_or_empty ';' expression_or_empty ')' statement { $$ = new ForStatement($1, $4, $6, $8, $10); }
 |   "continue" ';'                              { $$ = new ContinueStatement(); }
-|   "continue" T_id ';'                         { $$ = new ContinueStatement($2); }
+|   "continue" T_id ';'                         { $$ = new ContinueStatement($2); delete[] $2;}
 |   "break" ';'                                 { $$ = new BreakStatement(); }
-|   "break" T_id ';'                            { $$ = new BreakStatement($2); }
+|   "break" T_id ';'                            { $$ = new BreakStatement($2); delete[] $2; }
 |   "return" expression_or_empty ';'            { $$ = new ReturnStatement($2); }
 ;
 
 label:
     /* nothing */                               { $$ = nullptr; }
-|   T_id ':'                                    { $$ = new Label($1); }
+|   T_id ':'                                    { $$ = new Label($1); delete[] $1; }
 ;
 
 expression_or_empty:
@@ -215,6 +215,7 @@ expression:
 ;
 
 
+
 expression_list:
     no_comma_expression                     %prec ARGLIST { $$ = new ExpressionList({$1}); }
 |   no_comma_expression ',' expression_list %prec ARGLIST { $3->_expressions.push_front($1); $$ = $3; }
@@ -222,7 +223,7 @@ expression_list:
 
 
 no_comma_expression:
-    T_id                                        { $$ = new Id($1); }
+    T_id                                        { $$ = new Id($1); delete[] $1; }
 |   '(' expression ')'                          { $$ = $2; }
 |   "true"                                      { $$ = new Constant(true); }
 |   "false"                                     { $$ = new Constant(false); }
@@ -230,9 +231,9 @@ no_comma_expression:
 |   T_int_const                                 { $$ = new Constant((int16_t)$1); }
 |   T_char_const                                { $$ = new Constant((char)$1); }
 |   T_double_const                              { $$ = new Constant((long double)$1); }
-|   T_string_const                              { $$ = new Constant((std::string)$1); }
-|   T_id '(' ')'                                { $$ = new FunctionCall($1, new ExpressionList()); } 
-|   T_id '(' expression_list ')'                { $$ = new FunctionCall($1, $3); }
+|   T_string_const                              { $$ = new Constant((std::string)$1); delete[] $1; }
+|   T_id '(' ')'                                { $$ = new FunctionCall($1, new ExpressionList()); delete[] $1; } 
+|   T_id '(' expression_list ')'                { $$ = new FunctionCall($1, $3); delete[] $1; }
 |   no_comma_expression '[' no_comma_expression ']'               { $$ = new BracketedIndex($1, $3); }
 |   '&' no_comma_expression %prec ADDRESS                { $$ = new UnaryOp(UnaryOp::UnaryOpType::ADDRESS, $2); }
 |   '*' no_comma_expression %prec DEREF                  { $$ = new UnaryOp(UnaryOp::UnaryOpType::DEREF, $2); }

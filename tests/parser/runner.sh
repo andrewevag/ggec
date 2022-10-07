@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+
 
 from os import listdir
 from os.path import isfile, join
@@ -28,8 +28,10 @@ for prog in programs:
 	exitcode = process.returncode
 	producedOutput = process.stdout
 
-
-	producedJSON = json.loads(producedOutput)
+	try:
+		producedJSON = json.loads(producedOutput)
+	except:
+		exitcode = 1
 	expectedJSON = json.loads(output)
 	
 
