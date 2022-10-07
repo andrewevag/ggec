@@ -1,18 +1,20 @@
 #include <cstdio>
+#include <cstdlib>
+#include <vector>
+#include "ast.hpp"
+#include "parser.hpp"
+#include "lexer.hpp"
+#include <string>
 
-extern int yylex();
-extern char* yytext;
-
-
-
+AST* syntaxTree = nullptr;
 
 int main(){
-	int token;
-	do{
-		token = yylex();
-		printf("tokenId=%d, lexeme=\"%s\" ", token, yytext);
-	}while(token != 0);
+	
+	//VariableDeclaration*v = new ArrayDeclaration(new BasicType("int"),"x",new Constant((int16_t)12));
+	//delete v;
 
-
-	return 0;
+	int ret = yyparse();
+	syntaxTree->printTree(std::cout);
+	delete syntaxTree;
+	return ret;
 }

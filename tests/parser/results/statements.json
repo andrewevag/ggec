@@ -1,0 +1,325 @@
+{
+	"Program" : [
+		{
+			"DeclarationList" : [
+				{
+					"FunctionDefinition" : [
+						{ "BasicType" : [{"name" : "void"}] },
+						{"name" : "main"},
+						{
+							"ParameterList" : []
+						},
+						{
+							"DeclarationList" : []
+						},
+						{
+							"StatementList" : [
+								{
+									"EmptyStatement" : []
+								},
+								{
+									"SingleExpression" : [
+										{
+											"Id" : [{"name" : "x"}]
+										}
+									]
+								},
+								{
+									"StatementList" : [
+										{
+											"SingleExpression" : [
+												{
+													"Id" : [{"name" : "x"}]
+												}
+											]
+										},
+										{
+											"IfStatement" : [
+												{
+													"BinaryOp(EQUALS)" : [
+														{
+															"Id" : [{"name" : "x"}]
+														},
+														{
+															"IntConstant(0)" : []
+														}
+													]
+												},
+												{
+													"SingleExpression" : [
+														{
+															"PostfixUnAss(PLUSPLUS)" : [
+																{
+																	"Id" : [{"name" : "x"}]
+																}
+															]
+														}
+													]
+												}
+											]
+										},
+										{
+											"EmptyStatement" : []
+										}
+									]
+								},
+								{
+									"IfElseStatement" : [
+										{
+											"BinaryOp(NOTEQ)" : [
+												{
+													"Id" : [{"name" : "x"}]
+												},
+												{
+													"IntConstant(0)" : []
+												}
+											]
+										},
+										{
+											"StatementList" : [
+												{
+													"SingleExpression" : [
+														{
+															"PrefixUnAss(MINUSMINUS)" : [
+																{
+																	"Id" : [{"name" : "x"}]
+																}
+															]
+														}
+													]
+												}
+											]
+										},
+										{
+											"StatementList" : [
+												{
+													"SingleExpression" : [
+														{
+															"BinaryAss(MODASS)" : [
+																{
+																	"Id" : [{"name" : "x"}]
+																},
+																{
+																	"IntConstant(2)" : []
+																}
+															]
+														}
+													]
+												},
+												{
+													"EmptyStatement" : []
+												}
+											]
+										}
+									]
+								},
+								{
+									"ForStatement" : [
+										{
+											"BinaryAss(ASS)" : [
+												{
+													"Id" : [{"name" : "i"}]
+												},
+												{
+													"IntConstant(0)" : []
+												}
+											]
+										},
+										{
+											"BinaryOp(LESS)" : [
+												{
+													"Id" : [{"name" : "i"}]
+												},
+												{
+													"IntConstant(10)" : []
+												}
+											]
+										},
+										{
+											"PostfixUnAss(PLUSPLUS)" : [
+												{
+													"Id" : [{"name" : "i"}]
+												}
+											]
+										},
+										{
+											"SingleExpression" : [
+												{
+													"BinaryAss(PLUSASS)" : [
+														{
+															"Id" : [{"name" : "i"}]
+														},
+														{
+															"IntConstant(2)" : []
+														}
+													]
+												}
+											]
+										}
+									]
+								},
+								{
+									"ForStatement" : [
+										{
+											"Label" : [
+												{"name" : "firstFor"}
+											]
+										},
+										{
+											"StatementList" : [
+												{
+													"ContinueStatement" : [
+														{ "Target" : "firstFor" }
+													]
+												},
+												{
+													"BreakStatement" : [
+														{ "Target" : "firstFor" }
+													]
+												},
+												{
+													"BreakStatement" : []
+												}
+											]
+										}
+									]
+								},
+								{
+									"ReturnStatement" : [
+										{
+											"IntConstant(10)" : []
+										}
+									]
+								},
+								{
+									"ReturnStatement" : []
+								},
+								{
+									"ForStatement" : [
+										{
+											"Label" : [
+												{"name" : "secondFor"}
+											]
+										},
+										{
+											"BinaryAss(ASS)" : [
+												{
+													"Id" : [{"name" : "j"}]
+												},
+												{
+													"IntConstant(1)" : []
+												}
+											]
+										},
+										{
+											"BinaryOp(LESS)" : [
+												{
+													"Id" : [{"name" : "j"}]
+												},
+												{
+													"DoubleConstant(12.0100)" : []
+												}
+											]
+										},
+										{
+											"PostfixUnAss(MINUSMINUS)" : [
+												{
+													"Id" : [{"name" : "j"}]
+												}
+											]
+										},
+										{
+											"StatementList" : [
+												{
+													"ForStatement" : [
+														{
+															"Label" : [
+																{"name" : "innerFor"}
+															]
+														},
+														{
+															"BinaryAss(ASS)" : [
+																{
+																	"Id" : [{"name" : "k"}]
+																},
+																{
+																	"IntConstant(0)" : []
+																}
+															]
+														},
+														{
+															"BinaryOp(GREATER)" : [
+																{
+																	"Id" : [{"name" : "k"}]
+																},
+																{
+																	"IntConstant(13)" : []
+																}
+															]
+														},
+														{
+															"PostfixUnAss(PLUSPLUS)" : [
+																{
+																	"Id" : [{"name" : "k"}]
+																}
+															]
+														},
+														{
+															"StatementList" : [
+																{
+																	"IfStatement" : [
+																		{
+																			"BinaryOp(GREATEREQ)" : [
+																				{
+																					"Id" : [{"name" : "k"}]
+																				},
+																				{
+																					"IntConstant(10)" : []
+																				}
+																			]
+																		},
+																		{
+																			"StatementList" : [
+																				{
+																					"SingleExpression" : [
+																						{
+																							"BinaryAss(DIVASS)" : [
+																								{
+																									"Id" : [{"name" : "k"}]
+																								},
+																								{
+																									"Id" : [{"name" : "j"}]
+																								}
+																							]
+																						}
+																					]
+																				},
+																				{
+																					"BreakStatement" : [
+																						{
+																							"Target" : "innerFor"
+																						}
+																					]
+																				}
+																			]
+																		}
+																	]
+																}
+															]
+														}
+
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+
+					]
+				}
+			]
+		}
+	]
+}

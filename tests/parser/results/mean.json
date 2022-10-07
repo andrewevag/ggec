@@ -1,0 +1,462 @@
+{
+    "Program": [
+        {
+            "DeclarationList": [
+                {
+                    "FunctionDefinition": [
+                        {
+                            "BasicType": [
+                                {
+                                    "name": "void"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "main"
+                        },
+                        {
+                            "ParameterList": []
+                        },
+                        {
+                            "DeclarationList": [
+                                {
+                                    "DeclarationList": [
+                                        {
+                                            "VariableDeclaration": [
+                                                {
+                                                    "name": "n"
+                                                },
+                                                {
+                                                    "BasicType": [
+                                                        {
+                                                            "name": "int"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "VariableDeclaration": [
+                                                {
+                                                    "name": "k"
+                                                },
+                                                {
+                                                    "BasicType": [
+                                                        {
+                                                            "name": "int"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "VariableDeclaration": [
+                                                {
+                                                    "name": "i"
+                                                },
+                                                {
+                                                    "BasicType": [
+                                                        {
+                                                            "name": "int"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "VariableDeclaration": [
+                                                {
+                                                    "name": "seed"
+                                                },
+                                                {
+                                                    "BasicType": [
+                                                        {
+                                                            "name": "int"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "DeclarationList": [
+                                        {
+                                            "VariableDeclaration": [
+                                                {
+                                                    "name": "sum"
+                                                },
+                                                {
+                                                    "BasicType": [
+                                                        {
+                                                            "name": "double"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "StatementList": [
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "FunctionCall": [
+                                                {
+                                                    "name": "writeString"
+                                                },
+                                                {
+                                                    "ExpressionList": [
+                                                        {
+                                                            "StringConstant(Give n: )": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "BinaryAss(ASS)": [
+                                                {
+                                                    "Id": [
+                                                        {
+                                                            "name": "n"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "FunctionCall": [
+                                                        {
+                                                            "name": "readInteger"
+                                                        },
+                                                        {
+                                                            "ExpressionList": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "FunctionCall": [
+                                                {
+                                                    "name": "writeString"
+                                                },
+                                                {
+                                                    "ExpressionList": [
+                                                        {
+                                                            "StringConstant(Give k: )": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "SingleExpression": [
+                                        {
+                                            "BinaryAss(ASS)": [
+                                                {
+                                                    "Id": [
+                                                        {
+                                                            "name": "k"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "FunctionCall": [
+                                                        {
+                                                            "name": "readInteger"
+                                                        },
+                                                        {
+                                                            "ExpressionList": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "ForStatement": [
+                                        {
+                                            "CommaExpr": [
+                                                {
+                                                    "CommaExpr": [
+                                                        {
+                                                            "BinaryAss(ASS)": [
+                                                                {
+                                                                    "Id": [
+                                                                        {
+                                                                            "name": "i"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "IntConstant(0)": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "BinaryAss(ASS)": [
+                                                                {
+                                                                    "Id": [
+                                                                        {
+                                                                            "name": "sum"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "DoubleConstant(0.0000)": []
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "BinaryAss(ASS)": [
+                                                        {
+                                                            "Id": [
+                                                                {
+                                                                    "name": "seed"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "IntConstant(65)": []
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "BinaryOp(LESS)": [
+                                                {
+                                                    "Id": [
+                                                        {
+                                                            "name": "i"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "Id": [
+                                                        {
+                                                            "name": "k"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "PostfixUnAss(PLUSPLUS)": [
+                                                {
+                                                    "Id": [
+                                                        {
+                                                            "name": "i"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "SingleExpression": [
+                                                {
+                                                    "BinaryAss(PLUSASS)": [
+                                                        {
+                                                            "Id": [
+                                                                {
+                                                                    "name": "sum"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "TypeCast": [
+                                                                {
+                                                                    "BasicType": [
+                                                                        {
+                                                                            "name": "double"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "BinaryAss(ASS)": [
+                                                                        {
+                                                                            "Id": [
+                                                                                {
+                                                                                    "name": "seed"
+                                                                                }
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "BinaryOp(MOD)": [
+                                                                                {
+                                                                                    "BinaryOp(PLUS)": [
+                                                                                        {
+                                                                                            "BinaryOp(PLUS)": [
+                                                                                                {
+                                                                                                    "BinaryOp(MULT)": [
+                                                                                                        {
+                                                                                                            "Id": [
+                                                                                                                {
+                                                                                                                    "name": "seed"
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        },
+                                                                                                        {
+                                                                                                            "IntConstant(137)": []
+                                                                                                        }
+                                                                                                    ]
+                                                                                                },
+                                                                                                {
+                                                                                                    "IntConstant(221)": []
+                                                                                                }
+                                                                                            ]
+                                                                                        },
+                                                                                        {
+                                                                                            "Id": [
+                                                                                                {
+                                                                                                    "name": "i"
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                },
+                                                                                {
+                                                                                    "Id": [
+                                                                                        {
+                                                                                            "name": "n"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "IfStatement": [
+                                        {
+                                            "BinaryOp(GREATER)": [
+                                                {
+                                                    "Id": [
+                                                        {
+                                                            "name": "k"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "IntConstant(0)": []
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "StatementList": [
+                                                {
+                                                    "SingleExpression": [
+                                                        {
+                                                            "FunctionCall": [
+                                                                {
+                                                                    "name": "writeString"
+                                                                },
+                                                                {
+                                                                    "ExpressionList": [
+                                                                        {
+                                                                            "StringConstant(Mean: )": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "SingleExpression": [
+                                                        {
+                                                            "FunctionCall": [
+                                                                {
+                                                                    "name": "writeReal"
+                                                                },
+                                                                {
+                                                                    "ExpressionList": [
+                                                                        {
+                                                                            "BinaryOp(DIV)": [
+                                                                                {
+                                                                                    "Id": [
+                                                                                        {
+                                                                                            "name": "sum"
+                                                                                        }
+                                                                                    ]
+                                                                                },
+                                                                                {
+                                                                                    "TypeCast": [
+                                                                                        {
+                                                                                            "BasicType": [
+                                                                                                {
+                                                                                                    "name": "double"
+                                                                                                }
+                                                                                            ]
+                                                                                        },
+                                                                                        {
+                                                                                            "Id": [
+                                                                                                {
+                                                                                                    "name": "k"
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "SingleExpression": [
+                                                        {
+                                                            "FunctionCall": [
+                                                                {
+                                                                    "name": "writeString"
+                                                                },
+                                                                {
+                                                                    "ExpressionList": [
+                                                                        {
+                                                                            "StringConstant(\n)": []
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

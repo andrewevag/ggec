@@ -1,45 +1,11 @@
 %{
+#include <vector>
+#include "ast.hpp"
+#include "lexer.hpp"
+#include "parser.hpp"
+#include <cstdio>
 
-#define T_eof           0
-#define T_bool          1001
-#define T_break         1002
-#define T_byref         1003
-#define T_char          1004
-#define T_continue      1005
-#define T_delete        1006
-#define T_double        1007
-#define T_else          1008
-#define T_for           1009
-#define T_false         1010
-#define T_if            1011
-#define T_int           1012
-#define T_new           1013
-#define T_NULL          1014 
-#define T_return        1015
-#define T_true          1016
-#define T_void          1017
-#define T_id            1018
-#define T_int_const     1019
-#define T_double_const  1020
-#define T_char_const    1021
-#define T_string_const  1022
-#define T_eq            1023
-#define T_neq           1024
-#define T_geq           1025   
-#define T_leq           1026
-#define T_land          1027
-#define T_lor           1028
-#define T_plusplus      1029
-#define T_minusminus    1030
-#define T_pluseq        1031
-#define T_minuseq       1032
-#define T_multeq        1033
-#define T_diveq         1034
-#define T_modeq         1035
-
-
-
-
+std::string tempstr;
 int lineno = 1;
 %}
 
@@ -49,7 +15,7 @@ W [ \t\r]
 P [^\x00-\x1f\x7f\\\'\"]
 
 %option noyywrap
-
+%option nounput noinput
 %x CHAR
 %x STRING
 %x COMMENT
@@ -90,23 +56,23 @@ P [^\x00-\x1f\x7f\\\'\"]
 "%="        { return T_modeq; }
 [\=\+\-\*\/\%\(\)\<\>\&\!\?\:\,\;\(\)\{\}\[\]]    { return yytext[0]; }
 
-{L}({L}|{D}|_)*	                    { return T_id; }
-{D}+	                            { return T_int_const; }
-{D}+(\.{D}+([eE][\-\+]?{D}+)?)      { return T_double_const; }
+{L}({L}|{D}|_)*	                    { char* s = new char[strlen(yytext)+1]; memcpy(s, yytext, strlen(yytext)+1); yylval.str = s; return T_id; }
+{D}+	                            { yylval.i = atoi(yytext); return T_int_const; }
+{D}+(\.{D}+([eE][\-\+]?{D}+)?)      { yylval.d = strtold(yytext, NULL); return T_double_const; }
 
 
 \'                                  { BEGIN(CHAR); }
-<CHAR>\\x[0-9a-fA-F][0-9a-fA-F]\'   { BEGIN(INITIAL); return T_char_const; }
-<CHAR>\\[ntr0\\\'\"]\'              { BEGIN(INITIAL); return T_char_const; }
-<CHAR>{P}\'                         { BEGIN(INITIAL); return T_char_const; }
+<CHAR>\\x[0-9a-fA-F][0-9a-fA-F]\'   { yylval.c = getCharFromString(yytext); BEGIN(INITIAL); return T_char_const; }
+<CHAR>\\[ntr0\\\'\"]\'              { yylval.c = getCharFromString(yytext); BEGIN(INITIAL); return T_char_const; }
+<CHAR>{P}\'                         { yylval.c = yytext[0]; BEGIN(INITIAL); return T_char_const; }
 <CHAR>.|\n                          { fprintf(stderr, "didnot expect non printable in string %d\n", yytext[0]); exit(1); }
 <CHAR><<EOF>>                       { fprintf(stderr, "received EOF without string closing\n"); exit(1);}
 
-\"                                  { BEGIN(STRING); }
-<STRING>\"                          { BEGIN(INITIAL); return T_string_const; }
-<STRING>\\x[0-9a-fA-F][0-9a-fA-F]   { /* nothing */ }
-<STRING>\\[ntr0\\\'\"]              { /* nothing */ }
-<STRING>{P}                         { /* nothing */ }
+\"                                  { BEGIN(STRING); tempstr = ""; }
+<STRING>\"                          { yylval.str = new char[strlen(tempstr.c_str())+1]; memcpy(yylval.str, tempstr.c_str(), strlen(tempstr.c_str())+1); ; BEGIN(INITIAL); return T_string_const; }
+<STRING>\\x[0-9a-fA-F][0-9a-fA-F]   { tempstr.append(yytext); }
+<STRING>\\[ntr0\\\'\"]              { tempstr.append(yytext); }
+<STRING>{P}                         { tempstr.append(yytext); }
 <STRING>.|\n                        { fprintf(stderr, "didnot expect non printable in string %d\n", yytext[0]); exit(1);}
 <STRING><<EOF>>                     { fprintf(stderr, "received EOF without string closing\n"); exit(1);}
 
@@ -124,3 +90,42 @@ P [^\x00-\x1f\x7f\\\'\"]
                                         exit(1); }
 
 %%
+
+
+uint8_t getCharFromString(char* s){
+    uint8_t c;
+    if(s[0] == '\\'){
+        if(strlen(s) < 2){
+            yyerror("getCharFromString: got \\ but no character after that!\n");
+        }
+        switch(s[1]) {
+            case '\\':
+                c = '\\';
+                break;
+            case 'n':
+                c = '\n';
+                break;
+            case 't':
+                c = '\t';
+                break;
+            case 'r' :
+                c = '\r';
+                break;
+            case '0':
+                c = '\0';
+                break;
+            case 'x':
+                if (strlen(s) < 4){
+                    yyerror("getCharFromString: got \\x but no 2 digit hecadecimal number afterwards");
+                }
+                int i;
+                sscanf(s+2, "%02x", &i);
+                return i;
+            default:
+                c=s[1];
+        }
+        return c;
+    }else{
+        return (uint8_t)s[0];
+    }
+}

@@ -1,31 +1,70 @@
 .PHONY: clean distclean default help
 
+## Normal Build Variables
 CXX=c++
-CXXFLAGS=-Wall
-BINS=ggec lexertest
+CXXFLAGS=-g -Wall -std=c++14
+BINS=ggec
+INCLUDE=-I$(PWD)/inc
+INCLUDE+= -I$(PWD)
+DEPSOURCE=$(wildcard src/*.cpp)
+DEPOBJECTS=$(patsubst %.cpp, %.o, $(DEPSOURCE))
+##
+
+## Test dependencies
+PYTHON3?=/opt/homebrew/bin/python3
+ERL?=/opt/homebrew/bin/erl
+ERL_LIBS?=/opt/homebrew/opt/proper/proper-1.4
+## needs python3 deepdiff module to run tests
+## pip3 install deepdiff
+##
+
+## Test variables
+GEN?=100
+##
 
 default: $(BINS)
 
-ggec: lexer.o main.o
-	$(CXX) $(CXXFLAGS) -o $@ $^
+ggec: lexer.o main.o parser.o error.o ast.o tojsonstring.o $(DEPOBJECTS)
+	$(CXX) $(INCLUDE) $(CXXFLAGS) -o $@ $^
 
 
-lexer.cpp: lexer.l
+lexer.cpp: lexer.l ast.hpp
 	flex -s -o lexer.cpp lexer.l
 
-lexer.o: lexer.cpp
-	$(CXX) -c $(CXXFLAGS) -o $@ $^
+lexer.o: lexer.cpp parser.hpp
+	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
+
+parser.cpp parser.hpp: parser.y ast.hpp
+	bison -dv -o parser.cpp $<
+
+parser.o: parser.cpp parser.hpp
+	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
+
+
 
 %.o: %.cpp
-	$(CXX) -c $(CXXFLAGS) -o $@ $^
+	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $^
 
 
-lexertest: lexer.o 
-	$(MAKE) -C ./tests/lexer
-	$(CXX) $(CXXFLAGS) -o ./tests/lexer/$@ ./tests/lexer/main.o $^
+lexertest: lexer.o ./tests/lexer/main.o error.o ast.o tojsonstring.o parser.o $(DEPOBJECTS)
+	$(CXX) $(CXXFLAGS) -o ./tests/lexer/$@ $^
 
-test: lexertest
-	./tests/lexer/runner.sh
+parsertest: lexer.o ./tests/parser/main.o parser.o error.o ast.o tojsonstring.o $(DEPOBJECTS)
+	$(CXX) $(CXXFLAGS) -o ./tests/parser/$@ $^
+
+test: lexertest parsertest
+	@echo "🧪 Running Lexer Suite :"
+	@$(PYTHON3) ./tests/lexer/runner.sh
+	@echo "🧪 Running Parser Suite :"
+	@$(PYTHON3) ./tests/parser/runner.sh
+	@echo "🧪 Running Randomly Generated Edsger Programs :"
+	@echo "Generating the input files : ⛏️"
+	@export ERL
+	@export ERL_LIBS
+	@$(MAKE) -C examples/syntax_gen generate GEN="$(GEN)"
+	@echo "Running the input files on the parser : ⛏️"
+	@$(PYTHON3) ./tests/parser/runner_gen.sh $(GEN) 
+	
 
 
 # lexer.o: lexer.cpp lexer.hpp parser.hpp
@@ -40,15 +79,26 @@ test: lexertest
 
 clean:
 	$(RM) *.o $(BINS) lexer.cpp
+	$(RM) parser.hpp parser.output parser.cpp
+	$(RM) ./src/*.o
 	$(MAKE) -C ./tests/lexer clean
+	$(MAKE) -C ./tests/parser clean
+	$(MAKE) -C ./examples/syntax_gen clean
 
 distclean: clean
-	$(RM) 
-
+	$(RM) $(BINS)
+BLUE=\e[0;34m
+RESET=\e[0m
 help:
-	@echo "make: "
+	@echo "$(BLUE)make: $(RESET)"
 	@echo "\tbuilds the compiler"
-	@echo "make clean: "
-	@echo "\tremoves all automatically generated files except the final executable"
-	@echo "make distclean: "
+	@echo "$(BLUE)make clean: $(RESET)"
+	@echo "\tremoves all automatically generated files except the final executable does it too need to fix it before submitting"
+	@echo "$(BLUE)make distclean: $(RESET)"
 	@echo "\tremoves all automatically generated files and the final executable"
+	@echo "$(BLUE)make test [GEN=number] [PYTHON3=python3 path] [ERL=erl path] [ERL_LIBS=proper path]: $(RESET)"
+	@echo "\t-Run lexer and parser suites "
+	@echo "\t-Generate number syntactically correct Edsger programs and passes them through"
+	@echo "\t the parsertest"
+	@echo "\n\t requires python3 deepdiff module"
+	@echo "\t\t (pip3 install deepdiff)"
