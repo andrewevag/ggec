@@ -5,7 +5,8 @@
 - int (2 bytes)
 - char (1 byte)
 - double (10 bytes)
-- bool (bool)
+- bool (1 byte)
+- void
 ### Type Constructors
 - Pointer t* (2 bytes)
 
@@ -66,8 +67,23 @@ $\mathrm{RVAL}$ predicate
 19. $\forall op \in \{++, --\}, \Gamma \vdash \mathrm{LVAL}(x, \mathrm{double}) \rArr \Gamma \vdash x\ op: \mathrm{double} \land \Gamma \vdash x\ op: \mathrm{double}$
 20. $\forall op \in \{++, --\}\forall t, \Gamma \vdash \mathrm{LVAL}(x, \mathrm{Pointer}(t)) \rArr \Gamma \vdash x\ op: \mathrm{Pointer}(t) \land \Gamma \vdash op\ x: \mathrm{Pointer}(t)$
 21. $\forall n, \forall t_n, \forall a_n, \forall q, (\Gamma \vdash f : (a_n\ t_n \rarr q), (a_i = \mathrm{byref} \rArr \Gamma \vdash \mathrm{LVAL(x_i, t_i)}), (a_i = \mathrm{bycall} \rArr \Gamma \vdash x_i : t_i) ) \rArr \Gamma \vdash f(x_1, x_2, ..., x_n) : q$
+22. $\forall t, \Gamma \vdash e : \mathrm{int} \rArr \Gamma \vdash \mathrm{new}\ t[e] : \mathrm{Pointer}(t)$
+23. $\forall t, \Gamma \vdash \mathrm{new}\ t : \mathrm{Pointer}(t)$
+24. $\forall t, \Gamma \vdash e : \mathrm{Pointer}(t) \rArr \Gamma \vdash \mathrm{delete}\ e : \mathrm{Pointer}(t)$
 
-# Statements
+# Statement Restrictions
+1. $\Gamma \vdash e : \mathrm{bool}$, $\mathrm{if}\ e\ s_1 \mathrm{else}\ s_2$  is ok
+2. $for(e_1; e_2, e_3)\ s$, $\Gamma \vdash e_2 : \mathrm{bool}$
+   Αν η $e_2$ δεν δίνεται είναι true.
+3. Άτυπα το $\mathrm{label}$ θα χρησιμοποιηθεί ως type. Στην ιεραρχία κανονικά. 
+   1. Στα forloops κατά την σημασιολογική ανάλυση μπαίνει στο symbol table ως active label. Γίνεται η σημασιολογική ανάλυση του εσωτερικού της loop.
+   Όταν τελειώσει η loop το κάνεις inactive στο symbol table (Αυτό γίνεται διότι πρέπει να είναι μοναδικό το όνοα του label στο σώμα μίας συνάρτησης αλλά μπορεί να χρησιμοποιηθεί μόνο εντός της loop στην οποία δηλώθηκε)
+   2. Στα break && continue που έχουν label πρέπει να ελεγχθεί αν είναι active το label για να είναι valid. Αλλιώς ορίστηκε σε άλλη λοοπ άκυρη και είναι σημασιολογικό λάθος.
+4. $\mathrm{return}\ e;$ Βρες τρέχουσα συνάρτηση. Βρες return_type. Αν είναι void 
+   πρέπει η $e$ να παραλείπεται. Αν δεν είναι void πρέπει $e : \mathrm{return\_type}$ 
+5. name -> symbol_entry (type, frame offset)
+---
+
 
 <!-- # $\Gamma \vdash x_1 :t, x_2 : t , (f : (t, t) \rArr q) \rArr f(x_1, x_2) : q$
 $t^n, q, a_i \in \{\mathrm{bycall}, \mathrm{byref}\} \rArr (a_1\ t_1,a_2\ t_2, ...,a_n\ t_n) \rArr q$
@@ -144,3 +160,68 @@ x > 100 αν θα τερματισει 0 < x < 100 αν δεν τερματισ�
 int a[100];
 a[1] > a[x]; // if 0 < x < 99
 ``` -->
+
+
+```C
+
+void f(){
+	int x;
+	void g(){
+		int y;
+		void h(){ 
+			int z;
+			y = (((x + z) + y) + 10);
+			z = x;
+		}
+
+
+
+		y = h(); (SingleExpression(BinaryAss(ASS, Id(y), IntConst(10))) (scope* -> g)
+	}
+}
+
+void fun(){
+
+}
+```
+
+
+```C
+int f(int x, int y){
+	int z, w;
+	
+	
+	z = x;
+	w = x + y;
+	return z + w;
+}
+```
+
+w := x + y;
+ret := x + w;
+
+
+GlobalContexts -> Tree [(name, type)]
+Context -> [(name, type)]
+
+parameters
+---
+result type
+---
+static link
+---
+return address (possibly can do)
+---
+locals
+---
+temps
+
+
+[Scope tree]		-> [RunTime-Info Tree]
+[global]				
+ |    \				-> 									+ intermediate code for f -> [f] : return_address (...)  + intermediate_code -> code
+[f]   [fun]				[f] : return address (...)									     : locals										 
+ |							: locals													 : declarations
+[g]						    : declarations												 : parameters
+ |							: parameters												 : temporary results
+[h]						    					
