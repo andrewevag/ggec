@@ -4,6 +4,10 @@ A Compiler for the Edsger Programming Language
 # Tasks do not forget:
 - #include
 - https://stackoverflow.com/questions/62115979/how-to-implement-better-error-messages-for-flex-bison
+  - global state to keep line and column
+  - have each syntactic node keep track of the state where we found it
+  - everyone call call error-abort by giving a state.
+  
 
 # Known bugs
 
