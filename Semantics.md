@@ -84,6 +84,84 @@ $\mathrm{RVAL}$ predicate
 5. name -> symbol_entry (type, frame offset)
 ---
 
+# Notes
+- Δεν υπάρχουν εκφράσεις που να μπορούν να φτιάξουν void* 
+  άρα δεν παίζει σαν type το void*
+
+# Translating to LLVM
+
+## Types $\Longrightarrow$ LLVM Types
+
+| Edsger     | LLVM                  |
+|------------|-----------------------|
+| int        | i16                   |
+| char       | i8                    |
+| bool       | i8                    |
+| double     | x86_fp80              |
+| t*         | t*                    |
+| t* (array) | [size * element type] |
+
+## Global Variables
+Ta global variables μπορεί να είναι όλοι οι τύποι εκτός από void
+γίνονται define αυτούσιοι. Θεωρούνται αυτόματα pointers..
+> @var = global type
+
+## Local Variables
+> %var = alloca type ; this puts it in stack
+  
+Άμεσο για int, bool, char, double, t*.
+Για σκέτο pointer κάνεις
+> %ptrTothatPtr = alloca type
+Για array κάνεις
+> %ptrtoArray = alloca insideType, insideType size 
+
+ΚΑΙ ΑΥΤΟ ΘΕΩΡΕΙΤΑΙ POINTER ΘΕΛΕΙ DEREFERENCE
+(ΦΑΝΤΑΖΟΜΑΙ ΠΩΣ ΣΕ ΤΙ ΑΝΤΙΣΤΟΙΧΟΥΝ ΘΑ ΠΡΕΠΕΙ ΝΑ ΕΙΝΑΙ ΑΠΟΘΗΚΕΥΜΕΝΟ
+ΣΤΟ SYMBOL TABLE ΩΣΤΕ ΝΑ ΜΠΟΡΕΙΣ ΑΜΕΣΑ ΝΑ ΤΟ ΚΑΝΕΙΣ DEREFERENCE)
+Άρα με το initialization τρέχεις το alloca και βάζεις και στο symbol table που βρίσκεται αυτό. 
+## CONSTANTS
+Αυτά μπορούν να εμφανιστούν μόνο σε expressions 
+Ολα είναι άμεσες σταθερές που παιρνιούνται ως έχουν στο evaluation του παρακάτω. Μόνο τα strings έχουν διαφορά. Πρέπει να κάνεις initialize array στην τιμή και να επιστρέψεις char*. Αυτά τα κάνεις define σαν global variables me private linkage. Και άρα χρησιμοποιείς τον pointer απευθείας και γίνονται initialize απευθείας
+
+Πχ.
+>@.str = private unnamed_addr **constant** [13 x i8] c"Hello World!\00", align 1
+
+Βάζεις μόνος σου το 0 στο τέλος. Δεν σε νοιάζει ιδιαίτερα το visibility αφού από την σημασιολογική ανάλυση δεν πρόκειται να το πειράξει κάποιος άλλος.
+## CASTS
+Καταρχάς πρέπει να αποφασίσουμε τι casts επιτρέπονται.
+
+Participating to a cast : [int, char, double, bool, pointer]
+| From    | To      | Type of Cast                   |
+|---------|---------|--------------------------------|
+| int     | bool    | truncating unsigned downcast   |
+| int     | char    | truncating signed downcast     |
+| int     | double  | sitofp instruction in llvm                            |
+| int     | pointer | bitwise cast (llvm has inttoptr instruction)                  |
+| bool    | int     | unsigned upcast (zero-extend)  |
+| bool    | char    | unsigned upcast (zero-extend)  |
+| bool    | double  | uitofp instruction llvm                            |
+| bool    | pointer | unsigned upcast (zero-extend)  |
+| char    | int     | signed upcast (sign-extend)    |
+| char    | bool    | unsigned downcast (truncating) |
+| char    | double  | sitofp instruction llvm                            |
+| char    | pointer | unsigned upcast (zero-extend)  |
+| double  | int     | fptosi .. to llvm instruction                            |
+| double  | bool    | fptoui .. to llvm instruction                            |
+| double  | char    | fptosi .. to llvm instruction                            |
+| double  | pointer | (can do to int and then to ptr)	                            |
+| pointer | int     | bitwise cast (llvm has inttoptr instruction)                   |
+| pointer | bool    | unsigned downcast (truncating) |
+| pointer | char    | unsigned downcast (truncating) |
+| pointer | double  | can do ptrtoint and then uitofp                             |
+
+## Function Prototypes
+declare type @FunctionName (parameter list)
+
+## FunctionDefinitions
+define [linkage] type @FunctionName (parameter list) {
+	...
+}
+
 
 <!-- # $\Gamma \vdash x_1 :t, x_2 : t , (f : (t, t) \rArr q) \rArr f(x_1, x_2) : q$
 $t^n, q, a_i \in \{\mathrm{bycall}, \mathrm{byref}\} \rArr (a_1\ t_1,a_2\ t_2, ...,a_n\ t_n) \rArr q$
@@ -225,3 +303,4 @@ temps
 [g]						    : declarations												 : parameters
  |							: parameters												 : temporary results
 [h]						    					
+	
