@@ -1,28 +1,73 @@
+#include <cstddef>
 
+class Entity {
+public:
+	virtual size_t getSizeInBytes() = 0;
+};
 
-class Entity {};
+class Labelt : public Entity {
+public:
+	virtual size_t getSizeInBytes() override {
+		return 0;
+	}
+};
 
-class Labelt : public Entity {};
+class Type : public Entity {
+public:
+	virtual size_t getSizeInBytes() = 0;
+};
 
-class Type : public Entity {};
+class Boolt : public Type {
+public:
+	virtual size_t getSizeInBytes() override {
+		return 1;
+	}
+};
 
-class Boolt : public Type {};
+class Intt : public Type {
+public:
+	virtual size_t getSizeInBytes() override {
+		return 2;
+	}
+};
 
-class Intt : public Type {};
+class Voidt : public Type {
+public:
+	virtual size_t getSizeInBytes() override {
+		return 0;
+	}
+};
 
-class Voidt : public Type {};
+class Chart : public Type {
+	public:
+	virtual size_t getSizeInBytes() override {
+		return 1;
+	}
+};
 
-class Chart : public Type {};
-
-class Doublet : public Type {};
+class Doublet : public Type {
+public:
+	virtual size_t getSizeInBytes() override {
+		return 10;
+	}
+};
 
 class Pointert : public Type {
+public:
 	Pointert(Type* of) : _of(of) {}
+	virtual size_t getSizeInBytes() override {
+		return 8; //llvm needs 8
+	}
 private:
 	Type* _of;
 };
 
-class Anyt : public Type {};
+class Anyt : public Type {
+public:
+	virtual size_t getSizeInBytes() override {
+		return 0; // should never get called
+	}
+};
 
 
 

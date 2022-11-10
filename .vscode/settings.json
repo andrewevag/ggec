@@ -48,6 +48,9 @@
 		"streambuf": "cpp",
 		"cinttypes": "cpp",
 		"typeinfo": "cpp",
-		"*.eds": "c"
+		"*.eds": "c",
+		"ctime": "cpp",
+		"map": "cpp",
+		"iomanip": "cpp"
 	}
 }
