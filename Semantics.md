@@ -306,3 +306,24 @@ temps
 	
 # Problems 
 - Symbol table double allocation.
+
+
+# Things that are needed in the symbol table
+1. Immutability or not.
+2. Species of name 
+   1. Variable (Variable of which type)
+   2. Parameter (Parameter of which type)
+   3. Function (Function of which form)
+   4. Label
+3. If it is an lval (composite)
+4. Scoping level (composite)
+5. Offset (composite)
+6. (Value*, BB) llvm
+# Operation we need
+Activate label, Inactivate label
+lookup : name -> SymbolEntry
+
+# Plan
+1. Figure Types
+2. Figure Symbol Table Entries
+3. Do semantic analysis
