@@ -304,3 +304,5 @@ temps
  |							: parameters												 : temporary results
 [h]						    					
 	
+# Problems 
+- Symbol table double allocation.
