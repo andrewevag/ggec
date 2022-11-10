@@ -4,8 +4,9 @@
 #include <string>
 #include <deque>
 #include "tree.hpp"
+#include "types.hpp"
 
-class AST : public Tree {
+class AST : public Tree, public TypedEntity {
 public:
 	virtual ~AST();
 	virtual std::string toJSONString() = 0;
@@ -13,6 +14,7 @@ public:
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
 	virtual void printNode(std::ostream& out) = 0;
+	// virtual void sem() = 0;
 };
 class Declaration;
 class TypeExpression;
