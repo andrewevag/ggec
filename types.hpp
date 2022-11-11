@@ -1,4 +1,4 @@
-#include <cstddef>
+#include <vector>
 
 class Entity {
 public:
@@ -69,6 +69,23 @@ public:
 	}
 };
 
+class PassingWay {
+public:
+	enum PassingWayEnum { ByCall, ByRef };
+	PassingWayEnum _way;
+};
+
+
+
+class Functiont : public Type {
+public:
+	virtual size_t getSizeInBytes() override {
+		return 0; // should never get called
+	}
+private:
+	Type* _resultType;
+	std::vector<std::pair<PassingWay, Type*> > _parameterTypes;
+};
 
 
 class TypedEntity {

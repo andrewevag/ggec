@@ -31,5 +31,20 @@ void SymbolTable::insert(std::string name, SymbolEntry* e){
 }
 
 SymbolEntry* SymbolTable::lookup(std::string name) {
+	
+	// for(size_t i = this->_tbl.size() - 1; i >= 0; i--){
+	// 	for(size_t j = this->_tbl[i].size() - 1; j >= 0; j--){
+	// 		if(this->_tbl[i][j].first == name){
+	// 			return this->_tbl[i][j].second;
+	// 		}
+	// 	}
+	// }
+	for(auto i = this->_tbl.rbegin(); i != this->_tbl.rend(); i++){
+		for(auto j = (*i).rbegin(); j != (*i).rend(); j++){
+			if((*j).first == name){
+				return (*j).second;
+			}
+		}
+	}
 	return nullptr;
 }
