@@ -44,6 +44,9 @@ parser.o: parser.cpp parser.hpp
 symbol.o: symbol.cpp symbol.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
 
+semantical.o: semantical.cpp ast.hpp
+	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
+
 %.o: %.cpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $^
 

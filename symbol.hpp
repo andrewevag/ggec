@@ -5,11 +5,18 @@
 
 class SymbolEntry {
 public:
+	SymbolEntry(){}
+	
+	SymbolEntry(bool immutable, Entity* entity, bool isLval) 
+	: _isImmutable(immutable), _entity(entity), _isLVAL(isLval),
+	 _scopingDepth(0), _offset(0){}
+	 //fixed by insert
+
 	bool _isImmutable;
 	Entity* _entity;
 	bool _isLVAL;
-	int scopingDepth;
-	size_t offset;
+	int _scopingDepth;
+	size_t _offset;
 	
 	///=================================///
 	///============LLVM STUFF===========///
@@ -25,7 +32,7 @@ public:
 
 	/**
 	 * @brief Push A new Empty Scope =>> We expect to have the current function as head of the scope
-	 *
+	 * Except for the global scope.
 	 */
 	void pushScope();
 	/**
@@ -60,5 +67,6 @@ private:
 
 class State {
 public:
-	SymbolTable* globalTable;
+	State() : Table(new SymbolTable()){}
+	SymbolTable* Table;
 };

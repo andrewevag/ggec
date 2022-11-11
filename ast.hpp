@@ -5,6 +5,10 @@
 #include <deque>
 #include "tree.hpp"
 #include "types.hpp"
+#include "symbol.hpp"
+
+
+State globalState;
 
 class AST : public Tree, public TypedEntity {
 public:
@@ -14,7 +18,7 @@ public:
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
 	virtual void printNode(std::ostream& out) = 0;
-	// virtual void sem() = 0;
+	virtual void sem() = 0;
 };
 class Declaration;
 class TypeExpression;
@@ -37,6 +41,19 @@ public:
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)_decls}; }
 	virtual void printNode(std::ostream& out) override { out << "Program"; } 
 	virtual std::string toJSONString() override;
+
+	//====================
+	// Semantics
+	//====================
+	virtual void sem() override; 
+
+	//====================
+	
+	//====================
+	// Type Stuff
+	virtual Type* getType() override;
+	//====================
+
 private:
 	DeclarationList* _decls;
 };
@@ -46,7 +63,7 @@ public:
 	virtual ~Declaration();
 	//only interesting in variables || when parsed in line we later add the type of the first declared
 	virtual void embedType(TypeExpression*) = 0;
-
+	virtual void sem() = 0;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
@@ -63,6 +80,16 @@ public:
 		this->_typeExpr = type;
 	}
 
+	//====================
+	// Semantics
+	//====================
+	virtual void sem() override;
+	//====================
+
+	//====================
+	// Type Stuff
+	virtual Type* getType() override;
+	//====================
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*) _typeExpr }; } 
@@ -78,6 +105,21 @@ public:
 	ArrayDeclaration(TypeExpression* typeExp, std::string name, Expression* expr)
 	:  VariableDeclaration(typeExp, name), _expr(expr) {}
 	~ArrayDeclaration();
+
+	
+	//====================
+	// Semantics
+	//====================
+	virtual void sem() override;
+	//====================
+
+	//====================
+	// Type Stuff
+	virtual Type* getType() override;
+	//====================
+
+
+
 	/* Printing Syntax Tree Functiontgs */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)this->_typeExpr, (Tree*)this->_expr}; }
 	virtual void printNode(std::ostream& out) override { out << "ArrayDeclaration(" << _name << ')';  }
@@ -160,6 +202,11 @@ public:
 	virtual std::vector<Tree*> getChildren() = 0;
 	virtual void printNode(std::ostream& out) = 0;
 	virtual std::string toJSONString() = 0;
+
+	//====================
+	// Type Stuff
+	virtual Type* getType() = 0;
+	//====================
 private:
 };
 
@@ -175,6 +222,13 @@ public:
 		return new BasicType(_name);
 	}
 
+	//=============================
+	// Type related stuff
+	
+	virtual Type* getType() override;
+
+	//=============================
+	
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override {return {};};
@@ -196,7 +250,11 @@ public:
 		return new Pointer(this->_inner->copy());
 	}
 
-
+	//=============================
+	// Type related stuff
+	
+	virtual Type* getType() override;
+	//=============================
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)_inner}; };
 	virtual void printNode(std::ostream& out) override { out << "Pointer";}
