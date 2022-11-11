@@ -7,7 +7,10 @@ A Compiler for the Edsger Programming Language
   - global state to keep line and column
   - have each syntactic node keep track of the state where we found it
   - everyone call call error-abort by giving a state.
-  
+- function overloading
+- deep equality on types
+- destructors on types and symbols
+- to implement overloading -> lookup with type in SymbolTable (that is why equality of types is needed) 
 
 # Known bugs
 
