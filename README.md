@@ -14,6 +14,18 @@ A Compiler for the Edsger Programming Language
 
 # Known bugs
 
+# Assumptions
+
+## Function Overloading
+How it works:
+1. Functions with the same name and different parameter list can exist
+   1. Difference in parameter lists is defined only with different types and not with different pass specifications
+2. Nested Functions can be redefined with the same parameter list as a Non-nested one, being the active one from down under (in statical scope).
+3. Overloading by return type is not allowed.
+
+3. Thus defining the name_type1_parameter1_type2_parameter2_... is enough.
+
+
 # Warnings to take into account
 - Διπλού βάθους declaration list on functions
   ``` C
