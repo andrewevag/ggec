@@ -90,7 +90,8 @@ typedef enum {
    ENTRY_CONSTANT,                       /* Σταθερές                   */
    ENTRY_FUNCTION,                       /* Συναρτήσεις                */
    ENTRY_PARAMETER,                      /* Παράμετροι συναρτήσεων     */
-   ENTRY_TEMPORARY                       /* Προσωρινές μεταβλητές      */
+   ENTRY_TEMPORARY,                      /* Προσωρινές μεταβλητές      */
+   ENTRY_LABEL                           /* Ετικέτες για for-s         */
 } EntryType;
 
 
@@ -159,6 +160,9 @@ struct SymbolEntry_tag {
          int           number;
       } eTemporary;
 
+      struct {                                /******* Ετικέτα *********/
+
+      } eLabel;
    } u;                               /* Τέλος του union               */
 };
 
@@ -202,6 +206,8 @@ extern const Type typeReal;
 
 
 class TypedExpression {
+public:
+   Type getType() { return this->_t; }
 protected:
    Type _t;
 };
@@ -223,6 +229,7 @@ SymbolEntry * newFunction        (const char * name);
 SymbolEntry * newParameter       (const char * name, Type type,
                                   PassMode mode, SymbolEntry * f);
 SymbolEntry * newTemporary       (Type type);
+SymbolEntry * newLabel           (const char * name);
 
 void          forwardFunction    (SymbolEntry * f);
 void          endFunctionHeader  (SymbolEntry * f, Type type);
@@ -238,6 +245,6 @@ unsigned int  sizeOfType         (Type type);
 bool          equalType          (Type type1, Type type2);
 void          printType          (Type type);
 void          printMode          (PassMode mode);
-
+void          printSymbolTable   ();
 
 #endif

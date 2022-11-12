@@ -7,8 +7,8 @@ A Compiler for the Edsger Programming Language
   - global state to keep line and column
   - have each syntactic node keep track of the state where we found it
   - everyone call call error-abort by giving a state.
-  
-
+- Split sem() into parts of before and after codegen..  
+- Fix Symbol offset in symbol table.
 # Known bugs
 
 # Warnings to take into account

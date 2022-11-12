@@ -54,7 +54,16 @@ public:
 	virtual ~Declaration();
 	//only interesting in variables || when parsed in line we later add the type of the first declared
 	virtual void embedType(TypeExpression*) = 0;
-	virtual void sem() override;
+	virtual void sem() = 0;
+
+	/**
+	 * @brief Get the Name of the declaration. It is important for
+	 * functions to handle overloading since new names are generated
+	 * for the parameterList.
+	 * 
+	 * @return std::string 
+	 */
+	virtual std::string getName() = 0;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
@@ -69,6 +78,10 @@ public:
 	~VariableDeclaration();
 	virtual void embedType(TypeExpression* type) override {
 		this->_typeExpr = type;
+	}
+
+	virtual std::string getName() override {
+		return this->_name;
 	}
 
 	virtual void sem() override;
@@ -87,6 +100,11 @@ public:
 	ArrayDeclaration(TypeExpression* typeExp, std::string name, Expression* expr)
 	:  VariableDeclaration(typeExp, name), _expr(expr) {}
 	~ArrayDeclaration();
+
+	virtual std::string getName() override {
+		return this->_name;
+	}
+
 
 	virtual void sem() override;
 
@@ -107,6 +125,12 @@ public:
 
 	virtual void sem() override;
 
+	virtual std::string getName() override {
+		return this->_name + this->_parameters->getAggregatedName();
+	}
+
+
+
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)this->_resultType, (Tree*)this->_parameters}; };
 	virtual void printNode(std::ostream& out) override { out << "FunctionDeclaration(" << _name << ")"; };
@@ -126,6 +150,10 @@ public:
 	_resultType(typeExpr), _name(name), _parameters(parameters), _decls(decls), _statements(statements) {}
 	~FunctionDefinition();
 	virtual void embedType(TypeExpression* type) override {}
+
+	virtual std::string getName() override {
+		return this->_name + this->_parameters->getAggregatedName();
+	}
 
 	virtual void sem() override;
 
@@ -152,6 +180,9 @@ public:
 	: _pw(pw), _name(name), _type(type) {}
 	virtual ~Parameter();
 	
+	std::string getDefName() {
+		return this->_type->getDefName();
+	}
 	virtual void sem() override;
 
 	/* Printing Syntax Tree Functions */
@@ -173,6 +204,15 @@ public:
 	virtual std::string getName() = 0;
 	virtual TypeExpression* copy() = 0;
 
+	/**
+	 * @brief Get the name of the type for function definitions
+	 * 
+	 * @return std::string
+	 */
+	virtual std::string getDefName() = 0;
+	virtual Type toType() = 0;
+
+
 	virtual void sem() = 0;
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
@@ -191,6 +231,25 @@ public:
 	}
 	virtual TypeExpression* copy() override {
 		return new BasicType(_name);
+	}
+
+	virtual std::string getDefName() override {
+		return this->_name;
+	}
+
+	virtual Type toType() override {
+		if(this->_name == "void")
+			return typeVoid;
+		if(this->_name == "int")
+			return typeInteger;
+		if(this->_name == "char")
+			return typeChar;
+		if(this->_name == "bool")
+			return typeBoolean;
+		if(this->_name == "double")
+			return typeReal;
+		fprintf(stderr, "Error toType: Cannot Transform to Type");
+		exit(EXIT_FAILURE);
 	}
 
 	virtual void sem() override;
@@ -213,6 +272,13 @@ public:
 	}
 	virtual TypeExpression* copy() override {
 		return new Pointer(this->_inner->copy());
+	}
+
+	virtual std::string getDefName() override {
+		return this->_inner->getDefName() + "_ptr";
+	}
+	virtual Type toType() override {
+		return typePointer(this->_inner->toType());
 	}
 
 	virtual void sem() override;
@@ -385,6 +451,14 @@ class Expression : public AST, public TypedExpression {
 public:
 	virtual ~Expression();
 
+	/**
+	 * @brief Get if the expression is an IntConstant for defining
+	 * the size of an array
+	 * 
+	 * @return int if zero non correct if non-zero correct.
+	 */
+	virtual int isIntConstant() = 0;
+
 	virtual void sem() = 0;
 
 	/* Printing Syntax Tree Functions */
@@ -397,6 +471,10 @@ class Id : public Expression {
 public:
 	Id(std::string name) : _name(name) {}
 	virtual ~Id() = default;
+
+	virtual int isIntConstant() override {
+		return 0;
+	}
 
 	virtual void sem() override;
 
@@ -418,6 +496,16 @@ public:
 	Constant() : _ct(ConstantType::Null) {}
 	virtual ~Constant();
 	enum ConstantType { Bool, Null, Int, Char, Double, String };
+
+	virtual int isIntConstant() override {
+		switch (this->_ct)
+		{
+		case Bool: case Null: case Char: case Double: case String:
+			return 0;
+		case Int:
+			return this->_int;
+		}
+	}
 
 	virtual void sem() override;
 
@@ -450,6 +538,10 @@ public:
 	: _functionName(name), _arguments(args) {}
 	virtual ~FunctionCall();
 
+	virtual int isIntConstant() override {
+		return 0;
+	}
+
 	virtual void sem() override;
 
 	/* Printing Syntax Tree Functions */
@@ -466,6 +558,10 @@ public:
 	BracketedIndex(Expression* in, Expression* out)
 	: _in(in), _out(out) {} 
 	virtual ~BracketedIndex();
+
+	virtual int isIntConstant() override {
+		return 0;
+	}
 
 	virtual void sem() override;
 
@@ -497,6 +593,10 @@ public:
 	UnaryOp(UnaryOpType unop, Expression* operand)
 	: _UnOp(unop), _operand(operand) {}
 	virtual ~UnaryOp();
+
+	virtual int isIntConstant() override {
+		return 0;
+	}
 
 	virtual void sem() override;
 
@@ -537,7 +637,12 @@ public:
 	: _BinOp(binop), _leftOperand(left), _rightOperand(right) {}
 	virtual ~BinaryOp();
 
+	virtual int isIntConstant() override {
+		return 0;
+	}
+
 	virtual void sem() override;
+
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_leftOperand, _rightOperand}; }
@@ -564,7 +669,7 @@ public:
 	: _Unass(unass), _operand(operand) {}
 	virtual ~UnAss();
 
-
+	virtual int isIntConstant() = 0;
 	virtual void sem() = 0;
 
 	/* Printing Syntax Tree Functions */
@@ -582,6 +687,9 @@ public:
 	: UnAss(unass, operand) {}
 	virtual ~PrefixUnAss();
 
+	virtual int isIntConstant() override {
+		return 0;
+	}
 	virtual void sem() override;
 
 	/* Printing Syntax Tree Functions */
@@ -597,6 +705,9 @@ public:
 	: UnAss(unass, operand) {}
 	virtual ~PostfixUnAss();
 
+	virtual int isIntConstant() override {
+		return 0;
+	}
 	virtual void sem() override;
 
 	/* Printing Syntax Tree Functions */
@@ -625,6 +736,10 @@ public:
 	: _BinAss(type), _leftOperand(left), _rightOperand(right) {}
 	virtual ~BinaryAss();
 
+	virtual int isIntConstant() {
+		return 0;
+	}
+
 	virtual void sem() override;
 
 	/* Printing Syntax Tree Functions */
@@ -643,6 +758,10 @@ public:
 	: _type(type), _expr(expr) {}
 	virtual ~TypeCast();
 
+	virtual int isIntConstant() {
+		return 0;
+	}
+
 	virtual void sem() override;
 
 	/* Printing Syntax Tree Functions */
@@ -659,6 +778,10 @@ public:
 	TernaryOp(Expression* cond, Expression* ifbody, Expression* elsebody)
 	: _condition(cond), _ifBody(ifbody), _elseBody(elsebody) {}
 	virtual ~TernaryOp();
+
+	virtual int isIntConstant() {
+		return 0;
+	}
 
 	virtual void sem() override;
 
@@ -678,6 +801,10 @@ public:
 	New(TypeExpression* type, Expression* size) : _type(type), _size(size) {}
 	virtual ~New();
 
+	virtual int isIntConstant() override {
+		return 0;
+	}
+
 	virtual void sem() override;
 
 	/* Printing Syntax Tree Functions */
@@ -694,6 +821,10 @@ class Delete : public Expression {
 public:
 	Delete(Expression* expr) : _expr(expr) {} 
 	virtual ~Delete();
+
+	virtual int isIntConstant() override {
+		return 0;
+	}
 
 	virtual void sem() override;
 
@@ -712,6 +843,10 @@ public:
 	: _left(left), _right(right) {}
 	virtual ~CommaExpr();
 
+	virtual int isIntConstant() override {
+		return 0;
+	}
+
 	virtual void sem() override;
 
 	/* Printing Syntax Tree Functions */
@@ -727,6 +862,8 @@ class Label : public AST {
 public:
 	Label(std::string lblname) : _lblname(lblname) {}
 	virtual ~Label();
+
+	std::string getLabelName() { return this->_lblname; }
 
 	virtual void sem() override;
 
@@ -765,6 +902,17 @@ public:
 	ParameterList() : _parameters(std::deque<Parameter*>()) {}
 	virtual ~ParameterList();
 	std::deque<Parameter*> _parameters;
+
+
+	std::string getAggregatedName(){
+		std::string s;
+		for(auto &par: this->_parameters){
+			s +="_" + par->getDefName();
+		}
+		return s;
+	}
+
+
 
 	virtual void sem() override;
 
