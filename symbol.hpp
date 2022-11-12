@@ -22,6 +22,8 @@
 #ifndef __SYMBOL_HPP__
 #define __SYMBOL_HPP__
 
+#include <vector>
+
 
 /* ---------------------------------------------------------------------
    -------------------------- Τύπος bool -------------------------------
@@ -195,6 +197,14 @@ extern const Type typeInteger;
 extern const Type typeBoolean;
 extern const Type typeChar;
 extern const Type typeReal;
+
+
+
+
+class TypedExpression {
+protected:
+   Type _t;
+};
 
 
 /* ---------------------------------------------------------------------

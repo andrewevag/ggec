@@ -24,7 +24,7 @@ GEN?=100
 
 default: $(BINS)
 
-ggec: lexer.o main.o parser.o error.o ast.o tojsonstring.o general.o symbol.o $(DEPOBJECTS)
+ggec: lexer.o main.o parser.o error.o ast.o tojsonstring.o general.o symbol.o semantical.o $(DEPOBJECTS)
 	$(CXX) $(INCLUDE) $(CXXFLAGS) -o $@ $^
 
 
@@ -49,6 +49,10 @@ error.o: error.cpp general.hpp error.hpp
 symbol.o: symbol.cpp symbol.hpp general.hpp error.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
 
+semantical.o: semantical.cpp ast.hpp
+	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
+
+ast.hpp: symbol.hpp
 
 %.o: %.cpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $^

@@ -5,6 +5,7 @@
 #include "parser.hpp"
 #include "lexer.hpp"
 #include <string>
+#include "symbol.hpp"
 
 AST* syntaxTree = nullptr;
 
@@ -15,6 +16,7 @@ int main(){
 
 	int ret = yyparse();
 	syntaxTree->printTree(std::cout);
+	
 	delete syntaxTree;
 	return ret;
 }
