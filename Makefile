@@ -24,7 +24,7 @@ GEN?=100
 
 default: $(BINS)
 
-ggec: lexer.o main.o parser.o error.o ast.o tojsonstring.o $(DEPOBJECTS)
+ggec: lexer.o main.o parser.o error.o ast.o tojsonstring.o general.o symbol.o $(DEPOBJECTS)
 	$(CXX) $(INCLUDE) $(CXXFLAGS) -o $@ $^
 
 
@@ -40,16 +40,24 @@ parser.cpp parser.hpp: parser.y ast.hpp
 parser.o: parser.cpp parser.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
 
+general.o: general.cpp error.hpp
+	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
+
+error.o: error.cpp general.hpp error.hpp
+	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
+
+symbol.o: symbol.cpp symbol.hpp general.hpp error.hpp
+	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
 
 
 %.o: %.cpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $^
 
 
-lexertest: lexer.o ./tests/lexer/main.o error.o ast.o tojsonstring.o parser.o $(DEPOBJECTS)
+lexertest: lexer.o ./tests/lexer/main.o error.o ast.o tojsonstring.o parser.o general.o symbol.o $(DEPOBJECTS)
 	$(CXX) $(CXXFLAGS) -o ./tests/lexer/$@ $^
 
-parsertest: lexer.o ./tests/parser/main.o parser.o error.o ast.o tojsonstring.o $(DEPOBJECTS)
+parsertest: lexer.o ./tests/parser/main.o parser.o error.o ast.o tojsonstring.o general.o symbol.o $(DEPOBJECTS)
 	$(CXX) $(CXXFLAGS) -o ./tests/parser/$@ $^
 
 test: lexertest parsertest
