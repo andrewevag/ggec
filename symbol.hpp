@@ -161,7 +161,10 @@ struct SymbolEntry_tag {
       } eTemporary;
 
       struct {                                /******* Ετικέτα *********/
-
+         bool         explicitelyNamed;       /* Όνομα απο χρήστη ή οχι*/
+         bool         active;                 /* in loop or not        */
+         size_t       unnamedConst;           /* Int used to generate  */
+                                              /* its name              */
       } eLabel;
    } u;                               /* Τέλος του union               */
 };
@@ -208,8 +211,10 @@ extern const Type typeReal;
 class TypedExpression {
 public:
    Type getType() { return this->_t; }
+   bool isLval() { return this->_isLval; }
 protected:
    Type _t;
+   bool _isLval;
 };
 
 
@@ -230,12 +235,15 @@ SymbolEntry * newParameter       (const char * name, Type type,
                                   PassMode mode, SymbolEntry * f);
 SymbolEntry * newTemporary       (Type type);
 SymbolEntry * newLabel           (const char * name);
+SymbolEntry * newLabel           ();
 
 void          forwardFunction    (SymbolEntry * f);
 void          endFunctionHeader  (SymbolEntry * f, Type type);
 void          destroyEntry       (SymbolEntry * e);
 SymbolEntry * lookupEntry        (const char * name, LookupType type,
                                   bool err);
+SymbolEntry * lookupLabel        (const char * name, bool explicitelyNamed);
+SymbolEntry * lookupActiveFun    (); 
 
 Type          typeArray          (RepInteger size, Type refType);
 Type          typeIArray         (Type refType);

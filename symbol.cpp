@@ -26,6 +26,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdarg>
+#include <sstream>
 
 #include "general.hpp"
 #include "error.hpp"
@@ -57,6 +58,7 @@ const Type typeBoolean = &(typeConst[2]);
 const Type typeChar    = &(typeConst[3]);
 const Type typeReal    = &(typeConst[4]);
 
+size_t labelNamingInt = 0;
 
 
 /* ---------------------------------------------------------------------
@@ -504,6 +506,25 @@ SymbolEntry * newLabel (const char * name)
     if(e != NULL){
         e->entryType = ENTRY_LABEL;
         e->u.eLabel = {};
+        e->u.eLabel.active = true;
+        e->u.eLabel.explicitelyNamed = true;
+        e->u.eLabel.unnamedConst = ++labelNamingInt;
+    }
+    return e;
+}
+
+SymbolEntry * newLabel ()
+{
+    SymbolEntry* e;
+    std::ostringstream ss;
+    ss << "for" << ++labelNamingInt;
+    e = newEntry(ss.str().c_str());
+    if(e != NULL){
+        e->entryType = ENTRY_LABEL;
+        e->u.eLabel = {};
+        e->u.eLabel.active = true;
+        e->u.eLabel.explicitelyNamed = false;
+        e->u.eLabel.unnamedConst = labelNamingInt;
     }
     return e;
 }
@@ -569,6 +590,76 @@ SymbolEntry * lookupEntry (const char * name, LookupType type, bool err)
     if (err)
         error("Unknown identifier: %s", name);
     return NULL;
+}
+
+
+SymbolEntry * lookupLabel(const char * name, bool explicitelyNamed)
+{
+    unsigned int  hashValue;
+    SymbolEntry * e;
+    size_t        maxTilNow = 0;
+    if(explicitelyNamed)
+    {
+        hashValue = PJW_hash(name) % hashTableSize;
+        e = hashTable[hashValue];
+        while(e != NULL && e->nestingLevel == currentScope->nestingLevel){
+            if (strcmp(e->id, name) == 0 && e->entryType == ENTRY_LABEL){
+                return e;
+            }
+        }
+        return NULL;
+    }
+    else{
+        e = NULL;
+        // Label with max level is what opened last..
+        for(SymbolEntry * i = currentScope->entries; i != NULL; i = i->nextInScope)
+        {
+            if (i->entryType == ENTRY_LABEL){
+                if(i->u.eLabel.unnamedConst > maxTilNow){
+                    e = i;
+                }
+            }
+        }
+        return e;
+    }
+    
+}
+/**
+ * @brief \b Invariant If currently processing the body of a function CurrentScope's
+ * nesting level > 1 else if in global scope 0. Plus the entry for the function
+ * currently being processed is the first entry of Current's Scope Parent Scope.
+ * 
+ * @return SymbolEntry* 
+ * if Processing a function
+ * Return the entry for that function
+ * @endif
+ * if Not processing a function
+ * Return NULL;
+ * @endif
+ * 
+ * 
+ */
+SymbolEntry * lookupActiveFun    ()
+{
+    SymbolEntry* e;
+    if (currentScope->nestingLevel > 1){
+        // we are in a function look invariants
+        // get the function defined in parent scope.
+        e = currentScope->parent->entries;
+        if( e != NULL){
+            if(e->entryType == ENTRY_FUNCTION){
+                return e;   
+            }else { 
+                fatal("Internal Error: The First element of the parent scope "
+                      "is not a function invariant breached!!");
+            }
+        }else{
+               fatal("Internal Error: The First element of the parent scope "
+                      "doesnt exist invariant breached!!");
+        }
+    }else{
+        return NULL;
+    }
 }
 
 Type typeArray (RepInteger size, Type refType)

@@ -1,5 +1,27 @@
 # Gospel's Goatfish Edsger Compiler
 A Compiler for the Edsger Programming Language
+```
+                 |
+                 |
+                ,|.
+               ,\|/.
+             ,' .V. `.
+            / .     . \
+           /_`       '_\
+          ,' .:     ;, `.
+          |@)|  . .  |(@|
+     ,-._ `._';  .  :`_,' _,-.
+    '--  `-\ /,-===-.\ /-'  --`
+   (----  _|  ||___||  |_  ----)
+    `._,-'  \ /`-.-' \ /  `-._,'
+             /-.___,-'\     ap
+          /\/          \/\
+```
+
+# Invariant
+## Semantic Analysis
+- When processing a function first add the function in current scope and open a new one =>> The function whose processing is being done is the last entry of the parent scope if such exists. Since things added in the symbol table are backwards it is the first in the list of entries in parent scope. 
+- Scope nesting level of a function body is always > 1. Global scope is with nesting level 1.
 
 # Tasks do not forget:
 - #include
@@ -9,6 +31,7 @@ A Compiler for the Edsger Programming Language
   - everyone call call error-abort by giving a state.
 - Split sem() into parts of before and after codegen..  
 - Fix Symbol offset in symbol table.
+- grep -rnw TODO to find todo in code.
 # Known bugs
 
 # Warnings to take into account

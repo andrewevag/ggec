@@ -1,10 +1,14 @@
 #include "ast.hpp"
 #include "error.hpp"
+#include <sstream> 
+
 /* ---------------------------------------------------------------------
    ----------- Καθολικές μεταβλητές για τον χειρισμό Label -------------
    --------------------------------------------------------------------- */
 
-std::vector<Label*> NestingNamedloops;
+// std::vector<Label*> NestingNamedloops;
+// Variable for generating new names for for loops with no explicit labels.
+
 SymbolEntry* entryForFunction;
 
 
@@ -104,6 +108,11 @@ void SingleExpression::sem(){
 	this->_expr->sem();
 }
 
+/**
+ * @brief Semantically check the condition and the body. 
+ * The condition needs to be of type \b bool.
+ * 
+ */
 void IfStatement::sem(){
 	this->_condition->sem();
 	if(! equalType(this->_condition->getType(), typeBoolean)){
@@ -112,6 +121,11 @@ void IfStatement::sem(){
 	this->_ifbody->sem();
 }
 
+/**
+ * @brief Semantically check the condition, the ifbody and the else body
+ * The condition needs to be of type \b bool.
+ * 
+ */
 void IfElseStatement::sem(){
 	this->_condition->sem();
 	if(! equalType(this->_condition->getType(), typeBoolean)){
@@ -121,10 +135,21 @@ void IfElseStatement::sem(){
 	this->_elsebody->sem();
 }
 
+/**
+ * @brief Semantically check all three expressions in loop head and for body.
+ * The second expressions needs to be of type \b bool.
+ * If missing it is defaulted to \b true
+ * If a label is present add it in the stack of active labels since it can be used
+ * in the loop body.
+ * If a label is not present in the for loop header add it with a new name in the 
+ * stack of active labels to indicate that we are in a loop
+ * 
+ */
 void ForStatement::sem(){
 	if(this->_label != nullptr){
-		NestingNamedloops.push_back(this->_label);
 		newLabel(this->_label->getLabelName().c_str());
+	}else{
+		newLabel();
 	}
 
 	if(this->_first != nullptr){
@@ -142,7 +167,203 @@ void ForStatement::sem(){
 	}
 
 	this->_body->sem();
+	
+	
+	//inactivate the label
+	SymbolEntry* e;
+	if(this->_label != nullptr){
+		e = lookupLabel(this->_label->getLabelName().c_str(), true);
+		if(e != NULL){
+			e->u.eLabel.active = false;
+		}else{
+			fatal("Internal Error(ForStatement::sem): label added in symbol table and not found afterwards!");
+		}
+	}else{
+		e = lookupLabel(nullptr, false);
+		if(e != NULL){
+			e->u.eLabel.active = false;
+		}else{
+			fatal("Internal Error(ForStatement::sem): unnamed label not found afterwards");
+		}
+	}
+}
+
+/**
+ * @brief Check if the continue statement is valid.
+ * If searching with a name check the symbol table that the label exists
+ * and is active.
+ * If not searching with a name get the last label (which is the deepest in
+ * the case of nested loops) and verify that this is active.
+ * If not in loop semantics fail!
+ */
+void ContinueStatement::sem(){
+	SymbolEntry* e;
+	if(this->_target != "")
+	{
+		// check that the label is valid
+		e = lookupLabel(this->_target.c_str(), true);
+		// existance check
+		if(e == NULL){
+			fatal("Continue Statement not inside of a for loop named %s\n", this->_target.c_str());
+		}
+		else{
+			// activeness check
+			if( ! e->u.eLabel.active ){
+				fatal("Continue Statement not inside of a for loop named %s\n", this->_target.c_str());
+			}
+		}
+	}
+	else
+	{
+		e = lookupLabel(nullptr, false);
+		// existance check
+		if(e == NULL){
+			fatal("Continue Statement outside of a for loop\n");
+		}
+		else{
+			// activeness check
+			if( ! e->u.eLabel.active ){
+				fatal("Continue Statement outside of a for loop\n");
+			}
+		}
+	}
+}
+
+/**
+ * @brief Check if the break statement is valid.
+ * If searching with a name check the symbol table that the label exists
+ * and is active.
+ * If not searching with a name get the last label (which is the deepest in
+ * the case of nested loops) and verify that this is active.
+ * If not in loop semantics fail!
+ */
+void BreakStatement::sem(){
+	SymbolEntry* e;
+
+	if(this->_target != "")
+	{
+		e = lookupLabel(this->_target.c_str(), true);
+		// existance check
+		if(e == NULL){
+			fatal("Break Statement not inside of a for loop named %s\n", this->_target.c_str());
+		}else{
+			// activeness check
+			if( ! e->u.eLabel.active ){
+				fatal("Break Statement not inside of a for loop named %s\n", this->_target.c_str());
+			}
+		}
+	}
+	else
+	{
+		e = lookupLabel(nullptr, false);
+		// existance check
+		if(e == NULL){
+			fatal("Break Statement not inside of a for loop");
+		}
+		else{
+			// activeness check
+			if( ! e->u.eLabel.active ){
+				fatal("Break Statement not inside of a for loop");
+			}
+		}
+	}
+}
+
+/**
+ * @brief If no expression with the return statement -> check that the function
+ * in which the return statement is defined returns void.
+ * If the expression exist -> match expression type with return type of the function
+ * 
+ */
+void ReturnStatement::sem() {
+	SymbolEntry *e;
+	e = lookupActiveFun();
+	if (e == NULL)
+		fatal("Return Statement Outside of a function");
+	else{
+		Type resultType = e->u.eFunction.resultType;
+		if (this->_expr == nullptr && (! equalType(typeVoid, resultType))){
+			fatal("Expected an expression in the return statement");
+		}
+		if (this->_expr != nullptr){
+			// semantically analyze expression.
+			this->_expr->sem();
+			Type eType = this->_expr->getType();
+			if(! equalType(eType, resultType)){
+				fatal("Returning type does not match return type of the function");
+			}
+		}
+	}
 }
 
 
+/* ---------------------------------------------------------------------
+   ------------- Semantic Analysis For Expressions ---------------------
+   --------------------------------------------------------------------- */
 
+/**
+ * @brief Check that it is already defined as a variable or parameter
+ * and get it's type. It is lval.
+ * 
+ */
+void Id::sem()
+{
+	SymbolEntry* e = lookupEntry(this->_name.c_str(), LOOKUP_ALL_SCOPES, false);
+	if(e == NULL){
+		fatal("Identifier not previously declared %s", this->_name.c_str());
+	}
+	else{
+		switch (e->entryType)
+		{
+		case ENTRY_VARIABLE:
+			this->_t = e->u.eVariable.type;
+			break;
+		case ENTRY_PARAMETER:
+			this->_t = e->u.eParameter.type;
+			break;
+		
+		default:
+			fatal("Identifier %s not variable or parameter\n", this->_name.c_str());
+			break;
+		}
+	}
+	this->_isLval = true;
+}
+
+
+/**
+ * @brief Figure the type of the constant
+ * Is not lval.
+ * 
+ */
+void Constant::sem()
+{
+	switch (this->_ct)
+	{
+	case Bool:
+		this->_t = typeBoolean;
+		break;
+	case Null:
+		/**
+		 * TODO Figure out it's type and add it here
+		 */
+		break;
+	case Char:
+		this->_t = typeChar;
+		break;
+	case Int:
+		this->_t = typeInteger;
+		break;
+	case Double:
+		this->_t = typeReal;
+		break;
+	case String:
+		this->_t = typePointer(typeChar);
+		break;
+	}
+	this->_isLval = false;
+}
+
+void FunctionCall::sem(){
+
+}
