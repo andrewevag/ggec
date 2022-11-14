@@ -715,7 +715,12 @@ void BinaryAss::sem(){
 }
 
 void TypeCast::sem(){
-	// kala twra
+	this->_expr->sem();
+	// Type t = this->_expr->getType();
+	Type t = this->_type->toType();
+	this->_t = copyType(t);
+	// destroyType(t);
+	this->_isLval = false;
 }
 
 void TernaryOp::sem(){
