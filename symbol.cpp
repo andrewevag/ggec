@@ -560,6 +560,8 @@ void destroyEntry (SymbolEntry * e)
         case ENTRY_TEMPORARY:
             destroyType(e->u.eTemporary.type);
             break;
+        default:
+            break;
     }
     delete((char *) (e->id));
     delete(e);        
@@ -652,10 +654,12 @@ SymbolEntry * lookupActiveFun    ()
             }else { 
                 fatal("Internal Error: The First element of the parent scope "
                       "is not a function invariant breached!!");
+                return NULL;
             }
         }else{
                fatal("Internal Error: The First element of the parent scope "
                       "doesnt exist invariant breached!!");
+               return NULL;
         }
     }else{
         return NULL;

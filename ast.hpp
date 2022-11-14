@@ -34,6 +34,82 @@ class ExpressionList;
 class DeclarationList;
 class BasicType;
 
+class TypeExpression : public AST {
+public:
+	virtual ~TypeExpression();
+	virtual void penetrate(TypeExpression*) = 0;
+	virtual std::string getName() = 0;
+	virtual TypeExpression* copy() = 0;
+
+	/**
+	 * @brief Get the name of the type for function definitions
+	 * 
+	 * @return std::string
+	 */
+	virtual std::string getDefName() = 0;
+	virtual Type toType() = 0;
+
+
+	virtual void sem() = 0;
+	/* Printing Syntax Tree Functions */
+	virtual std::vector<Tree*> getChildren() = 0;
+	virtual void printNode(std::ostream& out) = 0;
+	virtual std::string toJSONString() = 0;
+private:
+};
+
+
+class Parameter : public AST {
+public:
+	enum PassingWay { ByCall, ByRef };
+	static std::string passingWayToString(PassingWay pw) { return pw == PassingWay::ByCall ? "ByCall" : "ByRef"; }
+	Parameter(PassingWay pw, TypeExpression* type, std::string name) 
+	: _pw(pw), _name(name), _type(type) {}
+	virtual ~Parameter();
+	
+	std::string getDefName() {
+		return this->_type->getDefName();
+	}
+	virtual void sem() override;
+
+	/* Printing Syntax Tree Functions */
+	virtual std::vector<Tree*> getChildren() override { return { (Tree*)this->_type }; };
+	virtual void printNode(std::ostream& out) override { 
+		out << "Parameter(" << passingWayToString(_pw) <<  ", " << _name << ")"; 
+	}
+	virtual std::string toJSONString() override;
+private:
+	PassingWay _pw;
+	std::string _name;
+	TypeExpression* _type;
+};
+
+class ParameterList : public AST {
+public:
+	ParameterList() : _parameters(std::deque<Parameter*>()) {}
+	virtual ~ParameterList();
+	std::deque<Parameter*> _parameters;
+
+
+	std::string getAggregatedName(){
+		std::string s;
+		for(auto &par: this->_parameters){
+			s +="_" + par->getDefName();
+		}
+		return s;
+	};
+
+
+
+	virtual void sem() override;
+
+	/* Printing Syntax Tree Functions */
+	virtual std::vector<Tree*> getChildren() override { return {_parameters.begin(), _parameters.end()}; }
+	virtual void printNode(std::ostream& out) override { out << "ParameterList"; }
+	virtual std::string toJSONString() override;
+};
+
+
 
 class Program : public AST {
 public:
@@ -172,54 +248,6 @@ private:
 };
 
 
-class Parameter : public AST {
-public:
-	enum PassingWay { ByCall, ByRef };
-	static std::string passingWayToString(PassingWay pw) { return pw == PassingWay::ByCall ? "ByCall" : "ByRef"; }
-	Parameter(PassingWay pw, TypeExpression* type, std::string name) 
-	: _pw(pw), _name(name), _type(type) {}
-	virtual ~Parameter();
-	
-	std::string getDefName() {
-		return this->_type->getDefName();
-	}
-	virtual void sem() override;
-
-	/* Printing Syntax Tree Functions */
-	virtual std::vector<Tree*> getChildren() override { return { (Tree*)this->_type }; };
-	virtual void printNode(std::ostream& out) override { 
-		out << "Parameter(" << passingWayToString(_pw) <<  ", " << _name << ")"; 
-	}
-	virtual std::string toJSONString() override;
-private:
-	PassingWay _pw;
-	std::string _name;
-	TypeExpression* _type;
-};
-
-class TypeExpression : public AST {
-public:
-	virtual ~TypeExpression();
-	virtual void penetrate(TypeExpression*) = 0;
-	virtual std::string getName() = 0;
-	virtual TypeExpression* copy() = 0;
-
-	/**
-	 * @brief Get the name of the type for function definitions
-	 * 
-	 * @return std::string
-	 */
-	virtual std::string getDefName() = 0;
-	virtual Type toType() = 0;
-
-
-	virtual void sem() = 0;
-	/* Printing Syntax Tree Functions */
-	virtual std::vector<Tree*> getChildren() = 0;
-	virtual void printNode(std::ostream& out) = 0;
-	virtual std::string toJSONString() = 0;
-private:
-};
 
 class BasicType : public TypeExpression {
 public:
@@ -505,6 +533,7 @@ public:
 		case Int:
 			return this->_int;
 		}
+		return 0;
 	}
 
 	virtual void sem() override;
@@ -897,31 +926,6 @@ public:
 
 };
 
-class ParameterList : public AST {
-public:
-	ParameterList() : _parameters(std::deque<Parameter*>()) {}
-	virtual ~ParameterList();
-	std::deque<Parameter*> _parameters;
-
-
-	std::string getAggregatedName(){
-		std::string s;
-		for(auto &par: this->_parameters){
-			s +="_" + par->getDefName();
-		}
-		return s;
-	}
-
-
-
-	virtual void sem() override;
-
-	/* Printing Syntax Tree Functions */
-	virtual std::vector<Tree*> getChildren() override { return {_parameters.begin(), _parameters.end()}; }
-	virtual void printNode(std::ostream& out) override { out << "ParameterList"; }
-	virtual std::string toJSONString() override;
-};
-
 class ExpressionList : public AST {
 public:
 
@@ -951,6 +955,7 @@ public:
 	}
 	virtual std::string toJSONString() override;
 
+	virtual std::string getName() override { return "";}
 	virtual void sem() override;
 
 	/* Printing Syntax Tree Functions */

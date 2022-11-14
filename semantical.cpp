@@ -398,10 +398,10 @@ void BracketedIndex::sem(){
 
 void UnaryOp::sem() {
 	this->_operand->sem();
-	
+	std::string printable[] = {"+", "-"};
 	switch (this->_UnOp) {		
 	case UnaryOp::ADDRESS:
-		if( ! this->_operand->_isLval ){
+		if( ! this->_operand->isLval()){
 			fatal("& not on l-value");
 		}
 		this->_t = typePointer(copyType(this->_operand->getType()));
@@ -414,11 +414,13 @@ void UnaryOp::sem() {
 		this->_t = copyType(this->_operand->getType()->refType);
 		this->_isLval = true;
 		break;
-	case UnaryOp::POS: case UnaryOp::NEG;
+	case UnaryOp::POS: case UnaryOp::NEG:
 		if ( ! equalType(this->_operand->getType(), typeInteger) && 
-		  	 ! equalType(this->_operand->getType(), typeReal)
-		 )
-		 fatal("Unary" ((this->_UnOp == UnaryOp::POS) ? "+": "-") "operator used on a non int or double operand");
+		  	 ! equalType(this->_operand->getType(), typeReal))
+		 {
+			fatal("Unary %s operator used on a non int or double operand", 
+		 		printable[((this->_UnOp == UnaryOp::POS) ? 0: 1)].c_str() );
+		 }
 
 		 this->_t = copyType(this->_operand->getType());
 		 this->_isLval = false;
@@ -467,7 +469,7 @@ void BinaryOp::sem(){
 			else if(this->_leftOperand->isPtrType()
 				&&  equalType(this->_rightOperand->getType(), typeInteger)
 			)
-				this->_t = copyType(this->_leftOperand->isPtrType());
+				this->_t = copyType(this->_leftOperand->getType());
 			
 			else {
 				std::string op = printable[this->_BinOp];
@@ -553,7 +555,7 @@ void BinaryOp::sem(){
 			break;
 		case COMMA: 
 			// p <> q.
-			this->_isLval;
+			this->_isLval = false;
 			this->_t = copyType(this->_rightOperand->getType());
 			break;
 		}
@@ -631,10 +633,6 @@ void StatementList::sem(){
 
 }
 
-void ParameterList::sem(){
-
-}
-
 void ExpressionList::sem(){
 
 }
@@ -643,3 +641,9 @@ void DeclarationList::sem(){
 
 }
 
+
+
+/** Unused **/
+void BasicType::sem(){}
+void Pointer::sem(){}
+void Label::sem(){}
