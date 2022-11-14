@@ -437,6 +437,9 @@ void UnaryOp::sem() {
 	}
 }
 
+
+
+
 /**
  * @brief Semantically analyze binOp
  * 
@@ -601,11 +604,39 @@ void PostfixUnAss::sem(){
 	 }
 }
 
-
+/**
+ * @brief 
+ * 
+ */
 void BinaryAss::sem(){
 	this->_leftOperand->sem();
 	this->_rightOperand->sem();
-	std::string printable;
+	BinaryOp* b = new BinaryOp(_, this->_leftOperand, this->_rightOperand);
+	
+	
+
+	std::string printable[] = {
+		"=", "*=", "/=", "%=", "+=", "-="
+	};
+
+	switch (this->_BinAss)
+	{
+	case ASS: 
+		// t = t.
+		break;
+	case MULTASS: case DIVASS: 
+		// int *= int
+		// double *= double 
+		break;
+	case MODASS: 
+		// int %= int
+		break;
+	case PLUSASS: case MINUSASS: 
+		// int <> int
+		// double <> double
+		// 
+		break;
+	}
 
 }
 
