@@ -1,6 +1,7 @@
 #include "ast.hpp"
 #include "error.hpp"
 #include <sstream> 
+#include <string>
 
 /* ---------------------------------------------------------------------
    ----------- Καθολικές μεταβλητές για τον χειρισμό Label -------------
@@ -316,10 +317,10 @@ void Id::sem()
 		switch (e->entryType)
 		{
 		case ENTRY_VARIABLE:
-			this->_t = e->u.eVariable.type;
+			this->_t = copyType(e->u.eVariable.type);
 			break;
 		case ENTRY_PARAMETER:
-			this->_t = e->u.eParameter.type;
+			this->_t = copyType(e->u.eParameter.type);
 			break;
 		
 		default:
@@ -341,7 +342,7 @@ void Constant::sem()
 	switch (this->_ct)
 	{
 	case Bool:
-		this->_t = typeBoolean;
+		this->_t = copyType(typeBoolean);
 		break;
 	case Null:
 		/**
@@ -349,21 +350,296 @@ void Constant::sem()
 		 */
 		break;
 	case Char:
-		this->_t = typeChar;
+		this->_t = copyType(typeChar);
 		break;
 	case Int:
-		this->_t = typeInteger;
+		this->_t = copyType(typeInteger);
 		break;
 	case Double:
-		this->_t = typeReal;
+		this->_t = copyType(typeReal);
 		break;
 	case String:
-		this->_t = typePointer(typeChar);
+		this->_t = typePointer(copyType(typeChar));
 		break;
 	}
 	this->_isLval = false;
 }
 
 void FunctionCall::sem(){
+	// TODO
+}
+
+/**
+ * @brief Check that the thing being accessed is a ptr and the inner 
+ * expression is a int expression. This is an lval.
+ * 
+ */
+void BracketedIndex::sem(){
+	/* first semantically analyze both the expressions used in the indexing */
+	this->_in->sem();
+	this->_out->sem();
+	if( ! this->_out->isPtrType() ){
+		fatal("No pointer type used in array indexing\n");
+	}
+	if ( ! equalType(this->_in->getType(), typeInteger) ){
+		fatal("No integer type used as index in array indexing\n");
+	}
+
+	// Figure out type
+	this->_t = copyType(this->_out->getType()->refType);
+	this->_isLval = true;
+}
+
+/**
+ * @brief Check the inner expression and figure it's type. Perform the 
+ * semantic rules based on the operator.
+ * 
+ */
+
+void UnaryOp::sem() {
+	this->_operand->sem();
+	
+	switch (this->_UnOp) {		
+	case UnaryOp::ADDRESS:
+		if( ! this->_operand->_isLval ){
+			fatal("& not on l-value");
+		}
+		this->_t = typePointer(copyType(this->_operand->getType()));
+		this->_isLval = false;
+		break;
+	case UnaryOp::DEREF:
+		if ( ! this->_operand->isPtrType() ){
+			fatal("* operator used on a non pointer type");
+		}
+		this->_t = copyType(this->_operand->getType()->refType);
+		this->_isLval = true;
+		break;
+	case UnaryOp::POS: case UnaryOp::NEG;
+		if ( ! equalType(this->_operand->getType(), typeInteger) && 
+		  	 ! equalType(this->_operand->getType(), typeReal)
+		 )
+		 fatal("Unary" ((this->_UnOp == UnaryOp::POS) ? "+": "-") "operator used on a non int or double operand");
+
+		 this->_t = copyType(this->_operand->getType());
+		 this->_isLval = false;
+		break;
+	case UnaryOp::NOT:
+		if (! equalType(this->_operand->getType(), typeBoolean)){
+			fatal("Unary ! operator used on non bool operrand");
+		}
+		this->_t = copyType(typeBoolean);
+		this->_isLval = false;
+		break;
+	default:
+		break;
+	}
+}
+
+/**
+ * @brief Semantically analyze binOp
+ * 
+ */
+void BinaryOp::sem(){
+	this->_leftOperand->sem();
+	this->_rightOperand->sem();
+
+	std::string printable[] = {
+		"*", "/", "%", "+", "-", "<", ">", "<=", ">=", "==", "!=", "&&", "||", ","
+	};
+	switch (this->_BinOp){
+		
+		case PLUS: case MINUS: 
+			// int <> int, double <> double, ptr <> int
+			this->_isLval = false;
+			// int <> int
+			if (	equalType(this->_leftOperand->getType(), typeInteger) 
+				&&	equalType(this->_rightOperand->getType(), typeInteger)
+			)
+				this->_t = copyType(typeInteger);
+
+			// double <> double
+			else if(equalType(this->_leftOperand->getType(), typeReal) 
+				&&  equalType(this->_rightOperand->getType(), typeReal)
+			)
+				this->_t = copyType(typeReal);
+			
+			// ptr <> int
+			else if(this->_leftOperand->isPtrType()
+				&&  equalType(this->_rightOperand->getType(), typeInteger)
+			)
+				this->_t = copyType(this->_leftOperand->isPtrType());
+			
+			else {
+				std::string op = printable[this->_BinOp];
+				fatal("Operator %s not used on correctly typed operands\n"
+					  "Expected int %s int or double %s double or t* %s int"
+				, op.c_str(), op.c_str(), op.c_str(), op.c_str());
+			}
+			break;
+		
+		case MULT: case DIV: 
+			// int <> int, double <> double
+			this->_isLval = false;
+
+			// int <> int
+			if (	equalType(this->_leftOperand->getType(), typeInteger) 
+				&&	equalType(this->_rightOperand->getType(), typeInteger)
+			)
+				this->_t = copyType(typeInteger);
+
+			// double <> double
+			else if(equalType(this->_leftOperand->getType(), typeReal) 
+				&&  equalType(this->_rightOperand->getType(), typeReal)
+			)
+				this->_t = copyType(typeReal);
+			
+			else {
+				std::string op = printable[this->_BinOp];
+				fatal("Operator %s not used on correctly typed operands\n"
+					  "Expected int %s int or double %s double "
+				, op.c_str(), op.c_str(), op.c_str());
+			}
+
+			break;
+		
+		case MOD: 
+			// int <> int
+
+			this->_isLval = false;
+
+			// int <> int
+			if (	equalType(this->_leftOperand->getType(), typeInteger) 
+				&&	equalType(this->_rightOperand->getType(), typeInteger)
+			)
+				this->_t = copyType(typeInteger);
+						
+			else {
+				std::string op = printable[this->_BinOp];
+				fatal("Operator %s not used on correctly typed operands\n"
+					  "Expected int %s int"
+				, op.c_str(), op.c_str());
+			}
+
+			break;
+		case LESS: case GREATER: case LESSEQ: case GREATEREQ: case EQUALS: case NOTEQ: 
+			// t <> t
+			this->_isLval = false;
+			if (equalType(this->_leftOperand->getType(), this->_rightOperand->getType()))
+			{
+				this->_t = copyType(typeBoolean);
+			}
+
+			else {
+				std::string op = printable[this->_BinOp];
+				fatal("Operator %s not used on same typed operands\n"
+					  "Expected t %s t"
+				, op.c_str(), op.c_str());
+			}
+			break;
+		case LAND: case LOR: 
+			// bool <> bool
+			if (	equalType(this->_leftOperand->getType(), typeBoolean) 
+				&&	equalType(this->_rightOperand->getType(), typeBoolean)
+			)
+				this->_t = copyType(typeBoolean);
+						
+			else {
+				std::string op = printable[this->_BinOp];
+				fatal("Operator %s not used on correctly typed operands\n"
+					  "Expected bool %s bool"
+				, op.c_str(), op.c_str());
+			}
+
+			break;
+		case COMMA: 
+			// p <> q.
+			this->_isLval;
+			this->_t = copyType(this->_rightOperand->getType());
+			break;
+		}
+}
+
+void PrefixUnAss::sem(){
+	this->_operand->sem();
+	this->_isLval = false;
+	std::string printable[] = { "++", "--"};  
+	
+	if(! this->_operand->isLval()){
+		fatal("operator %s not used on an l-value", printable[this->_Unass].c_str());
+	}
+	if ( equalType(this->_operand->getType(), typeInteger) 
+	  || equalType(this->_operand->getType(), typeReal)
+	  || this->_operand->isPtrType()
+	 ){
+		this->_t = copyType(this->_operand->getType());
+	 }else{
+		fatal("operator %s not used on correct type\n"
+		      "expected int or double or t*", printable[this->_Unass].c_str()
+		);
+	 }
+}
+
+void PostfixUnAss::sem(){
+	this->_operand->sem();
+	this->_isLval = false;
+	std::string printable[] = { "++", "--"};  
+	
+	if(! this->_operand->isLval()){
+		fatal("operator %s not used on an l-value", printable[this->_Unass].c_str());
+	}
+	if ( equalType(this->_operand->getType(), typeInteger) 
+	  || equalType(this->_operand->getType(), typeReal)
+	  || this->_operand->isPtrType()
+	 ){
+		this->_t = copyType(this->_operand->getType());
+	 }else{
+		fatal("operator %s not used on correct type\n"
+		      "expected int or double or t*", printable[this->_Unass].c_str()
+		);
+	 }
+}
+
+
+void BinaryAss::sem(){
+	this->_leftOperand->sem();
+	this->_rightOperand->sem();
+	std::string printable;
 
 }
+
+void TypeCast::sem(){
+
+}
+
+void TernaryOp::sem(){
+
+}
+
+void New::sem(){
+
+}
+
+void Delete::sem(){
+
+}
+
+void CommaExpr::sem(){
+
+}
+
+void StatementList::sem(){
+
+}
+
+void ParameterList::sem(){
+
+}
+
+void ExpressionList::sem(){
+
+}
+
+void DeclarationList::sem(){
+
+}
+

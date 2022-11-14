@@ -212,6 +212,39 @@ class TypedExpression {
 public:
    Type getType() { return this->_t; }
    bool isLval() { return this->_isLval; }
+   bool isPtrType() {
+      if (this->_t != NULL){
+         if(this->_t->kind == Type_tag::TYPE_POINTER)
+            return true;
+      }
+      return false;
+   }
+   // static bool eqType(TypedExpression* l, TypedExpression* r){
+   //    equalType(l->_t, r->_t);
+   // }
+   static Type copyType(Type _t){
+      if( _t->kind == Type_tag::TYPE_ARRAY ||
+          _t->kind == Type_tag::TYPE_IARRAY ||
+          _t->kind == Type_tag::TYPE_POINTER
+       )
+       {
+         Type t = new Type_tag;
+         t->kind = _t->kind;
+         t->refType = copyType(_t->refType);
+         return t;
+       }
+       else{
+         Type t = new Type_tag;
+         t->kind = _t->kind;
+         t->refType = NULL;
+         return t;
+       }
+   }
+   // Type getTypeCopy(){
+   //    return copyType(this->_t);
+   // }
+
+   
 protected:
    Type _t;
    bool _isLval;

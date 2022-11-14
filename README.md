@@ -32,6 +32,7 @@ A Compiler for the Edsger Programming Language
 - Split sem() into parts of before and after codegen..  
 - Fix Symbol offset in symbol table.
 - grep -rnw TODO to find todo in code.
+- Types in TypedExpression Objects need to be explicitely deeply destroyed.
 # Known bugs
 
 # Warnings to take into account
