@@ -264,7 +264,15 @@ public:
 	virtual std::string getDefName() override {
 		return this->_name;
 	}
-
+	/**
+	 * @brief Doesn't perform a deep copy of the type
+	 * just returns with symbol.hpp convention.. 
+	 *
+	 * TODO
+	 * needs delete with the symbol.hpp convention
+	 * after using.
+	 * @return Type 
+	 */
 	virtual Type toType() override {
 		if(this->_name == "void")
 			return typeVoid;
@@ -672,6 +680,11 @@ public:
 
 	virtual void sem() override;
 
+	friend void binaryOpAnalysis(BinaryOp&);
+
+	void setLeft(Expression* l) { this->_leftOperand = l; }
+	void setRight(Expression* r) { this->_rightOperand = r; }
+
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_leftOperand, _rightOperand}; }
@@ -826,6 +839,7 @@ private:
 
 class New : public Expression {
 public:
+	// _size can be null! indicating that size is 1.
 	New(TypeExpression* type) : _type(type), _size(nullptr) {}
 	New(TypeExpression* type, Expression* size) : _type(type), _size(size) {}
 	virtual ~New();

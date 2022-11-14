@@ -49,7 +49,8 @@ static struct Type_tag typeConst [] = {
     { Type_tag::TYPE_INTEGER, NULL, 0, 0 },
     { Type_tag::TYPE_BOOLEAN, NULL, 0, 0 },
     { Type_tag::TYPE_CHAR,    NULL, 0, 0 },
-    { Type_tag::TYPE_REAL,    NULL, 0, 0 }
+    { Type_tag::TYPE_REAL,    NULL, 0, 0 },
+    { Type_tag::TYPE_ANY,     NULL, 0, 0 }
 };
 
 const Type typeVoid    = &(typeConst[0]);
@@ -57,7 +58,7 @@ const Type typeInteger = &(typeConst[1]);
 const Type typeBoolean = &(typeConst[2]);
 const Type typeChar    = &(typeConst[3]);
 const Type typeReal    = &(typeConst[4]);
-
+const Type typeAny     = &(typeConst[5]);
 size_t labelNamingInt = 0;
 
 
@@ -738,14 +739,19 @@ unsigned int sizeOfType (Type type)
             return 10;
         case Type_tag::TYPE_ARRAY:
             return type->size * sizeOfType(type->refType);
+        case Type_tag::TYPE_ANY:
+            return 0;
     }
     return 0;
 }
 
 bool equalType (Type type1, Type type2)
 {
-    if (type1->kind != type2->kind)
-        return false;
+    if (type1->kind != type2->kind){
+        if (type1->kind == Type_tag::TYPE_ANY || type2->kind == Type_tag::TYPE_ANY)
+            return true;
+        else return false;
+    }
     switch (type1->kind) {
         case Type_tag::TYPE_ARRAY:
             if (type1->size != type2->size)
@@ -754,6 +760,7 @@ bool equalType (Type type1, Type type2)
         case Type_tag::TYPE_POINTER:
             return equalType(type1->refType, type2->refType);
         default: break;
+
     }
     return true;        
 }
@@ -792,6 +799,9 @@ void printType (Type type)
         case Type_tag::TYPE_POINTER:
             printf("*");
             printType(type->refType);
+            break;
+        case Type_tag::TYPE_ANY:
+            printf("Any");
             break;
     }
 }

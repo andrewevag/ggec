@@ -348,6 +348,7 @@ void Constant::sem()
 		/**
 		 * TODO Figure out it's type and add it here
 		 */
+		this->_t = copyType(typeAny);
 		break;
 	case Char:
 		this->_t = copyType(typeChar);
@@ -365,8 +366,47 @@ void Constant::sem()
 	this->_isLval = false;
 }
 
+#define forParameters(i, g) for(SymbolEntry* i = g->u.eFunction.firstArgument; i != NULL; i = i->u.eParameter.next)
+/**
+ * @brief Grab the function from the symbol table.
+ * Match the argument types with byrefs required being lval.
+ * 
+ */
 void FunctionCall::sem(){
-	// TODO
+	SymbolEntry* e = lookupEntry(this->_functionName.c_str(), LOOKUP_ALL_SCOPES, false);
+	
+	// existance of the name
+	if(e == NULL){
+		fatal("Calling a function not previously defined");
+	}
+	// check if the name is a function.
+	else if(e->entryType != ENTRY_FUNCTION){
+		fatal(std::string(this->_functionName + " is not a function.").c_str());
+	}
+
+	// argument matching
+	this->_arguments->sem();
+	size_t i = 0;
+	forParameters(p, e){
+		if(p->entryType != ENTRY_PARAMETER){
+			fatal("Internal Error: lookup table entry for function doesnt have parameter entries as parameters");
+		}
+		// match the argument to the expresion
+		if (! equalType(p->u.eParameter.type, this->_arguments->_expressions[i]->getType()) ){
+			fatal("Argument no: %d does not match with definition of function", i+1);
+		}
+
+		// byref -> lval
+		// not byref or lval
+		if( !  (p->u.eParameter.mode != PASS_BY_REFERENCE || this->_arguments->_expressions[i]->isLval()) ){
+			fatal("Argument no: %d expected lval to match byref argument", i+1);
+		}
+		i++;
+	}	
+
+	// type of the expression is the result type of the function.
+	this->_t = copyType(e->u.eFunction.resultType);
+	this->_isLval = false;
 }
 
 /**
@@ -438,130 +478,155 @@ void UnaryOp::sem() {
 }
 
 
+void binaryOpAnalysis(BinaryOp& b)
+{
+	// BinaryOp* bop = &b;
+	
+	b._leftOperand->sem();
+	b._rightOperand->sem();
+	
+	switch (b._BinOp){
+		
+		case BinaryOp::PLUS: case BinaryOp::MINUS: 
+			// int <> int, double <> double, ptr <> int
+			b._isLval = false;
+			// int <> int
+			if (	equalType(b._leftOperand->getType(), typeInteger) 
+				&&	equalType(b._rightOperand->getType(), typeInteger)
+			)
+				b._t = TypedExpression::copyType(typeInteger);
 
+			// double <> double
+			else if(equalType(b._leftOperand->getType(), typeReal) 
+				&&  equalType(b._rightOperand->getType(), typeReal)
+			)
+				b._t = TypedExpression::copyType(typeReal);
+			
+			// ptr <> int
+			else if(b._leftOperand->isPtrType()
+				&&  equalType(b._rightOperand->getType(), typeInteger)
+			)
+				b._t = TypedExpression::copyType(b._leftOperand->getType());
+			
+			else {
+				throw b._BinOp;
+			}
+			break;
+		
+		case BinaryOp::MULT: case BinaryOp::DIV: 
+			// int <> int, double <> double
+			b._isLval = false;
+
+			// int <> int
+			if (	equalType(b._leftOperand->getType(), typeInteger) 
+				&&	equalType(b._rightOperand->getType(), typeInteger)
+			)
+				b._t = TypedExpression::copyType(typeInteger);
+
+			// double <> double
+			else if(equalType(b._leftOperand->getType(), typeReal) 
+				&&  equalType(b._rightOperand->getType(), typeReal)
+			)
+				b._t = TypedExpression::copyType(typeReal);
+			
+			else {
+				throw b._BinOp;
+			}
+
+			break;
+		
+		case BinaryOp::MOD: 
+			// int <> int
+
+			b._isLval = false;
+
+			// int <> int
+			if (	equalType(b._leftOperand->getType(), typeInteger) 
+				&&	equalType(b._rightOperand->getType(), typeInteger)
+			)
+				b._t = TypedExpression::copyType(typeInteger);
+						
+			else {
+				throw b._BinOp;
+			}
+
+			break;
+		case BinaryOp::LESS: 
+		case BinaryOp::GREATER: 
+		case BinaryOp::LESSEQ: 
+		case BinaryOp::GREATEREQ: 
+		case BinaryOp::EQUALS: 
+		case BinaryOp::NOTEQ: 
+			// t <> t
+			b._isLval = false;
+			if (equalType(b._leftOperand->getType(), b._rightOperand->getType()))
+			{
+				b._t = TypedExpression::copyType(typeBoolean);
+			}
+
+			else {
+				throw b._BinOp;
+			}
+			break;
+		case BinaryOp::LAND: 
+		case BinaryOp::LOR: 
+			// bool <> bool
+			if (	equalType(b._leftOperand->getType(), typeBoolean) 
+				&&	equalType(b._rightOperand->getType(), typeBoolean)
+			)
+				b._t = TypedExpression::copyType(typeBoolean);
+						
+			else {
+				throw b._BinOp;
+			}
+
+			break;
+		case BinaryOp::COMMA: 
+			// p <> q.
+			b._isLval = false;
+			b._t = TypedExpression::copyType(b._rightOperand->getType());
+			break;
+		}
+}
 
 /**
  * @brief Semantically analyze binOp
  * 
  */
 void BinaryOp::sem(){
-	this->_leftOperand->sem();
-	this->_rightOperand->sem();
+	try {
+		binaryOpAnalysis(*this);
+	} catch (BinaryOpType opr){
+		std::string printable[] = {
+			"*", "/", "%", "+", "-", "<", ">", "<=", ">=", "==", "!=", "&&", "||", ","
+		};
 
-	std::string printable[] = {
-		"*", "/", "%", "+", "-", "<", ">", "<=", ">=", "==", "!=", "&&", "||", ","
-	};
-	switch (this->_BinOp){
+		std::string op = printable[opr];
+		switch (opr){
 		
-		case PLUS: case MINUS: 
-			// int <> int, double <> double, ptr <> int
-			this->_isLval = false;
-			// int <> int
-			if (	equalType(this->_leftOperand->getType(), typeInteger) 
-				&&	equalType(this->_rightOperand->getType(), typeInteger)
-			)
-				this->_t = copyType(typeInteger);
-
-			// double <> double
-			else if(equalType(this->_leftOperand->getType(), typeReal) 
-				&&  equalType(this->_rightOperand->getType(), typeReal)
-			)
-				this->_t = copyType(typeReal);
-			
-			// ptr <> int
-			else if(this->_leftOperand->isPtrType()
-				&&  equalType(this->_rightOperand->getType(), typeInteger)
-			)
-				this->_t = copyType(this->_leftOperand->getType());
-			
-			else {
-				std::string op = printable[this->_BinOp];
-				fatal("Operator %s not used on correctly typed operands\n"
-					  "Expected int %s int or double %s double or t* %s int"
-				, op.c_str(), op.c_str(), op.c_str(), op.c_str());
-			}
-			break;
+		case PLUS: case MINUS:
+			fatal(std::string("Operator " + op + " not used on correctly typed operands\n"
+					"Expected int " + op + " int or double " + op + "double or t*" + 
+					op + "int").c_str());
 		
 		case MULT: case DIV: 
-			// int <> int, double <> double
-			this->_isLval = false;
-
-			// int <> int
-			if (	equalType(this->_leftOperand->getType(), typeInteger) 
-				&&	equalType(this->_rightOperand->getType(), typeInteger)
-			)
-				this->_t = copyType(typeInteger);
-
-			// double <> double
-			else if(equalType(this->_leftOperand->getType(), typeReal) 
-				&&  equalType(this->_rightOperand->getType(), typeReal)
-			)
-				this->_t = copyType(typeReal);
-			
-			else {
-				std::string op = printable[this->_BinOp];
-				fatal("Operator %s not used on correctly typed operands\n"
-					  "Expected int %s int or double %s double "
-				, op.c_str(), op.c_str(), op.c_str());
-			}
-
-			break;
+			fatal(std::string("Operator "+ op +" not used on correctly typed operands\n"
+					"Expected int "+ op +" int or double "+ op +" double").c_str());
 		
 		case MOD: 
-			// int <> int
-
-			this->_isLval = false;
-
-			// int <> int
-			if (	equalType(this->_leftOperand->getType(), typeInteger) 
-				&&	equalType(this->_rightOperand->getType(), typeInteger)
-			)
-				this->_t = copyType(typeInteger);
-						
-			else {
-				std::string op = printable[this->_BinOp];
-				fatal("Operator %s not used on correctly typed operands\n"
-					  "Expected int %s int"
-				, op.c_str(), op.c_str());
-			}
-
-			break;
+			fatal(std::string("Operator "+ op +" not used on correctly typed operands\n"
+					"Expected int "+ op +" int").c_str());
+		
 		case LESS: case GREATER: case LESSEQ: case GREATEREQ: case EQUALS: case NOTEQ: 
-			// t <> t
-			this->_isLval = false;
-			if (equalType(this->_leftOperand->getType(), this->_rightOperand->getType()))
-			{
-				this->_t = copyType(typeBoolean);
-			}
-
-			else {
-				std::string op = printable[this->_BinOp];
-				fatal("Operator %s not used on same typed operands\n"
-					  "Expected t %s t"
-				, op.c_str(), op.c_str());
-			}
-			break;
+			fatal(std::string("Operator "+ op +" not used on same typed operands\n"
+					"Expected t "+ op +" t").c_str());
+		
 		case LAND: case LOR: 
-			// bool <> bool
-			if (	equalType(this->_leftOperand->getType(), typeBoolean) 
-				&&	equalType(this->_rightOperand->getType(), typeBoolean)
-			)
-				this->_t = copyType(typeBoolean);
-						
-			else {
-				std::string op = printable[this->_BinOp];
-				fatal("Operator %s not used on correctly typed operands\n"
-					  "Expected bool %s bool"
-				, op.c_str(), op.c_str());
-			}
-
-			break;
-		case COMMA: 
-			// p <> q.
-			this->_isLval = false;
-			this->_t = copyType(this->_rightOperand->getType());
-			break;
+			fatal(std::string("Operator "+ op +" not used on correctly typed operands\n"
+					"Expected bool "+ op +" bool").c_str());
+		default: break;
 		}
+	}
 }
 
 void PrefixUnAss::sem(){
@@ -609,67 +674,118 @@ void PostfixUnAss::sem(){
  * 
  */
 void BinaryAss::sem(){
-	this->_leftOperand->sem();
-	this->_rightOperand->sem();
-	BinaryOp* b = new BinaryOp(_, this->_leftOperand, this->_rightOperand);
-	
-	
+	// enum BinaryOpType { MULT, DIV, MOD, PLUS, MINUS, LESS, GREATER, LESSEQ,
+	// GREATEREQ, EQUALS, NOTEQ, LAND, LOR, COMMA };
+	// enum BinaryAssType { ASS, MULTASS, DIVASS, MODASS, PLUSASS, MINUSASS };
 
-	std::string printable[] = {
-		"=", "*=", "/=", "%=", "+=", "-="
-	};
+	BinaryOp::BinaryOpType toBinOp[] = { BinaryOp::EQUALS, BinaryOp::MULT, BinaryOp::DIV, 
+		BinaryOp::MOD, BinaryOp::PLUS, BinaryOp::MINUS };
+	BinaryOp *b = new BinaryOp(
+		toBinOp[this->_BinAss], this->_leftOperand, this->_rightOperand
+	);
 
-	switch (this->_BinAss)
-	{
-	case ASS: 
-		// t = t.
-		break;
-	case MULTASS: case DIVASS: 
-		// int *= int
-		// double *= double 
-		break;
-	case MODASS: 
-		// int %= int
-		break;
-	case PLUSASS: case MINUSASS: 
-		// int <> int
-		// double <> double
-		// 
-		break;
+	if( ! this->_leftOperand->isLval() ){
+		fatal("Assignemnt not used with l-value");
 	}
+	try {
+		binaryOpAnalysis(*b);
+	} catch (BinaryOp::BinaryOpType opr){
+		switch(opr){
+			case BinaryOp::EQUALS:
+				fatal("Not same types on left and right of = assignment");
+			case BinaryOp::MULT:
+				fatal("Operator *= not used correctly, expected int *= int or double *= double");
+			case BinaryOp::DIV:
+				fatal("Operator /= not used correctly, expected int /= int or double /= double");
+			case BinaryOp::MOD:
+				fatal("Operator %= not used correctly, expected int %= int");
+			case BinaryOp::PLUS:
+				fatal("Operator += not used correctly, expected int += int or double += double or t* += int");
+			case BinaryOp::MINUS:
+				fatal("Operator -= not used correctly, expected int -= int or double -= double or t* -= int");
+			default:
+				fatal("Internal error BinaryAss::sem()");
+		}
+	}
+
+	b->setLeft(nullptr);
+	b->setRight(nullptr);
+	delete b;
 
 }
 
 void TypeCast::sem(){
-
+	// kala twra
 }
 
 void TernaryOp::sem(){
-
+	this->_condition->sem();
+	this->_ifBody->sem();
+	this->_elseBody->sem();
+	
+	if ( !  equalType(this->_condition->getType(), typeBoolean))
+		fatal("Expected boolean in ternary operator condition");
+	if ( ! equalType(this->_ifBody->getType(), this->_elseBody->getType()))
+		fatal("Expected the same type in the two clauses of ternary operator");
+	
+	this->_t = copyType(this->_ifBody->getType());
+	this->_isLval = false;
 }
 
+/**
+ * @brief If size is given the expression should be int => return type* 
+ *        If size is not given just return type*this->getType()
+ * 		  Is not lval.
+ * 
+ * 
+ */
 void New::sem(){
-
+	if(this->_size != nullptr){
+		this->_size->sem(); 
+		if(! equalType(this->getType(), typeInteger)){
+			fatal("New operator needs type int as size");
+		}
+	}
+	Type t = this->_type->toType();
+	// destroyType(t);
+	this->_t = typePointer(copyType(t));
+	this->_isLval = false;
 }
 
+/**
+ * @brief Gets pointer returns pointer is not lval
+ * 
+ */
 void Delete::sem(){
-
+	this->_expr->sem();
+	if(! this->_expr->isPtrType())
+		fatal("Expected pointer type in delete operator");
+	this->_t = copyType(this->_expr->getType());
+	this->_isLval = false;
 }
+
+
 
 void CommaExpr::sem(){
-
+	this->_left->sem();
+	this->_right->sem();
+	this->_t = copyType(this->_right->getType());
+	this->_isLval = false;
 }
 
 void StatementList::sem(){
-
+	for(auto &stmt : this->_stmts)
+		stmt->sem();
 }
 
 void ExpressionList::sem(){
-
+	for(auto &expr : this->_expressions)
+		expr->sem();
 }
 
 void DeclarationList::sem(){
-
+	for(auto &decl : this->_decls)
+		decl->sem();
 }
 
 
