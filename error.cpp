@@ -35,6 +35,9 @@
    --------- Υλοποίηση των συναρτήσεων του χειριστή σφαλμάτων ----------
    --------------------------------------------------------------------- */
 
+extern int lineno;
+
+
 void internal (const char * fmt, ...)
 {
    va_list ap;
@@ -59,7 +62,7 @@ void fatal (const char * fmt, ...)
    if (fmt[0] == '\r')
       fmt++;
    else
-      fprintf(stderr, "%s:%d: ", filename, linecount);
+      fprintf(stderr, "%s:%d: ", filename, lineno);
    fprintf(stderr, "Fatal error, ");
    vfprintf(stderr, fmt, ap);
    fprintf(stderr, "\n");
@@ -75,7 +78,7 @@ void error (const char * fmt, ...)
    if (fmt[0] == '\r')
       fmt++;
    else
-      fprintf(stderr, "%s:%d: ", filename, linecount);
+      fprintf(stderr, "%s:%d: ", filename, lineno);
    fprintf(stderr, "Error, ");
    vfprintf(stderr, fmt, ap);
    fprintf(stderr, "\n");
@@ -96,8 +99,6 @@ void warning (const char * fmt, ...)
    fprintf(stderr, "\n");
    va_end(ap);
 }
-
-extern int lineno;
 
 void yyerror(const char *msg)
 {

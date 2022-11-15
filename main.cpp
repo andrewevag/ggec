@@ -16,7 +16,7 @@ int main(){
 
 	int ret = yyparse();
 	syntaxTree->printTree(std::cout);
-	
+	syntaxTree->sem();
 	delete syntaxTree;
 	return ret;
 }

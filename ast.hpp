@@ -49,7 +49,7 @@ public:
 	virtual std::string getDefName() = 0;
 	virtual Type toType() = 0;
 
-
+	static TypeExpression* fromType(Type t);
 	virtual void sem() = 0;
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;

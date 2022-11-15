@@ -3,7 +3,7 @@
 ## Normal Build Variables
 CXX=c++
 CXXFLAGS=-g -Wall -std=c++14
-BINS=ggec
+BINS=ggec main
 INCLUDE=-I$(PWD)/inc
 INCLUDE+= -I$(PWD)
 DEPSOURCE=$(wildcard src/*.cpp)
@@ -23,6 +23,9 @@ GEN?=100
 ##
 
 default: $(BINS)
+
+main: ggec
+	cp $< $@
 
 ggec: lexer.o main.o parser.o error.o ast.o tojsonstring.o general.o symbol.o semantical.o $(DEPOBJECTS)
 	$(CXX) $(INCLUDE) $(CXXFLAGS) -o $@ $^

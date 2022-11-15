@@ -12,6 +12,29 @@
 
 SymbolEntry* entryForFunction;
 
+TypeExpression* TypeExpression::fromType(Type t)
+{
+		switch (t->kind)
+		{
+		case Type_tag::TYPE_ANY:
+			return nullptr;
+		case Type_tag::TYPE_CHAR:
+			return new BasicType("char");
+		case Type_tag::TYPE_BOOLEAN:
+			return new BasicType("bool");
+		case Type_tag::TYPE_VOID:
+			return new BasicType("void");
+		case Type_tag::TYPE_INTEGER:
+			return new BasicType("int");
+		case Type_tag::TYPE_REAL:
+			return new BasicType("double");
+		case Type_tag::TYPE_POINTER:
+			return new Pointer(fromType(t->refType));
+		default:
+			break;
+		}
+		return nullptr;
+	}
 
 /* ---------------------------------------------------------------------
    ------------- Semantic Analysis For Declarations --------------------
@@ -26,7 +49,7 @@ void Program::sem(){
 	this->_decls->sem();
 	
 	closeScope();
-	printSymbolTable();
+	// printSymbolTable();
 }
 
 void VariableDeclaration::sem() {
@@ -74,15 +97,20 @@ void FunctionDefinition::sem() {
 	SymbolEntry* f;
 	f = newFunction(this->getName().c_str());
 	openScope();
+	entryForFunction = f;
 	this->_parameters->sem();
 	endFunctionHeader(f, this->_resultType->toType());
 
+	printSymbolTable();
 	this->_decls->sem();
 	this->_statements->sem();
 	closeScope();
+	printSymbolTable();
+	
 }
 
 void Parameter::sem(){
+	printSymbolTable();
 	newParameter(
 		this->_name.c_str(), 
 		this->_type->toType(), 
@@ -373,8 +401,16 @@ void Constant::sem()
  * 
  */
 void FunctionCall::sem(){
-	SymbolEntry* e = lookupEntry(this->_functionName.c_str(), LOOKUP_ALL_SCOPES, false);
-	
+	// need to look for a fixed name based on the arguments.
+	this->_arguments->sem();
+	ParameterList* pn = new ParameterList();
+	for(auto & arg: this->_arguments->_expressions){
+		pn->_parameters.push_back(new Parameter(Parameter::ByCall, TypeExpression::fromType(arg->getType()), ""));
+	}
+	FunctionDeclaration* decl = new FunctionDeclaration(nullptr, this->_functionName, pn);
+
+	SymbolEntry* e = lookupEntry(decl->getName().c_str(), LOOKUP_ALL_SCOPES, false);
+	delete decl;
 	// existance of the name
 	if(e == NULL){
 		fatal("Calling a function not previously defined");
@@ -385,7 +421,7 @@ void FunctionCall::sem(){
 	}
 
 	// argument matching
-	this->_arguments->sem();
+	
 	size_t i = 0;
 	forParameters(p, e){
 		if(p->entryType != ENTRY_PARAMETER){
@@ -684,9 +720,7 @@ void BinaryAss::sem(){
 		toBinOp[this->_BinAss], this->_leftOperand, this->_rightOperand
 	);
 
-	if( ! this->_leftOperand->isLval() ){
-		fatal("Assignemnt not used with l-value");
-	}
+	
 	try {
 		binaryOpAnalysis(*b);
 	} catch (BinaryOp::BinaryOpType opr){
@@ -706,6 +740,9 @@ void BinaryAss::sem(){
 			default:
 				fatal("Internal error BinaryAss::sem()");
 		}
+	}
+	if( ! this->_leftOperand->isLval() ){
+			fatal("Assignemnt not used with l-value");
 	}
 
 	b->setLeft(nullptr);

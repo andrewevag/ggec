@@ -219,6 +219,8 @@ public:
       if (this->_t != NULL){
          if(this->_t->kind == Type_tag::TYPE_POINTER)
             return true;
+         else if(this->_t->kind == Type_tag::TYPE_ARRAY)
+            return true;
       }
       return false;
    }

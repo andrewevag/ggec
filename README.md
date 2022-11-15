@@ -33,8 +33,11 @@ A Compiler for the Edsger Programming Language
 - Fix Symbol offset in symbol table.
 - grep -rnw TODO to find todo in code.
 - Types in TypedExpression Objects need to be explicitely deeply destroyed.
-# Known bugs
 
+# Known bugs
+- In and out mixed in bracketed index!.
+- isPtrType() on arrays!
+- equalType to handle equality of array type and ptr type!!.
 # Warnings to take into account
 - Διπλού βάθους declaration list on functions
   ``` C
