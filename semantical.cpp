@@ -102,6 +102,9 @@ void FunctionDeclaration::sem(){
 void FunctionDefinition::sem() {
 	SymbolEntry* f;
 	f = newFunction(this->getName().c_str());
+	if(f == NULL){
+		fatal("Duplicate Function Definition In Current Scope");
+	}
 	openScope();
 	entryForFunction = f;
 	this->_parameters->sem();

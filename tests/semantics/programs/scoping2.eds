@@ -1,0 +1,14 @@
+
+void main(int x, byref int y){
+	void main(int x, int z){
+		return;
+	}
+
+	int main(int x, byref int z){
+		return 0;
+	}
+}
+
+void main(){
+	
+}
