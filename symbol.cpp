@@ -747,6 +747,13 @@ unsigned int sizeOfType (Type type)
 
 bool equalType (Type type1, Type type2)
 {
+    if (type1->kind == Type_tag::TYPE_ARRAY && type2->kind == Type_tag::TYPE_POINTER){
+        return equalType(type1->refType, type2->refType);
+    }
+    if (type2->kind == Type_tag::TYPE_ARRAY && type1->kind == Type_tag::TYPE_POINTER){
+        return equalType(type1->refType, type2->refType);
+    }
+    
     if (type1->kind != type2->kind){
         if (type1->kind == Type_tag::TYPE_ANY || type2->kind == Type_tag::TYPE_ANY)
             return true;
@@ -754,8 +761,7 @@ bool equalType (Type type1, Type type2)
     }
     switch (type1->kind) {
         case Type_tag::TYPE_ARRAY:
-            if (type1->size != type2->size)
-                return false;
+            return equalType(type1->refType, type2->refType);
         case Type_tag::TYPE_IARRAY:
         case Type_tag::TYPE_POINTER:
             return equalType(type1->refType, type2->refType);

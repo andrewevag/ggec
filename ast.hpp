@@ -270,7 +270,7 @@ public:
 	 *
 	 * TODO
 	 * needs delete with the symbol.hpp convention
-	 * after using.
+	 * after using. -- 
 	 * @return Type 
 	 */
 	virtual Type toType() override {
@@ -331,6 +331,7 @@ class Statement : public AST {
 public:
 	virtual ~Statement();
 	virtual void sem() = 0;
+	virtual bool returns() = 0;
 };
 
 class EmptyStatement : public Statement {
@@ -339,6 +340,10 @@ public:
 	virtual ~EmptyStatement();
 	
 	virtual void sem() override;
+
+	virtual bool returns() override {
+		return false;
+	}
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {}; };
@@ -354,6 +359,10 @@ public:
 	virtual ~SingleExpression();
 
 	virtual void sem() override;
+
+	virtual bool returns() override {
+		return false;
+	}
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)_expr}; }
@@ -371,6 +380,10 @@ public:
 
 	virtual void sem() override;
 
+	virtual bool returns() override {
+		return false;
+	}
+
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)_condition, (Tree*)_ifbody}; }
 	virtual void printNode(std::ostream& out) override { out << "IfStatement"; }
@@ -387,6 +400,13 @@ public:
 	virtual ~IfElseStatement();
 
 	virtual void sem() override;
+
+	virtual bool returns() override {
+		bool lr = _ifbody->returns(), rr = _elsebody->returns();
+		if( lr && rr)
+			return true;
+		else return false;
+	}
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)_condition, (Tree*) _ifbody, (Tree*)_elsebody}; };
@@ -406,6 +426,10 @@ public:
 	virtual ~ForStatement();
 
 	virtual void sem() override;
+
+	virtual bool returns() override {
+		return false;
+	}
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { 
@@ -429,6 +453,10 @@ public:
 
 	virtual void sem() override;
 
+	virtual bool returns() override {
+		return false;
+	}
+
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {}; };
 	virtual void printNode(std::ostream& out) override { 
@@ -450,6 +478,10 @@ public:
 
 	virtual void sem() override;
 
+	virtual bool returns() override {
+		return false;
+	}
+
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {}; };
 	virtual void printNode(std::ostream& out) override { 
@@ -469,6 +501,10 @@ public:
 	virtual ~ReturnStatement();
 	
 	virtual void sem() override;
+
+	virtual bool returns() override {
+		return true;
+	}
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override {
@@ -592,8 +628,8 @@ private:
 
 class BracketedIndex : public Expression {
 public:
-	BracketedIndex(Expression* in, Expression* out)
-	: _in(in), _out(out) {} 
+	BracketedIndex(Expression* i1, Expression* i2)
+	: _in(i2), _out(i1) {} 
 	virtual ~BracketedIndex();
 
 	virtual int isIntConstant() override {
@@ -932,6 +968,14 @@ public:
 	std::deque<Statement*> _stmts;
 
 	virtual void sem() override;
+
+	virtual bool returns() override {
+		bool myRet = false;
+		for(auto &stmt : this->_stmts){
+			myRet = myRet || stmt->returns();
+		}
+		return myRet;
+	}
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_stmts.begin(), _stmts.end()}; }

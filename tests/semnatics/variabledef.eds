@@ -1,0 +1,13 @@
+
+
+char x;
+
+double* y, z2;
+
+char z;
+char* z;
+
+bool f;
+bool* g;
+int x_2;
+int**** x_3, x_4;

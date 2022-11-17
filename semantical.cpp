@@ -4,13 +4,10 @@
 #include <string>
 
 /* ---------------------------------------------------------------------
-   ----------- Καθολικές μεταβλητές για τον χειρισμό Label -------------
+   ------------- Καθολικές μεταβλητές της Σημασιολογίας ----------------
    --------------------------------------------------------------------- */
-
-// std::vector<Label*> NestingNamedloops;
-// Variable for generating new names for for loops with no explicit labels.
-
 SymbolEntry* entryForFunction;
+#define forCurrentScope(e) for(SymbolEntry* e = currentScope->entries; e != NULL; e = e->nextInScope)
 
 TypeExpression* TypeExpression::fromType(Type t)
 {
@@ -28,7 +25,7 @@ TypeExpression* TypeExpression::fromType(Type t)
 			return new BasicType("int");
 		case Type_tag::TYPE_REAL:
 			return new BasicType("double");
-		case Type_tag::TYPE_POINTER:
+		case Type_tag::TYPE_POINTER: case Type_tag::TYPE_ARRAY:
 			return new Pointer(fromType(t->refType));
 		default:
 			break;
@@ -47,9 +44,16 @@ void Program::sem(){
 	
 	/* perform semantic analysis of the program declarations. */
 	this->_decls->sem();
+	bool mainDefined = false;
+	forCurrentScope(e)
+		if(e->entryType == ENTRY_FUNCTION && std::string(e->id) == "main")
+			if(! e->u.eFunction.isForward)
+				mainDefined = true;	
 	
+	if( ! mainDefined)
+		fatal("Function \"void main ()\" not defined on global scope");
 	closeScope();
-	// printSymbolTable();
+	
 }
 
 void VariableDeclaration::sem() {
@@ -104,6 +108,18 @@ void FunctionDefinition::sem() {
 	printSymbolTable();
 	this->_decls->sem();
 	this->_statements->sem();
+	if (! (this->_statements->returns() || equalType(this->_resultType->toType(), typeVoid))){
+		fatal("Not all paths return in function definition %s", this->_name.c_str());
+	}
+	// before we close scope check that all functions in scope are defined and not only declared
+	
+	forCurrentScope(e){
+		if(e->entryType == ENTRY_FUNCTION){
+			if (e->u.eFunction.isForward){
+				fatal("Nested Function \"%s\" declared but not defined", e->id);
+			}
+		}
+	}
 	closeScope();
 	printSymbolTable();
 	
@@ -373,10 +389,7 @@ void Constant::sem()
 		this->_t = copyType(typeBoolean);
 		break;
 	case Null:
-		/**
-		 * TODO Figure out it's type and add it here
-		 */
-		this->_t = copyType(typeAny);
+		this->_t = typePointer(copyType(typeAny));
 		break;
 	case Char:
 		this->_t = copyType(typeChar);
@@ -748,6 +761,9 @@ void BinaryAss::sem(){
 	b->setLeft(nullptr);
 	b->setRight(nullptr);
 	delete b;
+
+	this->_t = copyType(this->_leftOperand->getType());
+	this->_isLval = false;
 
 }
 

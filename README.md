@@ -22,7 +22,7 @@ A Compiler for the Edsger Programming Language
 ## Semantic Analysis
 - When processing a function first add the function in current scope and open a new one =>> The function whose processing is being done is the last entry of the parent scope if such exists. Since things added in the symbol table are backwards it is the first in the list of entries in parent scope. 
 - Scope nesting level of a function body is always > 1. Global scope is with nesting level 1.
-
+- Non Nested Function Declarations can be defined externally by using the same name convention
 # Tasks do not forget:
 - #include
 - https://stackoverflow.com/questions/62115979/how-to-implement-better-error-messages-for-flex-bison
@@ -33,11 +33,9 @@ A Compiler for the Edsger Programming Language
 - Fix Symbol offset in symbol table.
 - grep -rnw TODO to find todo in code.
 - Types in TypedExpression Objects need to be explicitely deeply destroyed.
-
+- Memory Cleaning
 # Known bugs
-- In and out mixed in bracketed index!.
-- isPtrType() on arrays!
-- equalType to handle equality of array type and ptr type!!.
+
 # Warnings to take into account
 - Διπλού βάθους declaration list on functions
   ``` C
@@ -56,7 +54,7 @@ A Compiler for the Edsger Programming Language
             │       └──VariableDeclaration(y) <br />
             │           └──BasicType(int) <br />
             └──StatementList <br />
-
+- TypeExpression::fromType handling of TYPE_ANY
 Note:
 We have the declaration of Functions and each line
 ex. int x, y; is it's own declaration List.
