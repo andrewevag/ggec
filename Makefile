@@ -61,13 +61,16 @@ ast.hpp: symbol.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $^
 
 
-lexertest: lexer.o ./tests/lexer/main.o error.o ast.o tojsonstring.o parser.o general.o symbol.o $(DEPOBJECTS)
+lexertest: lexer.o ./tests/lexer/main.o error.o ast.o tojsonstring.o parser.o general.o symbol.o semantical.o $(DEPOBJECTS)
 	$(CXX) $(CXXFLAGS) -o ./tests/lexer/$@ $^
 
-parsertest: lexer.o ./tests/parser/main.o parser.o error.o ast.o tojsonstring.o general.o symbol.o $(DEPOBJECTS)
+parsertest: lexer.o ./tests/parser/main.o parser.o error.o ast.o tojsonstring.o general.o symbol.o semantical.o $(DEPOBJECTS)
 	$(CXX) $(CXXFLAGS) -o ./tests/parser/$@ $^
 
-test: lexertest parsertest
+semanticstest: ./tests/semantics/main.o lexer.o parser.o error.o ast.o tojsonstring.o general.o symbol.o semantical.o $(DEPOBJECTS)
+	$(CXX) $(CXXFLAGS) -o ./tests/semantics/$@ $^
+
+test: lexertest parsertest semanticstest
 	@echo "🧪 Running Lexer Suite :"
 	@$(PYTHON3) ./tests/lexer/runner.sh
 	@echo "🧪 Running Parser Suite :"
@@ -79,6 +82,8 @@ test: lexertest parsertest
 	@$(MAKE) -C examples/syntax_gen generate GEN="$(GEN)"
 	@echo "Running the input files on the parser : ⛏️"
 	@$(PYTHON3) ./tests/parser/runner_gen.sh $(GEN) 
+	@echo "🧪 Running Semantics Suite :"
+	@$(PYTHON3) ./tests/semantics/runner.sh
 	
 
 
@@ -99,6 +104,7 @@ clean:
 	$(MAKE) -C ./tests/lexer clean
 	$(MAKE) -C ./tests/parser clean
 	$(MAKE) -C ./examples/syntax_gen clean
+	$(MAKE) -C ./tests/semantics clean
 
 distclean: clean
 	$(RM) $(BINS)

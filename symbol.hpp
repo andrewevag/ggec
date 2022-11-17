@@ -200,6 +200,7 @@ typedef enum {
 extern Scope        * currentScope;       /* Τρέχουσα εμβέλεια         */
 extern unsigned int   quadNext;           /* Αριθμός επόμενης τετράδας */
 extern unsigned int   tempNumber;         /* Αρίθμηση των temporaries  */
+extern std::vector<SymbolEntry*> lastDefFuns; /* function we're processing */
 
 extern const Type typeVoid;
 extern const Type typeInteger;

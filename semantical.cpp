@@ -95,6 +95,8 @@ void FunctionDeclaration::sem(){
 	this->_parameters->sem();
 	endFunctionHeader(f, this->_resultType->toType());
 	closeScope();
+	printSymbolTable();
+
 }
 
 void FunctionDefinition::sem() {
@@ -126,7 +128,7 @@ void FunctionDefinition::sem() {
 }
 
 void Parameter::sem(){
-	printSymbolTable();
+	// printSymbolTable();
 	newParameter(
 		this->_name.c_str(), 
 		this->_type->toType(), 
@@ -322,12 +324,15 @@ void BreakStatement::sem(){
  */
 void ReturnStatement::sem() {
 	SymbolEntry *e;
+	printSymbolTable();
 	e = lookupActiveFun();
 	if (e == NULL)
 		fatal("Return Statement Outside of a function");
 	else{
 		Type resultType = e->u.eFunction.resultType;
 		if (this->_expr == nullptr && (! equalType(typeVoid, resultType))){
+			printSymbolTable();
+			printType(resultType);
 			fatal("Expected an expression in the return statement");
 		}
 		if (this->_expr != nullptr){

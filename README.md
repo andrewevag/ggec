@@ -55,6 +55,10 @@ A Compiler for the Edsger Programming Language
             │           └──BasicType(int) <br />
             └──StatementList <br />
 - TypeExpression::fromType handling of TYPE_ANY
+- Function Stack is kept in a global vector in the symbol table
+  - This was needed because we couldn't decide which is the last function we're in
+    - When newFunction is called it's entry is pushed into the stack
+    - When closeScope() is called it's entry is popped from the stack but only if there is an entry to begin with (account for global scope)
 Note:
 We have the declaration of Functions and each line
 ex. int x, y; is it's own declaration List.

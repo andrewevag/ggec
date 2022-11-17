@@ -202,9 +202,9 @@ std::string FunctionCall::toJSONString(){
 std::string BracketedIndex::toJSONString(){
 	return
 	obj_head("BracketedIndex")
-		+ this->_in->toJSONString() +
-		newvalue
 		+ this->_out->toJSONString() +
+		newvalue
+		+ this->_in->toJSONString() +
 	obj_tail;
 }
 

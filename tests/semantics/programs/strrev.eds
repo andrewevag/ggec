@@ -1,3 +1,5 @@
+void writeString(char* str);
+int strlen(char* str);
 
 void main ()
 {

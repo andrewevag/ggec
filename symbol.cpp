@@ -41,6 +41,8 @@ Scope        * currentScope;           /* Τρέχουσα εμβέλεια     
 unsigned int   quadNext;               /* Αριθμός επόμενης τετράδας      */
 unsigned int   tempNumber;             /* Αρίθμηση των temporaries       */
 
+std::vector<SymbolEntry*> lastDefFuns;     
+
 static unsigned int   hashTableSize;   /* Μέγεθος πίνακα κατακερματισμού */
 static SymbolEntry ** hashTable;       /* Πίνακας κατακερματισμού        */
 
@@ -200,6 +202,8 @@ void closeScope ()
     }
     
     currentScope = currentScope->parent;
+    if(lastDefFuns.size() != 0)
+        lastDefFuns.pop_back();
     delete(t);
 }
 
@@ -363,6 +367,7 @@ SymbolEntry * newFunction (const char * name)
             e->u.eFunction.pardef = PARDEF_DEFINE;
             e->u.eFunction.firstArgument = e->u.eFunction.lastArgument = NULL;
             e->u.eFunction.resultType = NULL;
+            lastDefFuns.push_back(e);
         }
         return e;
     }
@@ -370,6 +375,7 @@ SymbolEntry * newFunction (const char * name)
         e->u.eFunction.isForward = false;
         e->u.eFunction.pardef = PARDEF_CHECK;
         e->u.eFunction.lastArgument = NULL;
+        lastDefFuns.push_back(e);
         return e;
     }
     else {
@@ -450,6 +456,7 @@ void forwardFunction (SymbolEntry * f)
     if (f->entryType != ENTRY_FUNCTION)
         internal("Cannot make a non-function forward");
     f->u.eFunction.isForward = true;
+    // lastDefFuns.pop_back(); getPopped in closeScope();
 }
 
 void endFunctionHeader (SymbolEntry * f, Type type)
@@ -644,6 +651,9 @@ SymbolEntry * lookupLabel(const char * name, bool explicitelyNamed)
  */
 SymbolEntry * lookupActiveFun    ()
 {
+    if(lastDefFuns.size() == 0)
+        return NULL;
+    else return lastDefFuns.back();
     SymbolEntry* e;
     if (currentScope->nestingLevel > 1){
         // we are in a function look invariants
@@ -875,5 +885,8 @@ void printSymbolTable ()
             scp = scp->parent;
             printf("\n");
         }
+    printf("----------------------------------------\n");
+    printf("Nesting Funs Size: %ld\n", lastDefFuns.size());
+    printf("----------------------------------------\n");
     printf("----------------------------------------\n");
 }
