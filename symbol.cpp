@@ -31,6 +31,7 @@
 #include "general.hpp"
 #include "error.hpp"
 #include "symbol.hpp"
+#include "ast.hpp"
 
 
 /* ---------------------------------------------------------------------
@@ -179,6 +180,7 @@ void openScope ()
     newScope->negOffset = START_NEGATIVE_OFFSET;
     newScope->parent    = currentScope;
     newScope->entries   = NULL;
+    newScope->varOffset = START_POSITIVE_OFFSET;
 
     if (currentScope == NULL)
         newScope->nestingLevel = 1;
@@ -248,7 +250,8 @@ SymbolEntry * newVariable (const char * name, Type type)
         e->u.eVariable.type = type;
         type->refCount++;
         currentScope->negOffset -= sizeOfType(type);
-        e->u.eVariable.offset = currentScope->negOffset;
+        e->u.eVariable.offset = currentScope->varOffset;
+        currentScope->varOffset += sizeOfType(type);
     }
     return e;
 }
@@ -397,6 +400,7 @@ SymbolEntry * newParameter (const char * name, Type type,
             if (e != NULL) {
                 e->entryType = ENTRY_PARAMETER;
                 e->u.eParameter.type = type;
+                
                 type->refCount++;
                 e->u.eParameter.mode = mode;
                 e->u.eParameter.next = NULL;
@@ -443,7 +447,7 @@ static unsigned int fixOffset (SymbolEntry * args)
     else {
         unsigned int rest = fixOffset(args->u.eParameter.next);
         
-        args->u.eParameter.offset = START_POSITIVE_OFFSET + rest;
+        args->u.eParameter.offset = currentScope->varOffset + rest;
         if (args->u.eParameter.mode == PASS_BY_REFERENCE)
             return rest + 2;
         else
@@ -468,7 +472,7 @@ void endFunctionHeader (SymbolEntry * f, Type type)
             internal("Cannot end parameters in an already defined function");
             break;
         case PARDEF_DEFINE:
-            fixOffset(f->u.eFunction.firstArgument);
+            currentScope->varOffset+=fixOffset(f->u.eFunction.firstArgument);
             f->u.eFunction.resultType = type;
             type->refCount++;
             break;
@@ -889,4 +893,30 @@ void printSymbolTable ()
     printf("Nesting Funs Size: %ld\n", lastDefFuns.size());
     printf("----------------------------------------\n");
     printf("----------------------------------------\n");
+}
+
+
+
+
+llvm::Type* toLLVMType(Type t)
+{
+    switch (t->kind) {
+		case Type_tag::TYPE_BOOLEAN:
+			return llvm::IntegerType::get(AST::TheContext, 8);
+		case  Type_tag::TYPE_INTEGER:
+			return llvm::IntegerType::get(AST::TheContext, 16);
+		case  Type_tag::TYPE_REAL:
+			return llvm::Type::getX86_FP80Ty(AST::TheContext);
+		case  Type_tag::TYPE_VOID:
+			return llvm::Type::getVoidTy(AST::TheContext);
+		case Type_tag::TYPE_POINTER:
+			return llvm::PointerType::get(toLLVMType(t->refType),0);
+		case Type_tag::TYPE_CHAR:
+			return llvm::IntegerType::get(AST::TheContext, 8);
+		case Type_tag::TYPE_ARRAY:
+			return llvm::ArrayType::get(toLLVMType(t->refType),t->size);
+		default:
+			fatal("toLLVMType: No Such type ma boy!");
+			break;
+	}
 }

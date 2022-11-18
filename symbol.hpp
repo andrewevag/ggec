@@ -23,7 +23,7 @@
 #define __SYMBOL_HPP__
 
 #include <vector>
-
+#include "llvmhead.hpp"
 
 /* ---------------------------------------------------------------------
    -------------------------- Τύπος bool -------------------------------
@@ -45,7 +45,7 @@ typedef enum { false=0, true=1 } bool;
    ------------ Ορισμός σταθερών του πίνακα συμβόλων -------------------
    --------------------------------------------------------------------- */
 
-#define START_POSITIVE_OFFSET 8     /* Αρχικό θετικό offset στο Ε.Δ.   */
+#define START_POSITIVE_OFFSET 0     /* Αρχικό θετικό offset στο Ε.Δ.   */
 #define START_NEGATIVE_OFFSET 0     /* Αρχικό αρνητικό offset στο Ε.Δ. */
 
 
@@ -179,6 +179,7 @@ typedef struct Scope_tag Scope;
 struct Scope_tag {
     unsigned int   nestingLevel;             /* Βάθος φωλιάσματος      */
     unsigned int   negOffset;                /* Τρέχον αρνητικό offset */
+    unsigned int   varOffset;                /* Για τις μεταβλητές & παραμέτρους */
     Scope        * parent;                   /* Περιβάλλουσα εμβέλεια  */
     SymbolEntry  * entries;                  /* Σύμβολα της εμβέλειας  */
 };
@@ -210,7 +211,7 @@ extern const Type typeReal;
 extern const Type typeAny;
 
 
-
+llvm::Type* toLLVMType(Type t);
 
 class TypedExpression {
 public:

@@ -55,7 +55,7 @@ symbol.o: symbol.cpp symbol.hpp general.hpp error.hpp
 semantical.o: semantical.cpp ast.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
 
-ast.hpp: symbol.hpp
+ast.hpp: symbol.hpp llvmhead.hpp
 
 %.o: %.cpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $^

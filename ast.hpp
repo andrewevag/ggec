@@ -5,6 +5,8 @@
 #include <deque>
 #include "tree.hpp"
 #include "symbol.hpp"
+#include "llvmhead.hpp"
+
 
 
 /* ---------------------------------------------------------------------
@@ -19,9 +21,18 @@ public:
 	virtual std::string toJSONString() = 0;
 	virtual void sem() = 0;
 
+	virtual llvm::Value* codegen() = 0;
+
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
 	virtual void printNode(std::ostream& out) = 0;
+
+	static llvm::LLVMContext TheContext;
+	static std::unique_ptr<llvm::Module> TheModule;
+	static std::unique_ptr<llvm::legacy::FunctionPassManager> TheFPM;
+	static std::unique_ptr<llvm::IRBuilder<> > Builder;
+
+
 };
 class Declaration;
 class TypeExpression;
@@ -48,9 +59,12 @@ public:
 	 */
 	virtual std::string getDefName() = 0;
 	virtual Type toType() = 0;
+	
 
 	static TypeExpression* fromType(Type t);
 	virtual void sem() = 0;
+
+	virtual llvm::Value* codegen() override;
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
 	virtual void printNode(std::ostream& out) = 0;
@@ -71,6 +85,8 @@ public:
 		return this->_type->getDefName();
 	}
 	virtual void sem() override;
+
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return { (Tree*)this->_type }; };
@@ -103,6 +119,8 @@ public:
 
 	virtual void sem() override;
 
+	virtual llvm::Value* codegen() override;
+
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_parameters.begin(), _parameters.end()}; }
 	virtual void printNode(std::ostream& out) override { out << "ParameterList"; }
@@ -117,6 +135,7 @@ public:
 	virtual ~Program();
 	virtual void sem() override;
 
+	virtual llvm::Value* codegen() override;
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)_decls}; }
 	virtual void printNode(std::ostream& out) override { out << "Program"; } 
@@ -141,6 +160,8 @@ public:
 	 */
 	virtual std::string getName() = 0;
 
+	virtual llvm::Value* codegen() override;
+
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
 	virtual void printNode(std::ostream& out) = 0;
@@ -161,6 +182,7 @@ public:
 	}
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*) _typeExpr }; } 
@@ -184,6 +206,8 @@ public:
 
 	virtual void sem() override;
 
+	virtual llvm::Value* codegen() override;
+
 	/* Printing Syntax Tree Functiontgs */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)this->_typeExpr, (Tree*)this->_expr}; }
 	virtual void printNode(std::ostream& out) override { out << "ArrayDeclaration(" << _name << ')';  }
@@ -205,7 +229,7 @@ public:
 		return this->_name + this->_parameters->getAggregatedName();
 	}
 
-
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)this->_resultType, (Tree*)this->_parameters}; };
@@ -232,7 +256,7 @@ public:
 	}
 
 	virtual void sem() override;
-
+	virtual llvm::Value* codegen() override;
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)this->_resultType, (Tree*)this->_parameters, (Tree*)this->_decls, (Tree*)this->_statements}; }
 	virtual void printNode(std::ostream& out) override { out << "FunctionDefinition(" << _name << ")"; }
@@ -289,6 +313,7 @@ public:
 	}
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override {return {};};
@@ -318,6 +343,7 @@ public:
 	}
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)_inner}; };
@@ -331,6 +357,7 @@ class Statement : public AST {
 public:
 	virtual ~Statement();
 	virtual void sem() = 0;
+	virtual llvm::Value* codegen() = 0;
 	virtual bool returns() = 0;
 };
 
@@ -340,6 +367,7 @@ public:
 	virtual ~EmptyStatement();
 	
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	virtual bool returns() override {
 		return false;
@@ -359,6 +387,7 @@ public:
 	virtual ~SingleExpression();
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	virtual bool returns() override {
 		return false;
@@ -379,6 +408,7 @@ public:
 	virtual ~IfStatement();
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	virtual bool returns() override {
 		return false;
@@ -400,6 +430,7 @@ public:
 	virtual ~IfElseStatement();
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	virtual bool returns() override {
 		bool lr = _ifbody->returns(), rr = _elsebody->returns();
@@ -426,6 +457,7 @@ public:
 	virtual ~ForStatement();
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	virtual bool returns() override {
 		return false;
@@ -452,6 +484,7 @@ public:
 	virtual ~ContinueStatement();
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	virtual bool returns() override {
 		return false;
@@ -477,6 +510,7 @@ public:
 	virtual ~BreakStatement();
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	virtual bool returns() override {
 		return false;
@@ -501,6 +535,7 @@ public:
 	virtual ~ReturnStatement();
 	
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	virtual bool returns() override {
 		return true;
@@ -532,6 +567,7 @@ public:
 	virtual int isIntConstant() = 0;
 
 	virtual void sem() = 0;
+	virtual llvm::Value* codegen() = 0;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
@@ -549,6 +585,7 @@ public:
 	}
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {}; };
@@ -581,6 +618,7 @@ public:
 	}
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {}; };
@@ -616,7 +654,7 @@ public:
 	}
 
 	virtual void sem() override;
-
+	virtual llvm::Value* codegen() override;
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)_arguments}; };
 	virtual void printNode(std::ostream& out) override { out << "FunctionCall(" << _functionName << ")"; }
@@ -637,6 +675,7 @@ public:
 	}
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_in, _out}; };
@@ -672,6 +711,7 @@ public:
 	}
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_operand}; }
@@ -715,6 +755,7 @@ public:
 	}
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	friend void binaryOpAnalysis(BinaryOp&);
 
@@ -749,6 +790,7 @@ public:
 
 	virtual int isIntConstant() = 0;
 	virtual void sem() = 0;
+	virtual llvm::Value* codegen() = 0;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
@@ -769,6 +811,7 @@ public:
 		return 0;
 	}
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {this->_operand}; }
@@ -787,6 +830,7 @@ public:
 		return 0;
 	}
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {this->_operand}; }
@@ -819,6 +863,7 @@ public:
 	}
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_leftOperand, _rightOperand}; }
@@ -841,6 +886,7 @@ public:
 	}
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return { _type, _expr }; }
@@ -862,6 +908,7 @@ public:
 	}
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_condition, _ifBody, _elseBody}; }
@@ -885,6 +932,7 @@ public:
 	}
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { if (this->_size != nullptr) return {_type, _size}; else return {_type}; }
@@ -906,6 +954,7 @@ public:
 	}
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_expr}; }
@@ -927,6 +976,7 @@ public:
 	}
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_left, _right}; }
@@ -945,6 +995,7 @@ public:
 	std::string getLabelName() { return this->_lblname; }
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {}; }
@@ -968,6 +1019,7 @@ public:
 	std::deque<Statement*> _stmts;
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	virtual bool returns() override {
 		bool myRet = false;
@@ -993,6 +1045,7 @@ public:
 	std::deque<Expression*> _expressions;
 
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_expressions.begin(), _expressions.end()}; }
@@ -1012,9 +1065,11 @@ public:
 			i->embedType(t);
 	}
 	virtual std::string toJSONString() override;
+	
 
 	virtual std::string getName() override { return "";}
 	virtual void sem() override;
+	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_decls.begin(), _decls.end()}; }
