@@ -268,12 +268,12 @@ void ContinueStatement::sem(){
 		e = lookupLabel(nullptr, false);
 		// existance check
 		if(e == NULL){
-			fatal("Continue Statement outside of a for loop\n");
+			fatal("Continue Statement outside of a for loop with no label\n");
 		}
 		else{
 			// activeness check
 			if( ! e->u.eLabel.active ){
-				fatal("Continue Statement outside of a for loop\n");
+				fatal("Continue Statement outside of a for loop with no label\n");
 			}
 		}
 	}
