@@ -45,7 +45,7 @@ typedef enum { false=0, true=1 } bool;
    ------------ Ορισμός σταθερών του πίνακα συμβόλων -------------------
    --------------------------------------------------------------------- */
 
-#define START_POSITIVE_OFFSET 0     /* Αρχικό θετικό offset στο Ε.Δ.   */
+#define START_POSITIVE_OFFSET 8     /* Αρχικό θετικό offset στο Ε.Δ.   */
 #define START_NEGATIVE_OFFSET 0     /* Αρχικό αρνητικό offset στο Ε.Δ. */
 
 
@@ -122,13 +122,12 @@ struct SymbolEntry_tag {
    SymbolEntry  * nextHash;           /* Επόμενη εγγραφή στον Π.Κ.     */
    SymbolEntry  * nextInScope;        /* Επόμενη εγγραφή στην εμβέλεια */
 
-   llvm::Value  * llvmVal;            /*  */
-
    union {                            /* Ανάλογα με τον τύπο εγγραφής: */
 
       struct {                                /******* Μεταβλητή *******/
          Type          type;                  /* Τύπος                 */
          int           offset;                /* Offset στο Ε.Δ.       */
+         llvm::Value * llvmVal;               /* Null if not global    */  
       } eVariable;
 
       struct {                                /******** Σταθερά ********/
@@ -143,15 +142,17 @@ struct SymbolEntry_tag {
       } eConstant;
 
       struct {                                /******* Συνάρτηση *******/
-         bool          isForward;             /* Δήλωση forward        */
-         SymbolEntry * firstArgument;         /* Λίστα παραμέτρων      */
-         SymbolEntry * lastArgument;          /* Τελευταία παράμετρος  */
-         Type          resultType;            /* Τύπος αποτελέσματος   */
-         PARDEF pardef;                       /* Κατάσταση παραμέτρων  */
+         bool            isForward;           /* Δήλωση forward        */
+         SymbolEntry   * firstArgument;       /* Λίστα παραμέτρων      */
+         SymbolEntry   * lastArgument;        /* Τελευταία παράμετρος  */
+         Type            resultType;          /* Τύπος αποτελέσματος   */
+         PARDEF          pardef;              /* Κατάσταση παραμέτρων  */
          // Still considering
-         llvm::Value * parentEnvironment;     // Null if nesting level = 0;
-         llvm::Value * 
-         int           firstQuad;             /* Αρχική τετράδα        */
+         llvm::Value   * env;                 /* Current Environament  */
+         llvm::Function* fun;                 /* Handle for the func   */
+         bool            hasHead;             /* If the head for the   */
+                                              /* is generated or not   */
+         int             firstQuad;           /* Αρχική τετράδα        */
       } eFunction;
 
       struct {                                /****** Παράμετρος *******/

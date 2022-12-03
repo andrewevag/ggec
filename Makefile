@@ -2,12 +2,14 @@
 
 ## Normal Build Variables
 CXX=c++
-CXXFLAGS=-g -Wall -std=c++14
+CXXFLAGS=-Wall -std=c++14 -g `$(LLVMCONFIG) --cxxflags` -fexceptions
+LDFLAGS=$(shell $(LLVMCONFIG) --ldflags --system-libs --libs all)
 BINS=ggec main
 INCLUDE=-I$(PWD)/inc
 INCLUDE+= -I$(PWD)
 DEPSOURCE=$(wildcard src/*.cpp)
 DEPOBJECTS=$(patsubst %.cpp, %.o, $(DEPSOURCE))
+LLVMCONFIG=llvm-config-11
 ##
 
 ## Test dependencies
@@ -27,8 +29,8 @@ default: $(BINS)
 main: ggec
 	cp $< $@
 
-ggec: lexer.o main.o parser.o error.o ast.o tojsonstring.o general.o symbol.o semantical.o $(DEPOBJECTS)
-	$(CXX) $(INCLUDE) $(CXXFLAGS) -o $@ $^
+ggec: lexer.o main.o parser.o error.o ast.o tojsonstring.o general.o symbol.o semantical.o codegen.o $(DEPOBJECTS)
+	$(CXX) $(INCLUDE) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 
 lexer.cpp: lexer.l ast.hpp
@@ -54,6 +56,10 @@ symbol.o: symbol.cpp symbol.hpp general.hpp error.hpp
 
 semantical.o: semantical.cpp ast.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
+
+codegen.o: codegen.cpp symbol.hpp ast.hpp error.hpp
+	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
+
 
 ast.hpp: symbol.hpp llvmhead.hpp
 

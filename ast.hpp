@@ -32,6 +32,24 @@ public:
 	static std::unique_ptr<llvm::legacy::FunctionPassManager> TheFPM;
 	static std::unique_ptr<llvm::IRBuilder<> > Builder;
 
+	/* More Constant LLVM stuff */
+	static llvm::Type *i8;
+  	static llvm::Type *i16;
+	static llvm::Type *i8p;
+
+	static llvm::ConstantInt* c8(char c) {
+    	return llvm::ConstantInt::get(TheContext, llvm::APInt(8, c, true));
+  	}
+  	static llvm::ConstantInt* c32(int n) {
+    	return llvm::ConstantInt::get(TheContext, llvm::APInt(32, n, true));
+  	}
+	static llvm::ConstantInt* c16(int n) {
+    	return llvm::ConstantInt::get(TheContext, llvm::APInt(16, n, true));
+  	}
+  	static llvm::ConstantInt* c64(int n) {
+    	return llvm::ConstantInt::get(TheContext, llvm::APInt(64, n, true));
+  	}
+  	
 
 };
 class Declaration;
@@ -65,6 +83,7 @@ public:
 	virtual void sem() = 0;
 
 	virtual llvm::Value* codegen() override;
+
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
 	virtual void printNode(std::ostream& out) = 0;
@@ -151,6 +170,7 @@ public:
 	virtual void sem() override;
 
 	virtual llvm::Value* codegen() override;
+	
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)_decls}; }
 	virtual void printNode(std::ostream& out) override { out << "Program"; } 
@@ -175,7 +195,7 @@ public:
 	 */
 	virtual std::string getName() = 0;
 
-	virtual llvm::Value* codegen() override;
+	virtual llvm::Value* codegen() = 0;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
@@ -1061,6 +1081,7 @@ public:
 
 	virtual void sem() override;
 	virtual llvm::Value* codegen() override;
+
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_expressions.begin(), _expressions.end()}; }

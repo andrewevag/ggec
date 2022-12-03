@@ -127,6 +127,11 @@ void FunctionDefinition::sem() {
 			}
 		}
 	}
+	
+	this->codegen();
+	// TheFunction <- from this->codegen();
+	// gets execution in a new basic block inside TheFunction
+	// this->_statements->codegen();
 	closeScope();
 	printSymbolTable();
 	

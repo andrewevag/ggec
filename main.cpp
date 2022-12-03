@@ -16,7 +16,8 @@ int main(){
 
 	int ret = yyparse();
 	syntaxTree->printTree(std::cout);
-	syntaxTree->sem();
+	// syntaxTree->sem();
+	syntaxTree->codegen();
 	delete syntaxTree;
 	return ret;
 }

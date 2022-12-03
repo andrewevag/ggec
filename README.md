@@ -41,9 +41,11 @@ A Compiler for the Edsger Programming Language
 2. Possible offsets when calling functions
     1. +1 local nested function -> call using your own environment
     2. 0  recursion or nested function on same level -> call using the environment
-            you were called with.
+            you were called with. |nestingLevelOfTheCalle - youNestingLevel| + 1.
     3. <0 functions that you are inside of -> get the environment to call climping
-            up |nestingLevelOftheCalle - yourNestingLevel|.
+            up |nestingLevelOftheCalle - yourNestingLevel| + 1.
+
+**In the symbol table for every function we need it's context.**
 
 # Known bugs
 

@@ -17,7 +17,7 @@ void main(){
 			for(int i =0 ; i < |-1|; i++){
 				ctxToCall = load ctxToCall[0];
 			}
-			prime(mydoenv[0] , 10);
+			prime((mydoenv[0])[0] , 10);
 			
 			down(i8* mydoenv,
 		}
@@ -42,9 +42,9 @@ void main(){
 2. Possible offsets when calling functions
 	1. +1 local nested function -> call using your own environment
 	2. 0  recursion or nested function on same level -> call using the environment
-			you were called with.
+			you were called with. |nestingLevelOfTheCalle - youNestingLevel| + 1.
 	3. <0 functions that you are inside of -> get the environment to call climping
-			up |nestingLevelOftheCalle - yourNestingLevel|. 
+			up |nestingLevelOftheCalle - yourNestingLevel| + 1. 
 
 
 

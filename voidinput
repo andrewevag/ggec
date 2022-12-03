@@ -1,0 +1,4 @@
+void main(){
+	void prime(int n, byref char c){
+	}
+}
