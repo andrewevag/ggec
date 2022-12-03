@@ -210,9 +210,12 @@ llvm::Value* FunctionDefinition::codegen(){
 		auto argLevelCasted = Builder->CreateBitCast(argLevel, llvm::PointerType::get(realArg->getType(), 0), "env.0.casted");
 		Builder->CreateStore(realArg, argLevelCasted);
 	}
-	// Builder->CreateRetVoid();
+	
 	
 	this->_statements->codegen();
+
+	// TODO remove it
+	Builder->CreateRetVoid();
 	return nullptr;
 }
 
@@ -247,8 +250,24 @@ llvm::Value* IfStatement::codegen(){
 	// conditionEval = icmp ne i8 condition, 0
 	// br i1 conditionEval, label trueLabel, label Endif  
 	// TheModule->get functionStack
-	llvm::BasicBlock *TrueLabel  = llvm::BasicBlock::Create(TheContext, "iftrue", f);
-	llvm::BasicBlock *EndIfLabel = llvm::BasicBlock::Create(TheContext, "endif", f);
+	SymbolEntry * e   = lookupActiveFun();
+	llvm::Function* f = e->u.eFunction.fun;
+	
+	// Basic Blocks for Jumping
+	llvm::BasicBlock *TrueBlock  = llvm::BasicBlock::Create(TheContext, "iftrue", f);
+	llvm::BasicBlock *EndIfBlock = llvm::BasicBlock::Create(TheContext, "endif", f);
+
+	llvm::Value* conditionVal = this->_condition->codegen();
+	auto condBit = Builder->CreateICmpNE(conditionVal, c8(0), "cond");
+	Builder->CreateCondBr(condBit, TrueBlock, EndIfBlock);
+	
+	// Build If body;
+	Builder->SetInsertPoint(TrueBlock);
+	this->_ifbody->codegen();
+	Builder->CreateBr(EndIfBlock);
+	// Go to EndIfBlock
+	Builder->SetInsertPoint(EndIfBlock);
+
 	return nullptr;
 }
 llvm::Value* IfElseStatement::codegen(){
@@ -270,6 +289,17 @@ llvm::Value* Id::codegen(){
 	return nullptr;
 }
 llvm::Value* Constant::codegen(){
+	// for testing reason i will build true constant
+	if(this->_ct == Constant::ConstantType::Bool){
+		if(this->_bool){
+			auto added = Builder->CreateAdd(c8(10), c8(22));
+			return added;
+
+		}else{
+			auto added = Builder->CreateAdd(c8(10), c8(22));
+			return added;
+		}
+	}
 	return nullptr;
 }
 llvm::Value* FunctionCall::codegen(){
@@ -312,6 +342,8 @@ llvm::Value* Label::codegen(){
 	return nullptr;
 }
 llvm::Value* StatementList::codegen(){
+	for(auto &stmt : this->_stmts)
+		stmt->codegen();
 	return nullptr;
 }
 llvm::Value* ExpressionList::codegen(){

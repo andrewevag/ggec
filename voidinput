@@ -1,4 +1,6 @@
 void main(){
 	void prime(int n, byref char c){
+		if(true);
 	}
+	if(true);
 }
