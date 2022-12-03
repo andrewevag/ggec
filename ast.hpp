@@ -80,10 +80,25 @@ public:
 	Parameter(PassingWay pw, TypeExpression* type, std::string name) 
 	: _pw(pw), _name(name), _type(type) {}
 	virtual ~Parameter();
-	
+
+	/* Getter Functions */
 	std::string getDefName() {
 		return this->_type->getDefName();
 	}
+
+	TypeExpression* getType(){
+		return this->_type;
+	}
+	
+	std::string getName(){
+		return this->_name;
+	}
+	
+	PassingWay getPassingWay(){
+		return this->_pw;
+	}
+	/* End of Getter Functions */
+	
 	virtual void sem() override;
 
 	virtual llvm::Value* codegen() override;

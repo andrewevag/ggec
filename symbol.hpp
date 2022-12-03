@@ -122,6 +122,8 @@ struct SymbolEntry_tag {
    SymbolEntry  * nextHash;           /* Επόμενη εγγραφή στον Π.Κ.     */
    SymbolEntry  * nextInScope;        /* Επόμενη εγγραφή στην εμβέλεια */
 
+   llvm::Value  * llvmVal;            /*  */
+
    union {                            /* Ανάλογα με τον τύπο εγγραφής: */
 
       struct {                                /******* Μεταβλητή *******/
@@ -146,6 +148,9 @@ struct SymbolEntry_tag {
          SymbolEntry * lastArgument;          /* Τελευταία παράμετρος  */
          Type          resultType;            /* Τύπος αποτελέσματος   */
          PARDEF pardef;                       /* Κατάσταση παραμέτρων  */
+         // Still considering
+         llvm::Value * parentEnvironment;     // Null if nesting level = 0;
+         llvm::Value * 
          int           firstQuad;             /* Αρχική τετράδα        */
       } eFunction;
 

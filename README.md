@@ -34,6 +34,17 @@ A Compiler for the Edsger Programming Language
 - grep -rnw TODO to find todo in code.
 - Types in TypedExpression Objects need to be explicitely deeply destroyed.
 - Memory Cleaning
+
+
+# Codegen Invariants
+1. Δινεις παντα σε κατωτερες nested συναρτησεις το δικο σου local environmnent.
+2. Possible offsets when calling functions
+    1. +1 local nested function -> call using your own environment
+    2. 0  recursion or nested function on same level -> call using the environment
+            you were called with.
+    3. <0 functions that you are inside of -> get the environment to call climping
+            up |nestingLevelOftheCalle - yourNestingLevel|.
+
 # Known bugs
 
 # Warnings to take into account

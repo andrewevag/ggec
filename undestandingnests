@@ -1,0 +1,72 @@
+
+void main(){
+	int prime(i8 env, int dick)
+	bool something(i8 env){
+		prime()
+	}
+	
+	int prime(i8* env, int dick){
+		void do(i8* doenv, char c){
+			void down(i8* env){}
+			i8* mydoenv = {doenv, c};
+			
+			//looks up to the symbol table 
+			// prime nesting level - do nesting level == -1
+			// go up |-1|=1 time to get prime's static scope
+			ctxToCall = doenv;
+			for(int i =0 ; i < |-1|; i++){
+				ctxToCall = load ctxToCall[0];
+			}
+			prime(mydoenv[0] , 10);
+			
+			down(i8* mydoenv,
+		}
+
+		i8* myenv = {env, dick};
+		
+		prime(env, dick);
+		something(env);
+		do(myenv, 'a');
+		
+
+	}
+
+	int x;
+
+	%nenv = alloca i8 0
+	prime(nenv, 10);
+}
+
+
+1. Δινεις παντα σε κατωτερες nested συναρτησεις το δικο σοτ local environmnent.
+2. Possible offsets when calling functions
+	1. +1 local nested function -> call using your own environment
+	2. 0  recursion or nested function on same level -> call using the environment
+			you were called with.
+	3. <0 functions that you are inside of -> get the environment to call climping
+			up |nestingLevelOftheCalle - yourNestingLevel|. 
+
+
+
+
+sem(main)
+	sem(DeclarationList)
+		sem(FunctionDeclaration(prime))
+			{
+				newFunction(prime);
+				openScope()
+				putsArguments in SymbolTable
+				
+				sem(Declaration)					
+				sem(statements)
+					{
+						sem(singleExpression)
+							sem(FunctionCall(prime(dick)))
+								functionEntry <- lookupSymbolTableFor(prime)
+								llvmFunction <- Function
+								Builder -> putFunctionCall(env, dick);
+								
+recursive calls prime<-dinei to idio env
+oxi recursive call   <- 
+								
+					}
