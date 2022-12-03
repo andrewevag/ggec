@@ -196,10 +196,15 @@ void IfElseStatement::sem(){
  * 
  */
 void ForStatement::sem(){
+	SymbolEntry * e;
 	if(this->_label != nullptr){
-		newLabel(this->_label->getLabelName().c_str());
-	}else{
-		newLabel();
+		e = newLabel(this->_label->getLabelName().c_str());
+	}
+	else{
+		 e = newLabel();
+	}
+	if(e == nullptr){
+		fatal("Failed to Register For Loop");
 	}
 
 	if(this->_first != nullptr){
@@ -220,7 +225,6 @@ void ForStatement::sem(){
 	
 	
 	//inactivate the label
-	SymbolEntry* e;
 	if(this->_label != nullptr){
 		e = lookupLabel(this->_label->getLabelName().c_str(), true);
 		if(e != NULL){
