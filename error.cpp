@@ -26,6 +26,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstdarg>
+#include <string>
 
 #include "general.hpp"
 #include "error.hpp"
@@ -108,3 +109,17 @@ void yyerror(const char *msg)
 }
 
 
+ErrorInfo::ErrorInfo(){
+   this->_lineappeared = lineno;
+}
+
+ErrorInfo::~ErrorInfo(){}
+
+int ErrorInfo::getLineAppeared(){
+   return this->_lineappeared;
+}
+
+void ErrorInfo::Fatal(ErrorInfo* where, std::string msg){   
+   fprintf(stderr, "Error @%d : %s", where->getLineAppeared(), msg.c_str());
+   exit(EXIT_FAILURE);
+}

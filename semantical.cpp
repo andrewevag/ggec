@@ -52,12 +52,15 @@ void Program::sem(){
 	
 	if( ! mainDefined)
 		fatal("Function \"void main ()\" not defined on global scope");
-	closeScope();
 	
+	// ErrorInfo::Fatal(this, "Just Wanted to see");
+	closeScope();
+	// destroySymbolTable();
 }
 
 void VariableDeclaration::sem() {
 	newVariable(this->getName().c_str(), this->_typeExpr->toType());
+	
 }
 
 void ArrayDeclaration::sem(){
@@ -66,6 +69,7 @@ void ArrayDeclaration::sem(){
 		fatal("Not positive int constant used as size for a constant array!\n");
 	}
 	newVariable(this->getName().c_str(), typeArray(size, this->_typeExpr->toType()));
+	// ErrorInfo::Fatal(this, "Fatal At variable to see");
 
 }
 
@@ -196,12 +200,15 @@ void IfElseStatement::sem(){
  * 
  */
 void ForStatement::sem(){
+	SymbolEntry * e;
 	if(this->_label != nullptr){
-		newLabel(this->_label->getLabelName().c_str());
+		e = newLabel(this->_label->getLabelName().c_str());
 	}else{
-		newLabel();
+		e = newLabel();
 	}
-
+	if(e == nullptr){
+		ErrorInfo::Fatal(this, "Failed to Register For Loop");
+	}
 	if(this->_first != nullptr){
 		this->_first->sem();
 	}
@@ -220,7 +227,6 @@ void ForStatement::sem(){
 	
 	
 	//inactivate the label
-	SymbolEntry* e;
 	if(this->_label != nullptr){
 		e = lookupLabel(this->_label->getLabelName().c_str(), true);
 		if(e != NULL){

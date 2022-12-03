@@ -21,7 +21,7 @@
 
 #ifndef __ERROR_HPP__
 #define __ERROR_HPP__
-
+#include <string>
 
 /* ---------------------------------------------------------------------
    --------- Πρωτότυπα των συναρτήσεων του χειριστή σφαλμάτων ----------
@@ -32,5 +32,15 @@ void fatal    (const char * fmt, ...);
 void error    (const char * fmt, ...);
 void warning  (const char * fmt, ...);
 
+
+class ErrorInfo {
+public:
+   ErrorInfo();
+   ~ErrorInfo();
+   int getLineAppeared();
+   static void Fatal(ErrorInfo* where, std::string msg);
+private:
+   int _lineappeared;
+};
 
 #endif

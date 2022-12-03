@@ -5,6 +5,7 @@
 #include <deque>
 #include "tree.hpp"
 #include "symbol.hpp"
+#include "error.hpp"
 
 
 /* ---------------------------------------------------------------------
@@ -13,7 +14,7 @@
 class Label;
 extern std::vector<Label*> NestingNamedloops;
 
-class AST : public Tree {
+class AST : public Tree, public ErrorInfo {
 public:
 	virtual ~AST();
 	virtual std::string toJSONString() = 0;
