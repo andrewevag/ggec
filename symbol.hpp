@@ -23,6 +23,8 @@
 #define __SYMBOL_HPP__
 
 #include <vector>
+#include <utility>
+#include <string>
 #include "llvmhead.hpp"
 
 /* ---------------------------------------------------------------------
@@ -172,6 +174,8 @@ struct SymbolEntry_tag {
          bool         explicitelyNamed;       /* Όνομα απο χρήστη ή οχι*/
          bool         active;                 /* in loop or not        */
          size_t       unnamedConst;           /* Int used to generate  */
+         llvm::BasicBlock * entry;            /* Used for Continue */
+         llvm::BasicBlock * exit;             /* Used for Break */
                                               /* its name              */
       } eLabel;
    } u;                               /* Τέλος του union               */
@@ -281,7 +285,9 @@ SymbolEntry * newParameter       (const char * name, Type type,
                                   PassMode mode, SymbolEntry * f);
 SymbolEntry * newTemporary       (Type type);
 SymbolEntry * newLabel           (const char * name);
-SymbolEntry * newLabel           ();
+
+std::pair<SymbolEntry*, std::string>
+              newUnnamedLabel    ();
 
 void          forwardFunction    (SymbolEntry * f);
 void          endFunctionHeader  (SymbolEntry * f, Type type);

@@ -527,15 +527,17 @@ SymbolEntry * newLabel (const char * name)
         e->u.eLabel.active = true;
         e->u.eLabel.explicitelyNamed = true;
         e->u.eLabel.unnamedConst = ++labelNamingInt;
+        e->u.eLabel.entry = nullptr;
+        e->u.eLabel.exit = nullptr;
     }
     return e;
 }
 
-SymbolEntry * newLabel ()
+std::pair<SymbolEntry*, std::string> newUnnamedLabel ()
 {
     SymbolEntry* e;
     std::ostringstream ss;
-    ss << "for" << ++labelNamingInt;
+    ss << "@for" << ++labelNamingInt;
     e = newEntry(ss.str().c_str());
     if(e != NULL){
         e->entryType = ENTRY_LABEL;
@@ -543,8 +545,10 @@ SymbolEntry * newLabel ()
         e->u.eLabel.active = true;
         e->u.eLabel.explicitelyNamed = false;
         e->u.eLabel.unnamedConst = labelNamingInt;
+        e->u.eLabel.entry = nullptr;
+        e->u.eLabel.exit = nullptr;
     }
-    return e;
+    return std::make_pair<>(e, ss.str());
 }
 
 void destroyEntry (SymbolEntry * e)

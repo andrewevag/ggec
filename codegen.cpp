@@ -168,7 +168,7 @@ llvm::Value* FunctionDefinition::codegen(){
 	// If we are a nesting function -> store the previous static link given as argument to local env[0];
 	size_t offset = currentScope->varOffset;
 	llvm::Value* env = Builder->CreateAlloca(i8, 0, c64(offset), "env");
-
+	e->u.eFunction.env = env;
 
 	// f : llvm::Function   "name" ([env], arguments)
 	// On symbol table there is 
@@ -271,36 +271,197 @@ llvm::Value* IfStatement::codegen(){
 	return nullptr;
 }
 llvm::Value* IfElseStatement::codegen(){
+	SymbolEntry * e = lookupActiveFun();
+	llvm::Function * f = e->u.eFunction.fun;
+
+	// Basic Blocks for Jumping
+	llvm::BasicBlock * IfTrueBlock = llvm::BasicBlock::Create(TheContext, "iftrue", f);
+	llvm::BasicBlock * IfFalseBlock = llvm::BasicBlock::Create(TheContext, "iffalse", f);
+	llvm::BasicBlock * EndIfBlock = llvm::BasicBlock::Create(TheContext, "endif", f);
+
+	llvm::Value * conditionVal = this->_condition->codegen();
+	auto condBit = Builder->CreateICmpNE(conditionVal, c8(0), "cond");
+	Builder->CreateCondBr(condBit, IfTrueBlock, IfFalseBlock);
+
+	// Build If body;
+	Builder->SetInsertPoint(IfTrueBlock);
+	this->_ifbody->codegen();
+	Builder->CreateBr(EndIfBlock);
+
+	// Build Else body;
+	Builder->SetInsertPoint(IfFalseBlock);
+	this->_elsebody->codegen();
+	Builder->CreateBr(EndIfBlock);
+	
+	// Go to EndIfBlock
+	Builder->SetInsertPoint(EndIfBlock);
+
 	return nullptr;
 }
 llvm::Value* ForStatement::codegen(){
+	// label: for(ex1 ; ex2; ex3)
+	// 				statement
+	/*
+	 * ex1;
+	 * goto loophead:
+	 * loophead:
+	 * ex2;
+	 * if (ex2 == true) goto loopbody else goto endfor
+	 * 
+	 * loopbody:
+	 * statement
+	 * goto loopafter
+	 * 
+	 * loopafter:
+	 * ex3;
+	 * goto loophead
+	 * 
+	 * endfor:
+	 */
+	SymbolEntry * e = lookupActiveFun();
+	llvm::Function * f = e->u.eFunction.fun;
+	
+	SymbolEntry * lblEntry= lookupLabel(this->_label->getLabelName().c_str(), true);
+	llvm::BasicBlock * LoopHeadBlock  = llvm::BasicBlock::Create(TheContext, "loophead", f);
+	llvm::BasicBlock * LoopBodyBlock  = llvm::BasicBlock::Create(TheContext, "loopbody", f);
+	llvm::BasicBlock * LoopAfterBlock = llvm::BasicBlock::Create(TheContext, "loopafter", f);
+	llvm::BasicBlock * EndForBlock    = llvm::BasicBlock::Create(TheContext, "endfor", f);
+	
+	// Put the basic blocks so they can be available to continue && break statements.
+	lblEntry->u.eLabel.entry = LoopHeadBlock;
+	lblEntry->u.eLabel.exit  = EndForBlock;
+	
+
+	if(this->_first != nullptr){
+		this->_first->codegen();
+	}
+	Builder->CreateBr(LoopHeadBlock);
+
+	// loophead
+	llvm::Value* condition; // of type bool aka i8
+	Builder->SetInsertPoint(LoopHeadBlock);
+	if(this->_second != nullptr){
+		condition = this->_second->codegen();
+	}else{
+		condition = c8(1); // defaulting to true.
+	}
+
+	auto condBit = Builder->CreateICmpNE(condition, c8(0), "cond");
+	Builder->CreateCondBr(condBit, LoopBodyBlock, EndForBlock);
+
+	//loopbody
+	Builder->SetInsertPoint(LoopBodyBlock);
+	this->_body->codegen();
+	Builder->CreateBr(LoopAfterBlock);
+
+	//loopafter
+	Builder->SetInsertPoint(LoopAfterBlock);
+	if (this->_third != nullptr){
+		this->_third->codegen();
+	}
+	Builder->CreateBr(LoopHeadBlock);
+
 	return nullptr;
 }
 llvm::Value* ContinueStatement::codegen(){
+	/*
+	 * continue [label];
+	 *  
+	 * 
+	 */
+	SymbolEntry * lblEntry ;
+	if(this->_target == ""){
+		lblEntry = lookupLabel(NULL, false);
+	}else{
+		lblEntry = lookupLabel(this->_target.c_str(), true);
+	}
+
+	Builder->CreateBr(lblEntry->u.eLabel.entry);
 	return nullptr;
 }
 llvm::Value* BreakStatement::codegen(){
+	SymbolEntry * lblEntry ;
+	if(this->_target == ""){
+		lblEntry = lookupLabel(NULL, false);
+	}else{
+		lblEntry = lookupLabel(this->_target.c_str(), true);
+	}
+
+	Builder->CreateBr(lblEntry->u.eLabel.exit);
 	return nullptr;
 }
 llvm::Value* ReturnStatement::codegen(){
+	// return [e].
+	if(this->_expr == nullptr){
+		Builder->CreateRetVoid();
+	}else{
+		llvm::Value * retExp = this->_expr->codegen();
+		Builder->CreateRet(retExp);
+	}
 	return nullptr;
 }
 llvm::Value* Id::codegen(){
-	return nullptr;
+	/*
+	 * 
+	 */
+	SymbolEntry * e = lookupEntry(this->_name.c_str(), LOOKUP_ALL_SCOPES, false);
+	auto nestingLevel = e->nestingLevel;
+	auto varOffset    = ( e->entryType == ENTRY_PARAMETER ) ? e->u.eParameter.offset : e->u.eVariable.offset;
+	
+	llvm::Value* crtPtr = this->calculateAddressOf();
+	llvm::Value* valOfVar = Builder->CreateLoad(crtPtr, this->_name);
+	return valOfVar;
 }
-llvm::Value* Constant::codegen(){
-	// for testing reason i will build true constant
-	if(this->_ct == Constant::ConstantType::Bool){
-		if(this->_bool){
-			auto added = Builder->CreateAdd(c8(10), c8(22));
-			return added;
 
-		}else{
-			auto added = Builder->CreateAdd(c8(10), c8(22));
-			return added;
-		}
+
+llvm::Value* Constant::codegen(){
+	switch (_ct){
+		case Bool:
+			return c8(this->_bool ? 1 : 0);
+		case Null:   
+			// by semantic analysis this needs to be typecasted to be
+			// usable
+			return llvm::Constant::getNullValue(i8p);
+		case Int: 
+			return c16(this->_int);
+			break;
+		case Char :  
+			return c8(this->_char);
+		case Double:
+			return llvm::ConstantFP::get(toLLVMType(this->_t), this->_double);
+		case String:
+			// First allocate the string as a global variable
+			// and return the address of it.
+			llvm::GlobalVariable* ptr = new llvm::GlobalVariable(
+				*TheModule,
+				llvm::ArrayType::get(i8, this->_string.size() + 1),
+				false,
+				llvm::GlobalValue::PrivateLinkage,
+				0,
+				"str.const"
+			);
+			std::vector<llvm::Constant *> chars(utf8string.size());
+			for(unsigned int i = 0; i < utf8string.size(); i++)
+  				chars[i] = llvm::ConstantInt::get(i8, utf8string[i]);
+			auto init = llvm::ConstantArray::get(llvm::ArrayType::get(i8, chars.size()),
+                               entries);
+			llvm::GlobalVariable * v = new llvm::GlobalVariable(
+					module, 
+					init->getType(), 
+					true,
+                    llvm::GlobalVariable::ExternalLinkage, 
+					init,
+                    utf8string);
+			llvm::ConstantExpr::getBitCast(v, i8->getPointerTo());
+
+ 			// Global Variable Definitions
+ 			ptr->setInitializer(const_array_4);
+
+			// initialize it...
+
+			return ptr;
+		default: return nullptr;
 	}
-	return nullptr;
 }
 llvm::Value* FunctionCall::codegen(){
 	return nullptr;
@@ -351,4 +512,98 @@ llvm::Value* ExpressionList::codegen(){
 }
 llvm::Value* DeclarationList::codegen(){
 	return nullptr;
+}
+
+
+llvm::Value* AST::getEnvAt(unsigned int nestinglevel){
+	auto currNest = currentScope->nestingLevel;
+	SymbolEntry *  currFun  = lookupActiveFun();
+	auto currEnv = currFun->u.eFunction.env;
+	auto iter = abs(currNest - nestinglevel);
+	
+
+	for(int i = 0; i < iter; i++){
+		auto bitCastedEnv = Builder->CreateBitCast(currEnv, llvmPointer(i8p), "bitcastedEnv");
+		currEnv = Builder->CreateLoad(bitCastedEnv, "prevEnv");
+	}
+	return currEnv;
+}
+
+
+
+
+llvm::Value* Id::calculateAddressOf() {
+	// query the Symbol Table for the name && nesting level.
+	// get the env of the nested level of the variable (can be global here).
+	// get the offset in that environment and add it to the pointer of the env.
+	SymbolEntry * e = lookupEntry(this->_name.c_str(), LOOKUP_ALL_SCOPES, false);
+	
+	if(e->nestingLevel == 1){
+		// then the value for it is in 
+		llvm::Value* value = Builder->CreateGEP(e->u.eVariable.llvmVal, c64(0), this->_name);
+		return value;
+	}else{
+		llvm::Value* envOfVariable = getEnvAt(e->nestingLevel);
+		// get pointer to the offset. TypeCast it to type of Id * 
+		llvm::Value* rawBytePtr = Builder->CreateGEP(envOfVariable, c64(e->u.eVariable.offset), "rawBytePtr");
+		llvm::Value* actualVarPointer = Builder->CreateBitCast(
+			rawBytePtr, 
+			llvmPointer(toLLVMType(e->u.eVariable.type)),
+			this->_name + ".ptr"
+		);
+		
+		// return the pointer.
+		return actualVarPointer;		
+	}
+	return nullptr;
+}
+llvm::Value* Constant::calculateAddressOf() {
+	fatal("calculateAddressOf on Constant.");
+
+}
+llvm::Value* FunctionCall::calculateAddressOf() {
+	fatal("calculateAddressOf on FunctionCall.");
+}
+llvm::Value* BracketedIndex::calculateAddressOf() {
+	// Calculate the base pointer
+	// this->_out : Expression of type Pointer, this->_in : Expression of type Int.
+	llvm::Value* basePtr = this->_out->codegen();
+	// Add to it the inner expression
+	llvm::Value* offset = this->_in->codegen();
+	// return the added pointer
+	return Builder->CreateGEP(basePtr, offset, "calc.ptr");
+}
+llvm::Value* UnaryOp::calculateAddressOf() {
+	if(this->_UnOp ==  DEREF){
+		// this->_operand : Pointer(t)
+		return this->_operand->codegen();
+	}else{
+		fatal("calculateAddressOf on UnaryOp(%s)\n", UnaryOp::unaryOpTypeToString(this->_UnOp).c_str());
+	}
+}
+llvm::Value* BinaryOp::calculateAddressOf() {
+	fatal("calculateAddressOf on BinaryOp.");
+
+}
+llvm::Value* UnAss::calculateAddressOf() {
+	fatal("calculateAddressOf on UnAss.");
+
+}
+llvm::Value* BinaryAss::calculateAddressOf() {
+	fatal("calculateAddressOf on BinaryAss.");
+}
+llvm::Value* TypeCast::calculateAddressOf() {
+	fatal("calculateAddressOf on TypeCast.");
+}
+llvm::Value* TernaryOp::calculateAddressOf() {
+	fatal("calculateAddressOf on TernaryOp.");
+}
+llvm::Value* New::calculateAddressOf() {
+	fatal("calculateAddressOf on New");
+}
+llvm::Value* Delete::calculateAddressOf() {
+	fatal("calculateAddressOf on Delete.");
+}
+llvm::Value* CommaExpr::calculateAddressOf() {
+	fatal("calculateAddressOf on FunctionCall.");
 }

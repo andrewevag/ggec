@@ -50,7 +50,7 @@ public:
     	return llvm::ConstantInt::get(TheContext, llvm::APInt(64, n, true));
   	}
   	
-
+	static llvm::Value* getEnvAt(unsigned int nestinglevel);
 };
 class Declaration;
 class TypeExpression;
@@ -603,6 +603,7 @@ public:
 
 	virtual void sem() = 0;
 	virtual llvm::Value* codegen() = 0;
+	virtual llvm::Value* calculateAddressOf() = 0;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
@@ -621,6 +622,7 @@ public:
 
 	virtual void sem() override;
 	virtual llvm::Value* codegen() override;
+	virtual llvm::Value* calculateAddressOf() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {}; };
@@ -654,6 +656,7 @@ public:
 
 	virtual void sem() override;
 	virtual llvm::Value* codegen() override;
+	virtual llvm::Value* calculateAddressOf() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {}; };
@@ -690,6 +693,8 @@ public:
 
 	virtual void sem() override;
 	virtual llvm::Value* codegen() override;
+	virtual llvm::Value* calculateAddressOf() override;
+
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)_arguments}; };
 	virtual void printNode(std::ostream& out) override { out << "FunctionCall(" << _functionName << ")"; }
@@ -711,6 +716,7 @@ public:
 
 	virtual void sem() override;
 	virtual llvm::Value* codegen() override;
+	virtual llvm::Value* calculateAddressOf() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_in, _out}; };
@@ -747,6 +753,7 @@ public:
 
 	virtual void sem() override;
 	virtual llvm::Value* codegen() override;
+	virtual llvm::Value* calculateAddressOf() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_operand}; }
@@ -791,6 +798,7 @@ public:
 
 	virtual void sem() override;
 	virtual llvm::Value* codegen() override;
+	virtual llvm::Value* calculateAddressOf() override;
 
 	friend void binaryOpAnalysis(BinaryOp&);
 
@@ -826,6 +834,7 @@ public:
 	virtual int isIntConstant() = 0;
 	virtual void sem() = 0;
 	virtual llvm::Value* codegen() = 0;
+	virtual llvm::Value* calculateAddressOf() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() = 0;
@@ -847,6 +856,7 @@ public:
 	}
 	virtual void sem() override;
 	virtual llvm::Value* codegen() override;
+	virtual llvm::Value* calculateAddressOf() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {this->_operand}; }
@@ -866,6 +876,7 @@ public:
 	}
 	virtual void sem() override;
 	virtual llvm::Value* codegen() override;
+	virtual llvm::Value* calculateAddressOf() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {this->_operand}; }
@@ -899,6 +910,7 @@ public:
 
 	virtual void sem() override;
 	virtual llvm::Value* codegen() override;
+	virtual llvm::Value* calculateAddressOf() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_leftOperand, _rightOperand}; }
@@ -922,6 +934,7 @@ public:
 
 	virtual void sem() override;
 	virtual llvm::Value* codegen() override;
+	virtual llvm::Value* calculateAddressOf() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return { _type, _expr }; }
@@ -944,6 +957,7 @@ public:
 
 	virtual void sem() override;
 	virtual llvm::Value* codegen() override;
+	virtual llvm::Value* calculateAddressOf() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_condition, _ifBody, _elseBody}; }
@@ -968,6 +982,7 @@ public:
 
 	virtual void sem() override;
 	virtual llvm::Value* codegen() override;
+	virtual llvm::Value* calculateAddressOf() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { if (this->_size != nullptr) return {_type, _size}; else return {_type}; }
@@ -990,6 +1005,7 @@ public:
 
 	virtual void sem() override;
 	virtual llvm::Value* codegen() override;
+	virtual llvm::Value* calculateAddressOf() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_expr}; }
@@ -1012,6 +1028,7 @@ public:
 
 	virtual void sem() override;
 	virtual llvm::Value* codegen() override;
+	virtual llvm::Value* calculateAddressOf() override;
 
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {_left, _right}; }

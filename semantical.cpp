@@ -203,10 +203,17 @@ void IfElseStatement::sem(){
  * 
  */
 void ForStatement::sem(){
+	SymbolEntry * lblEntry;
 	if(this->_label != nullptr){
-		newLabel(this->_label->getLabelName().c_str());
+		lblEntry = newLabel(this->_label->getLabelName().c_str());
 	}else{
-		newLabel();
+		auto label = newUnnamedLabel();
+		lblEntry = label.first;
+		this->_label = new Label(label.second);
+	}
+
+	if(lblEntry == NULL){
+		fatal("Failed to Register Label in Symbol Table");
 	}
 
 	if(this->_first != nullptr){
