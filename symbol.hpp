@@ -50,6 +50,8 @@ typedef enum { false=0, true=1 } bool;
 #define START_POSITIVE_OFFSET 8     /* Αρχικό θετικό offset στο Ε.Δ.   */
 #define START_NEGATIVE_OFFSET 0     /* Αρχικό αρνητικό offset στο Ε.Δ. */
 
+#define GLOBAL_SCOPE          1     /* Nesting Level of Global Scope */
+
 
 /* ---------------------------------------------------------------------
    --------------- Ορισμός τύπων του πίνακα συμβόλων -------------------

@@ -445,7 +445,7 @@ void FunctionCall::sem(){
 	FunctionDeclaration* decl = new FunctionDeclaration(nullptr, this->_functionName, pn);
 
 	SymbolEntry* e = lookupEntry(decl->getName().c_str(), LOOKUP_ALL_SCOPES, false);
-	delete decl;
+	
 	// existance of the name
 	if(e == NULL){
 		fatal("Calling a function not previously defined");
@@ -455,8 +455,11 @@ void FunctionCall::sem(){
 		fatal(std::string(this->_functionName + " is not a function.").c_str());
 	}
 
+	this->_functionName = decl->getName();
+	delete decl;
+
 	// argument matching
-	
+	// TODO mallon peritto
 	size_t i = 0;
 	forParameters(p, e){
 		if(p->entryType != ENTRY_PARAMETER){

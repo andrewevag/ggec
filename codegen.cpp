@@ -424,7 +424,6 @@ llvm::Value* Constant::codegen(){
 			return llvm::Constant::getNullValue(i8p);
 		case Int: 
 			return c16(this->_int);
-			break;
 		case Char :  
 			return c8(this->_char);
 		case Double:
@@ -461,11 +460,37 @@ llvm::Value* Constant::codegen(){
 			//4. Return a cast to an i8*
 			llvm::Value* ptr = Builder->CreateBitCast(v, i8p, "string.ptr");
 			return ptr;
-		return nullptr;
 	}
-}
-llvm::Value* FunctionCall::codegen(){
 	return nullptr;
+
+}
+
+
+llvm::Value* FunctionCall::codegen(){
+	std::cout<< "mpika fCall\n";
+	std::cout<< this->_functionName << std::endl;
+	SymbolEntry* e = lookupEntry(this->_functionName.c_str(), LOOKUP_ALL_SCOPES, false);
+
+	if(e == NULL)
+		std::cout<< "enai null i malakia\n";
+
+	std::vector<llvm::Value*> evalArgs;
+
+	if(e->nestingLevel != GLOBAL_SCOPE){
+		std::cout<< e->nestingLevel << std::endl;
+		evalArgs.push_back(getEnvAt(e->nestingLevel-1));
+	}
+
+	for(auto &arg : this->_arguments->_expressions){
+		evalArgs.push_back(arg->codegen());
+	}
+
+	llvm::Function* f = e->u.eFunction.fun;
+	std::cout<< f<< std::endl;
+	f->print(llvm::outs());
+
+	return Builder->CreateCall(f,evalArgs,"fres");
+
 }
 llvm::Value* BracketedIndex::codegen(){
 	return nullptr;
@@ -520,8 +545,18 @@ llvm::Value* AST::getEnvAt(unsigned int nestinglevel){
 	auto currNest = currentScope->nestingLevel;
 	SymbolEntry *  currFun  = lookupActiveFun();
 	auto currEnv = currFun->u.eFunction.env;
-	auto iter = abs(currNest - nestinglevel);
+	long iter = currNest - nestinglevel;
 	
+	/*
+	 * For calling functions: 
+	 *		+1 -> currentNest
+	 *		 0 -> currNest - nestinglevel = 1 => nestinglevel = currNest -1
+	 *		-1 -> currNest - nestinglevel = 2 => nestinglevel = currNest -2
+	 *	call getEnvAt(nestinglevel of callee -1)
+	 * 
+	 */
+
+
 
 	for(int i = 0; i < iter; i++){
 		auto bitCastedEnv = Builder->CreateBitCast(currEnv, llvmPointer(i8p), "bitcastedEnv");

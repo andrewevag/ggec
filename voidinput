@@ -1,13 +1,17 @@
 void main(){
 	int x;
 	bool z;
-	void prime(int n, byref char c){
+	char c;
+	void prime(int n, byref char c,char* str){
 		if(z);
 		x;
+		prime(13,c,"dick");
+		main();
 		return;
 	}
 	if(true);
 	x;
+	prime(42,c,"hello"); 
 	"hello!";
 	return;
 }

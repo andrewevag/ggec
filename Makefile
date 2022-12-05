@@ -1,7 +1,7 @@
 .PHONY: clean distclean default help
 
 ## Normal Build Variables
-CXX=c++
+CXX=clang++
 CXXFLAGS=-Wall -std=c++14 -g `$(LLVMCONFIG) --cxxflags` -fexceptions
 LDFLAGS=$(shell $(LLVMCONFIG) --ldflags --system-libs --libs all)
 BINS=ggec main
@@ -9,7 +9,7 @@ INCLUDE=-I$(PWD)/inc
 INCLUDE+= -I$(PWD)
 DEPSOURCE=$(wildcard src/*.cpp)
 DEPOBJECTS=$(patsubst %.cpp, %.o, $(DEPSOURCE))
-LLVMCONFIG=llvm-config-11
+LLVMCONFIG=llvm-config
 ##
 
 ## Test dependencies
