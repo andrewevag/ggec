@@ -1,6 +1,13 @@
 void main(){
+	int x;
+	bool z;
 	void prime(int n, byref char c){
-		if(true);
+		if(z);
+		x;
+		return;
 	}
 	if(true);
+	x;
+	"hello!";
+	return;
 }

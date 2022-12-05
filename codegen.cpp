@@ -87,7 +87,7 @@ llvm::Value* FunctionDeclaration::codegen() {
 	SymbolEntry * e = lookupEntry(this->getName().c_str(), LOOKUP_ALL_SCOPES, false);
 
 	std::vector<llvm::Type*> parameterTypes;
-	if(currentScope->nestingLevel > 0){
+	if(currentScope->nestingLevel > 1){
 		// we are a nested function so we need an extra argument 
 		// for the environment... i8* 
 		parameterTypes.push_back(llvm::PointerType::get(i8, 0));
@@ -215,7 +215,7 @@ llvm::Value* FunctionDefinition::codegen(){
 	this->_statements->codegen();
 
 	// TODO remove it
-	Builder->CreateRetVoid();
+	// Builder->CreateRetVoid();
 	return nullptr;
 }
 
@@ -432,35 +432,36 @@ llvm::Value* Constant::codegen(){
 		case String:
 			// First allocate the string as a global variable
 			// and return the address of it.
-			llvm::GlobalVariable* ptr = new llvm::GlobalVariable(
+			//0. Defs
+			auto str = this->_string;
+			auto charType = i8;
+
+			//1. Initialize chars vector
+			std::vector<llvm::Constant *> chars(str.length());
+			for(unsigned int i = 0; i < str.size(); i++) {
+			chars[i] = c8(str[i]);
+			}
+
+			//1b. add a zero terminator too
+			chars.push_back(c8(0));
+
+
+			//2. Initialize the string from the characters
+			auto stringType = llvm::ArrayType::get(charType, chars.size());
+
+			//3. Create the declaration statement
+			auto v = new llvm::GlobalVariable(
 				*TheModule,
-				llvm::ArrayType::get(i8, this->_string.size() + 1),
+				stringType,
 				false,
 				llvm::GlobalValue::PrivateLinkage,
-				0,
-				"str.const"
+				llvm::ConstantArray::get(stringType, chars),
+				"string.const"
 			);
-			std::vector<llvm::Constant *> chars(utf8string.size());
-			for(unsigned int i = 0; i < utf8string.size(); i++)
-  				chars[i] = llvm::ConstantInt::get(i8, utf8string[i]);
-			auto init = llvm::ConstantArray::get(llvm::ArrayType::get(i8, chars.size()),
-                               entries);
-			llvm::GlobalVariable * v = new llvm::GlobalVariable(
-					module, 
-					init->getType(), 
-					true,
-                    llvm::GlobalVariable::ExternalLinkage, 
-					init,
-                    utf8string);
-			llvm::ConstantExpr::getBitCast(v, i8->getPointerTo());
-
- 			// Global Variable Definitions
- 			ptr->setInitializer(const_array_4);
-
-			// initialize it...
-
+			//4. Return a cast to an i8*
+			llvm::Value* ptr = Builder->CreateBitCast(v, i8p, "string.ptr");
 			return ptr;
-		default: return nullptr;
+		return nullptr;
 	}
 }
 llvm::Value* FunctionCall::codegen(){
@@ -606,4 +607,12 @@ llvm::Value* Delete::calculateAddressOf() {
 }
 llvm::Value* CommaExpr::calculateAddressOf() {
 	fatal("calculateAddressOf on FunctionCall.");
+}
+
+llvm::Value* PrefixUnAss::calculateAddressOf(){
+	fatal("calculateAddressOf on PrefixUnAss.");
+}
+
+llvm::Value* PostfixUnAss::calculateAddressOf(){
+	fatal("calculateAddressOf on PostfixUnAss");
 }

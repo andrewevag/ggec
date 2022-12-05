@@ -34,6 +34,7 @@ A Compiler for the Edsger Programming Language
 - grep -rnw TODO to find todo in code.
 - Types in TypedExpression Objects need to be explicitely deeply destroyed.
 - Memory Cleaning
+- Return ret void in void functions!! in LLVM to exit the last block
 
 
 # Codegen Invariants
