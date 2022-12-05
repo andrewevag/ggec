@@ -11,6 +11,7 @@ std::unique_ptr<llvm::IRBuilder<> > AST::Builder = std::make_unique<llvm::IRBuil
 llvm::Type* AST::i8 = llvm::IntegerType::get(TheContext, 8);
 llvm::Type* AST::i16 = llvm::IntegerType::get(TheContext, 16);
 llvm::Type* AST::i8p = llvm::PointerType::get(i8, 0);
+llvm::Type* AST::i64 = llvm::IntegerType::get(TheContext, 64);
 
 // DISCLAIMER IF NOTHING WORKS CHANGE *TheModule to TheModule.get()
 
@@ -477,15 +478,164 @@ llvm::Value* FunctionCall::codegen(){
 	
 
 }
+
 llvm::Value* BracketedIndex::codegen(){
-	return nullptr;
+	llvm::Value* brAdd = this->calculateAddressOf();
+	return Builder->CreateLoad(brAdd,"indexed");
 }
+
 llvm::Value* UnaryOp::codegen(){
+	switch (this->_UnOp){
+			case ADDRESS: return this->_operand->calculateAddressOf();
+			case DEREF:   return Builder->CreateLoad(this->_operand->calculateAddressOf(),"deref");
+			case POS: 	  return this->_operand->codegen();
+			case NEG: 	  
+				if(this->_t == typeInteger)
+					return Builder->CreateSub(c16(0),this->_operand->codegen(),"negint");
+				else
+					return Builder->CreateFNeg(this->_operand->codegen(),"negfp");
+			case NOT: 	  
+				llvm::Value* cond = Builder->CreateICmpEQ(c8(0),this->_operand->codegen(),"cond");
+				return Builder->CreateZExt(cond,i8,"not");
+		}
+	
 	return nullptr;
 }
 llvm::Value* BinaryOp::codegen(){
+	llvm::Value* left = this->_leftOperand->codegen();
+	llvm::Value* right = this->_rightOperand->codegen();
+	switch (this->_BinOp){
+		case MULT: 
+			if(this->_t == typeInteger)
+				return Builder->CreateMul(left,right,"multint");
+			else
+				return Builder->CreateFMul(left,right,"multfp");
+		case DIV:
+			if(this->_t == typeInteger)
+				return Builder->CreateSDiv(left,right,"divint");
+			else
+				return Builder->CreateFDiv(left,right,"divfp");
+		case MOD:
+			return Builder->CreateSRem(left,right,"modint");
+		case PLUS:
+			if(this->_t == typeInteger)
+				return Builder->CreateAdd(left,right,"plusint");
+			if(this->_t == typeReal)
+				return Builder->CreateFAdd(left,right,"plusfp");
+			else
+				return Builder->CreateGEP(left,right,"plusptr");
+		case MINUS:
+			if(this->_t == typeInteger)
+				return Builder->CreateSub(left,right,"minusint");
+			if(this->_t == typeReal)
+				return Builder->CreateFSub(left,right,"minusfp");
+			else{
+				llvm::Value* minus = Builder->CreateSub(c16(0),right,"negoff");
+				return Builder->CreateGEP(left,minus,"minusptr");
+			}
+		case LESS: 
+			if(this->_leftOperand->getType() == typeInteger || this->_leftOperand->getType() == typeChar || this->_leftOperand->getType() == typeBoolean){
+				llvm::Value* cmp = Builder->CreateICmpSLT(left,right,"cmp");
+				return Builder->CreateZExt(cmp,i8,"less");
+			}
+			if(this->_leftOperand->getType() == typeReal){
+				llvm::Value* cmp = Builder->CreateFCmpOLT(left,right,"cmp");
+				return Builder->CreateZExt(cmp,i8,"less");
+			}else{
+				llvm::Value* ptr1 = Builder->CreatePtrToInt(left,i64,"ltint");
+				llvm::Value* ptr2 = Builder->CreatePtrToInt(right,i64,"rtint");
+				llvm::Value* cmp = Builder->CreateICmpSLT(ptr1,ptr2,"cmp");
+				return Builder->CreateZExt(cmp,i8,"less");
+			}
+		case GREATER:
+			if(this->_leftOperand->getType() == typeInteger || this->_leftOperand->getType() == typeChar || this->_leftOperand->getType() == typeBoolean){
+				llvm::Value* cmp = Builder->CreateICmpSGT(left,right,"cmp");
+				return Builder->CreateZExt(cmp,i8,"gr");
+			}
+			if(this->_leftOperand->getType() == typeReal){
+				llvm::Value* cmp = Builder->CreateFCmpOGT(left,right,"cmp");
+				return Builder->CreateZExt(cmp,i8,"gr");
+			}else{
+				llvm::Value* ptr1 = Builder->CreatePtrToInt(left,i64,"ltint");
+				llvm::Value* ptr2 = Builder->CreatePtrToInt(right,i64,"rtint");
+				llvm::Value* cmp = Builder->CreateICmpSGT(ptr1,ptr2,"cmp");
+				return Builder->CreateZExt(cmp,i8,"gr");
+			}
+		case LESSEQ:
+			if(this->_leftOperand->getType() == typeInteger || this->_leftOperand->getType() == typeChar || this->_leftOperand->getType() == typeBoolean){
+				llvm::Value* cmp = Builder->CreateICmpSLE(left,right,"cmp");
+				return Builder->CreateZExt(cmp,i8,"leq");
+			}
+			if(this->_leftOperand->getType() == typeReal){
+				llvm::Value* cmp = Builder->CreateFCmpOLE(left,right,"cmp");
+				return Builder->CreateZExt(cmp,i8,"leq");
+			}else{
+				llvm::Value* ptr1 = Builder->CreatePtrToInt(left,i64,"ltint");
+				llvm::Value* ptr2 = Builder->CreatePtrToInt(right,i64,"rtint");
+				llvm::Value* cmp = Builder->CreateICmpSLE(ptr1,ptr2,"cmp");
+				return Builder->CreateZExt(cmp,i8,"leq");
+			}
+		case GREATEREQ:
+			if(this->_leftOperand->getType() == typeInteger || this->_leftOperand->getType() == typeChar || this->_leftOperand->getType() == typeBoolean){
+				llvm::Value* cmp = Builder->CreateICmpSGE(left,right,"cmp");
+				return Builder->CreateZExt(cmp,i8,"greq");
+			}
+			if(this->_leftOperand->getType() == typeReal){
+				llvm::Value* cmp = Builder->CreateFCmpOGE(left,right,"cmp");
+				return Builder->CreateZExt(cmp,i8,"greq");
+			}else{
+				llvm::Value* ptr1 = Builder->CreatePtrToInt(left,i64,"ltint");
+				llvm::Value* ptr2 = Builder->CreatePtrToInt(right,i64,"rtint");
+				llvm::Value* cmp = Builder->CreateICmpSGE(ptr1,ptr2,"cmp");
+				return Builder->CreateZExt(cmp,i8,"greq");
+			}
+		case EQUALS:
+			if(this->_leftOperand->getType() == typeInteger || this->_leftOperand->getType() == typeChar || this->_leftOperand->getType() == typeBoolean){
+				llvm::Value* cmp = Builder->CreateICmpEQ(left,right,"cmp");
+				return Builder->CreateZExt(cmp,i8,"eq");
+			}
+			if(this->_leftOperand->getType() == typeReal){
+				llvm::Value* cmp = Builder->CreateFCmpOEQ(left,right,"cmp");
+				return Builder->CreateZExt(cmp,i8,"eq");
+			}else{
+				llvm::Value* ptr1 = Builder->CreatePtrToInt(left,i64,"ltint");
+				llvm::Value* ptr2 = Builder->CreatePtrToInt(right,i64,"rtint");
+				llvm::Value* cmp = Builder->CreateICmpEQ(ptr1,ptr2,"cmp");
+				return Builder->CreateZExt(cmp,i8,"eq");
+			}
+		case NOTEQ:
+			if(this->_leftOperand->getType() == typeInteger || this->_leftOperand->getType() == typeChar || this->_leftOperand->getType() == typeBoolean){
+				llvm::Value* cmp = Builder->CreateICmpNE(left,right,"cmp");
+				return Builder->CreateZExt(cmp,i8,"neq");
+			}
+			if(this->_leftOperand->getType() == typeReal){
+				llvm::Value* cmp = Builder->CreateFCmpONE(left,right,"cmp");
+				return Builder->CreateZExt(cmp,i8,"neq");
+			}else{
+				llvm::Value* ptr1 = Builder->CreatePtrToInt(left,i64,"ltint");
+				llvm::Value* ptr2 = Builder->CreatePtrToInt(right,i64,"rtint");
+				llvm::Value* cmp = Builder->CreateICmpNE(ptr1,ptr2,"cmp");
+				return Builder->CreateZExt(cmp,i8,"neq");
+			}
+		case LAND:{
+			llvm::Value* cmpl = Builder->CreateICmpNE(left,c8(0),"cmp");
+			llvm::Value* cmpr = Builder->CreateICmpNE(right,c8(0),"cmp");
+			llvm::Value* cmp = Builder->CreateAnd(cmpl,cmpr,"cmp");
+			return Builder->CreateZExt(cmp,i8,"and");
+			}
+		case LOR:{
+			llvm::Value* cmpl = Builder->CreateICmpNE(left,c8(0),"cmp");
+			llvm::Value* cmpr = Builder->CreateICmpNE(right,c8(0),"cmp");
+			llvm::Value* cmp = Builder->CreateOr(cmpl,cmpr,"cmp");
+			return Builder->CreateZExt(cmp,i8,"or");
+			}
+		case COMMA: return nullptr;
+	}
 	return nullptr;
+
 }
+
+
 llvm::Value* PrefixUnAss::codegen(){
 	return nullptr;
 }

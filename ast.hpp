@@ -36,7 +36,7 @@ public:
 	static llvm::Type *i8;
   	static llvm::Type *i16;
 	static llvm::Type *i8p;
-
+	static llvm::Type *i64;
 	static llvm::ConstantInt* c8(char c) {
     	return llvm::ConstantInt::get(TheContext, llvm::APInt(8, c, true));
   	}
