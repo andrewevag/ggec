@@ -79,22 +79,27 @@ llvm::Value* ArrayDeclaration::codegen(){
 //	codegen()
 //	...
 //}
-
-llvm::Value* FunctionDeclaration::codegen() {
+void FunctionHead::declare(){
 	// Get the Function to put in Symbol Table
 	// If this is a nested Function then it needs to have an extra argument
 	// of type i8* which is the %env.
+	std::cout << "In declare!!!\n";
 	SymbolEntry * e = lookupEntry(this->getName().c_str(), LOOKUP_ALL_SCOPES, false);
 
+	
 	std::vector<llvm::Type*> parameterTypes;
-	if(currentScope->nestingLevel > 1){
+	if(e->nestingLevel > GLOBAL_SCOPE){
 		// we are a nested function so we need an extra argument 
 		// for the environment... i8* 
+		//
 		parameterTypes.push_back(llvm::PointerType::get(i8, 0));
 	}
 	// Get the types for all parameters
 	for (auto &par : this->_parameters->_parameters){
-		parameterTypes.push_back(toLLVMType(par->getType()->toType()));
+		if(par->getPassingWay() == Parameter::PassingWay::ByRef){
+			parameterTypes.push_back(llvmPointer(toLLVMType(par->getType()->toType()))); 
+		}else 
+			parameterTypes.push_back(toLLVMType(par->getType()->toType()));
 	}
 
 	llvm::Function* f = 
@@ -109,6 +114,10 @@ llvm::Value* FunctionDeclaration::codegen() {
 
 	e->u.eFunction.fun = f;
 	e->u.eFunction.hasHead = true;
+}
+
+llvm::Value* FunctionDeclaration::codegen() {
+	this->declare();
 	return nullptr;
 }
 
@@ -122,42 +131,11 @@ llvm::Value* FunctionDefinition::codegen(){
 	SymbolEntry * e = lookupEntry(this->getName().c_str(), LOOKUP_ALL_SCOPES, false);
 	// Else define the llvm::Function.
 	llvm::Function* f;
-	if ( e->u.eFunction.hasHead == false){
-		
-		// brand new definition
-		std::vector<llvm::Type*> parameterTypes;
-		std::cout << "<><><><>" << std::endl;
-		std::cout << "FunctionName : " << this->getName() << std::endl;
-		std::cout << "CurrentScope : " << e->nestingLevel << std::endl;
-		std::cout << "<><><><>" << std::endl;
-		if(e->nestingLevel > 1){
-			// we are a nested function so we need an extra argument 
-			// for the environment... i8* 
-			parameterTypes.push_back(llvm::PointerType::get(i8, 0));
-		}
-		
-		// Get the types for all parameters
-		for (auto &par : this->_parameters->_parameters){
-			if(par->getPassingWay() == Parameter::ByRef){
-				parameterTypes.push_back(llvmPointer(toLLVMType(par->getType()->toType())));
-			}else{
-				parameterTypes.push_back(toLLVMType(par->getType()->toType()));
-			}
-		}
+	f = e->u.eFunction.fun;
 
-		f =	llvm::Function::Create(
-				llvm::FunctionType::get(toLLVMType(this->_resultType->toType()), 
-										parameterTypes, false),
-				llvm::Function::ExternalLinkage,
-				this->getName(),
-				*TheModule
-			);
-		e->u.eFunction.fun = f;
-		e->u.eFunction.hasHead = true;
-	}
-	else{
-		f = e->u.eFunction.fun;
-	}
+	std::cout << "<><><>When Definining The function<><><>" << std::endl;
+	f->print(llvm::outs());
+	std::cout << "<><><><><><>" << std::endl;
 
 	// Begin the first block of the function!! 
 	llvm::BasicBlock *FB = llvm::BasicBlock::Create(TheContext, "entry", f);
@@ -211,8 +189,8 @@ llvm::Value* FunctionDefinition::codegen(){
 		Builder->CreateStore(realArg, argLevelCasted);
 	}
 	
-	
 	this->_statements->codegen();
+	
 
 	// TODO remove it
 	// Builder->CreateRetVoid();
@@ -478,18 +456,25 @@ llvm::Value* FunctionCall::codegen(){
 
 	if(e->nestingLevel != GLOBAL_SCOPE){
 		std::cout<< e->nestingLevel << std::endl;
-		evalArgs.push_back(getEnvAt(e->nestingLevel-1));
+		evalArgs.push_back(getEnvAt(e->nestingLevel));
 	}
 
+	// #define forParameters(i, g) for(SymbolEntry* i = g->u.eFunction.firstArgument; i != NULL; i = i->u.eParameter.next)
+	SymbolEntry * i = e->u.eFunction.firstArgument;
 	for(auto &arg : this->_arguments->_expressions){
-		evalArgs.push_back(arg->codegen());
+		if(i->u.eParameter.mode == PASS_BY_REFERENCE){
+			evalArgs.push_back(arg->calculateAddressOf());
+		}else
+			evalArgs.push_back(arg->codegen());
+		i = i->u.eParameter.next;
 	}
-
+	printSymbolTable();
 	llvm::Function* f = e->u.eFunction.fun;
 	std::cout<< f<< std::endl;
 	f->print(llvm::outs());
 
-	return Builder->CreateCall(f,evalArgs,"fres");
+	return Builder->CreateCall(f,evalArgs);
+	
 
 }
 llvm::Value* BracketedIndex::codegen(){
@@ -552,7 +537,7 @@ llvm::Value* AST::getEnvAt(unsigned int nestinglevel){
 	 *		+1 -> currentNest
 	 *		 0 -> currNest - nestinglevel = 1 => nestinglevel = currNest -1
 	 *		-1 -> currNest - nestinglevel = 2 => nestinglevel = currNest -2
-	 *	call getEnvAt(nestinglevel of callee -1)
+	 *	call getEnvAt(nestinglevel of callee - 1)
 	 * 
 	 */
 
@@ -574,22 +559,38 @@ llvm::Value* Id::calculateAddressOf() {
 	// get the offset in that environment and add it to the pointer of the env.
 	SymbolEntry * e = lookupEntry(this->_name.c_str(), LOOKUP_ALL_SCOPES, false);
 	
-	if(e->nestingLevel == 1){
+	if(e->nestingLevel == GLOBAL_SCOPE){
 		// then the value for it is in 
 		llvm::Value* value = Builder->CreateGEP(e->u.eVariable.llvmVal, c64(0), this->_name);
 		return value;
 	}else{
-		llvm::Value* envOfVariable = getEnvAt(e->nestingLevel);
-		// get pointer to the offset. TypeCast it to type of Id * 
-		llvm::Value* rawBytePtr = Builder->CreateGEP(envOfVariable, c64(e->u.eVariable.offset), "rawBytePtr");
-		llvm::Value* actualVarPointer = Builder->CreateBitCast(
-			rawBytePtr, 
-			llvmPointer(toLLVMType(e->u.eVariable.type)),
-			this->_name + ".ptr"
-		);
+		if(e->entryType != ENTRY_PARAMETER || (e->entryType == ENTRY_PARAMETER && e->u.eParameter.mode == PASS_BY_VALUE)){
+			llvm::Value* envOfVariable = getEnvAt(e->nestingLevel);
+			// get pointer to the offset. TypeCast it to type of Id * 
+			llvm::Value* rawBytePtr = Builder->CreateGEP(envOfVariable, c64(e->u.eVariable.offset), "rawBytePtr");
+			llvm::Value* actualVarPointer = Builder->CreateBitCast(
+				rawBytePtr, 
+				llvmPointer(toLLVMType(e->u.eVariable.type)),
+				this->_name + ".ptr"
+			);
+			// return the pointer.
+			return actualVarPointer;		
+		}
+		if(e->entryType == ENTRY_PARAMETER && e->u.eParameter.mode == PASS_BY_REFERENCE){
+			llvm::Value* envOfVariable = getEnvAt(e->nestingLevel);
+			// get pointer to the offset. TypeCast it to type of Id * 
+			llvm::Value* rawBytePtr = Builder->CreateGEP(envOfVariable, c64(e->u.eVariable.offset), "rawBytePtr");
+			llvm::Value* actualVarPointer = Builder->CreateBitCast(
+				rawBytePtr, 
+				llvmPointer(llvmPointer(toLLVMType(e->u.eVariable.type))),
+				this->_name + ".ptr"
+			);
+			actualVarPointer = Builder->CreateLoad(actualVarPointer, this->_name + ".byref.ptr");
+			// return the pointer.
+			return actualVarPointer;		
+		}
 		
-		// return the pointer.
-		return actualVarPointer;		
+		
 	}
 	return nullptr;
 }

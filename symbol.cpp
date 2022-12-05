@@ -408,7 +408,11 @@ SymbolEntry * newParameter (const char * name, Type type,
 
                 e->u.eParameter.offset = currentScope->varOffset;
                 // TODO 
-                currentScope->varOffset += sizeOfType(type);
+                if(e->u.eParameter.mode == PASS_BY_REFERENCE){
+                    currentScope->varOffset += sizeOfType(typePointer(type));    
+                }else
+                    currentScope->varOffset += sizeOfType(type);
+                
 
             }
             if (f->u.eFunction.lastArgument == NULL)
@@ -753,9 +757,10 @@ unsigned int sizeOfType (Type type)
             internal("Type void has no size");
             break;
         case Type_tag::TYPE_INTEGER:
+            return 2;
         case Type_tag::TYPE_IARRAY:
         case Type_tag::TYPE_POINTER:
-            return 2;
+            return 8;
         case Type_tag::TYPE_BOOLEAN:
         case Type_tag::TYPE_CHAR:
             return 1;

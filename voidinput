@@ -3,8 +3,9 @@ void main(){
 	bool z;
 	char c;
 	void prime(int n, byref char c,char* str){
+		double y[10];
 		if(z);
-		x;
+		x;		
 		prime(13,c,"dick");
 		main();
 		return;

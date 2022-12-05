@@ -251,10 +251,29 @@ private:
 	Expression* _expr;
 };
 
-class FunctionDeclaration : public Declaration {
+class FunctionHead : public Declaration{
 public:
-	FunctionDeclaration(TypeExpression* typeExpr, std::string name, ParameterList* parameters) : 
-	_resultType(typeExpr), _name(name), _parameters(parameters) {}
+	virtual void embedType(TypeExpression* type) = 0;
+	virtual void sem() = 0;
+	virtual std::string getName() = 0;
+	virtual llvm::Value* codegen() = 0;
+	virtual void declare();
+	virtual std::vector<Tree*> getChildren() = 0;
+	virtual void printNode(std::ostream& out) = 0;
+	virtual std::string toJSONString() = 0;
+
+protected:
+	TypeExpression* _resultType;
+	std::string _name;
+	/* this will be an empty list and not null ptr in case of no parameters */
+	ParameterList* _parameters;
+};
+
+class FunctionDeclaration : public FunctionHead {
+public:
+	FunctionDeclaration(TypeExpression* typeExpr, std::string name, ParameterList* parameters) {
+		this->_resultType = typeExpr; this->_name = name; this->_parameters = parameters;
+	}
 	~FunctionDeclaration();
 	virtual void embedType(TypeExpression* type) override {}
 
@@ -266,23 +285,20 @@ public:
 
 	virtual llvm::Value* codegen() override;
 
+
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)this->_resultType, (Tree*)this->_parameters}; };
 	virtual void printNode(std::ostream& out) override { out << "FunctionDeclaration(" << _name << ")"; };
 	virtual std::string toJSONString() override;
-private:
-	TypeExpression* _resultType;
-	std::string _name;
-	/* this will be an empty list and not null ptr in case of no parameters */
-	ParameterList* _parameters;
 
 };
 
-class FunctionDefinition : public Declaration {
+class FunctionDefinition : public FunctionHead {
 public:
 	FunctionDefinition(TypeExpression* typeExpr, std::string name, ParameterList* parameters, 
-	DeclarationList* decls, StatementList* statements) : 
-	_resultType(typeExpr), _name(name), _parameters(parameters), _decls(decls), _statements(statements) {}
+	DeclarationList* decls, StatementList* statements) :  _decls(decls), _statements(statements) {
+		this->_resultType = typeExpr; this->_name = name; this->_parameters = parameters;
+	}
 	~FunctionDefinition();
 	virtual void embedType(TypeExpression* type) override {}
 
@@ -292,15 +308,12 @@ public:
 
 	virtual void sem() override;
 	virtual llvm::Value* codegen() override;
+
 	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)this->_resultType, (Tree*)this->_parameters, (Tree*)this->_decls, (Tree*)this->_statements}; }
 	virtual void printNode(std::ostream& out) override { out << "FunctionDefinition(" << _name << ")"; }
 	virtual std::string toJSONString() override;
 private:
-	TypeExpression* _resultType;
-	std::string _name;
-	/* this will be an empty list and not null ptr in case of no parameters */
-	ParameterList* _parameters;
 	DeclarationList* _decls;
 	StatementList* _statements;
 	

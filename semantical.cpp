@@ -113,8 +113,10 @@ void FunctionDefinition::sem() {
 	endFunctionHeader(f, this->_resultType->toType());
 
 	printSymbolTable();
+	this->declare();
 	this->_decls->sem();
 	this->_statements->sem();
+	
 	if (! (this->_statements->returns() || equalType(this->_resultType->toType(), typeVoid))){
 		fatal("Not all paths return in function definition %s", this->_name.c_str());
 	}
@@ -129,6 +131,7 @@ void FunctionDefinition::sem() {
 	}
 	
 	this->codegen();
+
 	// TheFunction <- from this->codegen();
 	// gets execution in a new basic block inside TheFunction
 	// this->_statements->codegen();
