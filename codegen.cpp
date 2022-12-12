@@ -750,6 +750,8 @@ llvm::Value* BinaryAss::codegen(){
 	return nval;
 }
 llvm::Value* TypeCast::codegen(){
+	
+
 	return nullptr;
 }
 llvm::Value* TernaryOp::codegen(){
@@ -783,21 +785,28 @@ llvm::Value* TernaryOp::codegen(){
 
 	return phi;
 }
+
 llvm::Value* New::codegen(){
 	llvm::Value* index;
 	if(this->_size == nullptr)
 		index = c16(sizeOfType(this->_type->toType()));
 	else{
-		// new int[16] 
+		// ex. new int[16] 
 		llvm::Value* size = this->_size->codegen();
 		index = Builder->CreateMul(size,c16(sizeOfType(this->_type->toType())),"idx");
 	}
 	llvm::Value* rawptr = Builder->CreateCall(newF,{index},"rawptr");
 	return Builder->CreateBitCast(rawptr,toLLVMType(this->_t),"castptr");
 }
+
 llvm::Value* Delete::codegen(){
-	return nullptr;
+	// free((i8*) this->_t)
+	llvm::Value* ptrToDelete = this->codegen();
+	llvm::Value* rawPtr = Builder->CreateBitCast(ptrToDelete, i8p, "rawptr");
+	Builder->CreateCall(deleteF, { rawPtr });
+	return llvm::Constant::getNullValue(toLLVMType(this->getType()));
 }
+
 llvm::Value* CommaExpr::codegen(){
 	llvm::Value* left = this->_left->codegen();
 	llvm::Value* right = this->_right->codegen();
