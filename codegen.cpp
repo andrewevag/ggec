@@ -13,14 +13,28 @@ llvm::Type* AST::i16 = llvm::IntegerType::get(TheContext, 16);
 llvm::Type* AST::i8p = llvm::PointerType::get(i8, 0);
 llvm::Type* AST::i64 = llvm::IntegerType::get(TheContext, 64);
 
+llvm::Function* newF = llvm::Function::Create(
+		llvm::FunctionType::get(AST::i8p,{AST::i16},false),
+		llvm::Function::ExternalLinkage,
+		"new.F",
+		*AST::TheModule
+	);
+llvm::Function* deleteF = llvm::Function::Create(
+		llvm::FunctionType::get(llvm::Type::getVoidTy(AST::TheContext),{AST::i8p},false),
+		llvm::Function::ExternalLinkage,
+		"delete.F",
+		*AST::TheModule
+	);
+
 // DISCLAIMER IF NOTHING WORKS CHANGE *TheModule to TheModule.get()
 
 llvm::Value* Program::codegen(){
+	
 	this->sem();
 
 	bool bad = verifyModule(*TheModule, &llvm::errs());
 	if(bad){
-		fatal("Failed to verift module");
+		fatal("Failed to verify module");
 	}
 	TheModule->print(llvm::outs(), nullptr);
 
@@ -637,28 +651,157 @@ llvm::Value* BinaryOp::codegen(){
 
 
 llvm::Value* PrefixUnAss::codegen(){
-	return nullptr;
+	llvm::Value* addr = this->_operand->calculateAddressOf();
+	llvm::Value* val = Builder->CreateLoad(addr,"val");
+	llvm::Value* nval;
+	if(this->_Unass == PLUSPLUS){
+		if(this->_t == typeInteger){
+			nval = Builder->CreateAdd(val,c16(1),"nval");
+		}
+		else if(this->_t == typeReal){
+			nval = Builder->CreateFAdd(val,llvm::ConstantFP::get(toLLVMType(typeReal),llvm::APFloat(1.0)),"nval");
+		}else{
+			nval = Builder->CreateGEP(val,c64(1),"nval");
+		}
+		
+	}else{
+		if(this->_t == typeInteger){
+			nval = Builder->CreateSub(val,c16(1),"nval");
+		}
+		else if(this->_t == typeReal){
+			nval = Builder->CreateFSub(val,llvm::ConstantFP::get(toLLVMType(typeReal),llvm::APFloat(1.0)),"nval");
+		}else{
+			// llvm::Value* minus = Builder->CreateSub(c16(0),c16(1),"negoff");
+			nval = Builder->CreateGEP(val,c16(-1),"minusptr");
+		}
+
+	}
+	Builder->CreateStore(nval,addr);
+	return nval;
 }
 llvm::Value* PostfixUnAss::codegen(){
-	return nullptr;
+	llvm::Value* addr = this->_operand->calculateAddressOf();
+	llvm::Value* val = Builder->CreateLoad(addr,"val");
+	llvm::Value* nval;
+	if(this->_Unass == PLUSPLUS){
+		if(this->_t == typeInteger){
+			nval = Builder->CreateAdd(val,c16(1),"nval");
+		}
+		else if(this->_t == typeReal){
+			nval = Builder->CreateFAdd(val,llvm::ConstantFP::get(toLLVMType(typeReal),llvm::APFloat(1.0)),"nval");
+		}else{
+			nval = Builder->CreateGEP(val,c64(1),"nval");
+		}
+		
+	}else{
+		if(this->_t == typeInteger){
+			nval = Builder->CreateSub(val,c16(1),"nval");
+		}
+		else if(this->_t == typeReal){
+			nval = Builder->CreateFSub(val,llvm::ConstantFP::get(toLLVMType(typeReal),llvm::APFloat(1.0)),"nval");
+		}else{
+			// llvm::Value* minus = Builder->CreateSub(c16(0),c16(1),"negoff");
+			nval = Builder->CreateGEP(val,c16(-1),"minusptr");
+		}
+
+	}
+	Builder->CreateStore(nval,addr);
+	return nval;
 }
 llvm::Value* BinaryAss::codegen(){
-	return nullptr;
+	llvm::Value* addr = this->_leftOperand->calculateAddressOf();
+	llvm::Value* right = this->_rightOperand->codegen();
+	llvm::Value* left = Builder->CreateLoad(addr,"left");
+	llvm::Value* nval;
+	switch (this->_BinAss){
+		case ASS: 
+			break;
+		case MULTASS: 
+			if(this->_t == typeInteger)
+				nval = Builder->CreateMul(left,right,"multint");
+			else
+				nval = Builder->CreateFMul(left,right,"multfp");
+			
+		case DIVASS:
+			if(this->_t == typeInteger)
+				nval = Builder->CreateSDiv(left,right,"divint");
+			else
+				nval = Builder->CreateFDiv(left,right,"divfp");
+		case MODASS:
+			nval = Builder->CreateSRem(left,right,"modint");
+		case PLUSASS:
+			if(this->_t == typeInteger)
+				nval = Builder->CreateAdd(left,right,"plusint");
+			if(this->_t == typeReal)
+				nval = Builder->CreateFAdd(left,right,"plusfp");
+			else
+				nval = Builder->CreateGEP(left,right,"plusptr");
+		case MINUSASS:
+			if(this->_t == typeInteger)
+				nval = Builder->CreateSub(left,right,"minusint");
+			if(this->_t == typeReal)
+				nval = Builder->CreateFSub(left,right,"minusfp");
+			else{
+				llvm::Value* minus = Builder->CreateSub(c16(0),right,"negoff");
+				nval = Builder->CreateGEP(left,minus,"minusptr");
+			}
+	}
+	Builder->CreateStore(nval,addr);
+	return nval;
 }
 llvm::Value* TypeCast::codegen(){
 	return nullptr;
 }
 llvm::Value* TernaryOp::codegen(){
-	return nullptr;
+	SymbolEntry * e = lookupActiveFun();
+	llvm::Function * f = e->u.eFunction.fun;
+
+	// Basic Blocks for Jumping
+	llvm::BasicBlock * IfTrueBlock = llvm::BasicBlock::Create(TheContext, "iftrue", f);
+	llvm::BasicBlock * IfFalseBlock = llvm::BasicBlock::Create(TheContext, "iffalse", f);
+	llvm::BasicBlock * EndIfBlock = llvm::BasicBlock::Create(TheContext, "endif", f);
+
+	llvm::Value * conditionVal = this->_condition->codegen();
+	auto condBit = Builder->CreateICmpNE(conditionVal, c8(0), "cond");
+	Builder->CreateCondBr(condBit, IfTrueBlock, IfFalseBlock);
+	// Build If body;
+	Builder->SetInsertPoint(IfTrueBlock);
+	llvm::Value* ifbody = this->_ifBody->codegen();
+	Builder->CreateBr(EndIfBlock);
+
+	// Build Else body;
+	Builder->SetInsertPoint(IfFalseBlock);
+	llvm::Value* elsebody = this->_elseBody->codegen();
+	Builder->CreateBr(EndIfBlock);
+	
+	// Go to EndIfBlock
+	Builder->SetInsertPoint(EndIfBlock);
+	llvm::PHINode* phi = Builder->CreatePHI(toLLVMType(this->_t), 2, "val");
+	phi->addIncoming(ifbody,IfTrueBlock);
+	phi->addIncoming(elsebody,IfFalseBlock);
+
+
+	return phi;
 }
 llvm::Value* New::codegen(){
-	return nullptr;
+	llvm::Value* index;
+	if(this->_size == nullptr)
+		index = c16(sizeOfType(this->_type->toType()));
+	else{
+		// new int[16] 
+		llvm::Value* size = this->_size->codegen();
+		index = Builder->CreateMul(size,c16(sizeOfType(this->_type->toType())),"idx");
+	}
+	llvm::Value* rawptr = Builder->CreateCall(newF,{index},"rawptr");
+	return Builder->CreateBitCast(rawptr,toLLVMType(this->_t),"castptr");
 }
 llvm::Value* Delete::codegen(){
 	return nullptr;
 }
 llvm::Value* CommaExpr::codegen(){
-	return nullptr;
+	llvm::Value* left = this->_left->codegen();
+	llvm::Value* right = this->_right->codegen();
+	return right;
 }
 llvm::Value* Label::codegen(){
 	return nullptr;

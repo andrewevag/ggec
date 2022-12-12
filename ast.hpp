@@ -49,7 +49,8 @@ public:
   	static llvm::ConstantInt* c64(int n) {
     	return llvm::ConstantInt::get(TheContext, llvm::APInt(64, n, true));
   	}
-  	
+  	static llvm::Function* newF;
+	static llvm::Function* deleteF;
 	static llvm::Value* getEnvAt(unsigned int nestinglevel);
 };
 class Declaration;
