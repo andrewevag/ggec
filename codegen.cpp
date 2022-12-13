@@ -13,13 +13,13 @@ llvm::Type* AST::i16 = llvm::IntegerType::get(TheContext, 16);
 llvm::Type* AST::i8p = llvm::PointerType::get(i8, 0);
 llvm::Type* AST::i64 = llvm::IntegerType::get(TheContext, 64);
 
-llvm::Function* newF = llvm::Function::Create(
+llvm::Function* AST::newF = llvm::Function::Create(
 		llvm::FunctionType::get(AST::i8p,{AST::i16},false),
 		llvm::Function::ExternalLinkage,
 		"new.F",
 		*AST::TheModule
 	);
-llvm::Function* deleteF = llvm::Function::Create(
+llvm::Function* AST::deleteF = llvm::Function::Create(
 		llvm::FunctionType::get(llvm::Type::getVoidTy(AST::TheContext),{AST::i8p},false),
 		llvm::Function::ExternalLinkage,
 		"delete.F",
@@ -659,7 +659,7 @@ llvm::Value* PrefixUnAss::codegen(){
 			nval = Builder->CreateAdd(val,c16(1),"nval");
 		}
 		else if(this->_t == typeReal){
-			nval = Builder->CreateFAdd(val,llvm::ConstantFP::get(toLLVMType(typeReal),llvm::APFloat(1.0)),"nval");
+			nval = Builder->CreateFAdd(val,llvm::ConstantFP::get(toLLVMType(this->_t), 1.0L),"nval");
 		}else{
 			nval = Builder->CreateGEP(val,c64(1),"nval");
 		}
@@ -669,7 +669,7 @@ llvm::Value* PrefixUnAss::codegen(){
 			nval = Builder->CreateSub(val,c16(1),"nval");
 		}
 		else if(this->_t == typeReal){
-			nval = Builder->CreateFSub(val,llvm::ConstantFP::get(toLLVMType(typeReal),llvm::APFloat(1.0)),"nval");
+			nval = Builder->CreateFSub(val,llvm::ConstantFP::get(toLLVMType(typeReal),1.0L),"nval");
 		}else{
 			// llvm::Value* minus = Builder->CreateSub(c16(0),c16(1),"negoff");
 			nval = Builder->CreateGEP(val,c16(-1),"minusptr");
@@ -683,22 +683,30 @@ llvm::Value* PostfixUnAss::codegen(){
 	llvm::Value* addr = this->_operand->calculateAddressOf();
 	llvm::Value* val = Builder->CreateLoad(addr,"val");
 	llvm::Value* nval;
+	
 	if(this->_Unass == PLUSPLUS){
-		if(this->_t == typeInteger){
+		std::cout << this->_operand->getType()->kind << std::endl;
+		if(equalType(this->_t, typeInteger)){
+			std::cout << "POUTSAAAAAAAAAAA1" << std::endl;
 			nval = Builder->CreateAdd(val,c16(1),"nval");
 		}
-		else if(this->_t == typeReal){
-			nval = Builder->CreateFAdd(val,llvm::ConstantFP::get(toLLVMType(typeReal),llvm::APFloat(1.0)),"nval");
+		else if(equalType(this->_operand->getType(), typeReal)){
+			std::cout << "POUTSAAAAAAAAAAA2" << std::endl;
+			auto constantOne = new Constant(1.0L);
+			auto buildedConstant = constantOne->codegen();
+			
+			nval = Builder->CreateFAdd(val,buildedConstant,"nval");
 		}else{
+			std::cout << "POUTSAAAAAAAAAAA3" << std::endl;
 			nval = Builder->CreateGEP(val,c64(1),"nval");
 		}
 		
 	}else{
-		if(this->_t == typeInteger){
+		if(equalType(this->_t, typeInteger)){
 			nval = Builder->CreateSub(val,c16(1),"nval");
 		}
-		else if(this->_t == typeReal){
-			nval = Builder->CreateFSub(val,llvm::ConstantFP::get(toLLVMType(typeReal),llvm::APFloat(1.0)),"nval");
+		else if(equalType(this->_t, typeReal)){
+			nval = Builder->CreateFSub(val,llvm::ConstantFP::get(toLLVMType(typeReal),1.0L),"nval");
 		}else{
 			// llvm::Value* minus = Builder->CreateSub(c16(0),c16(1),"negoff");
 			nval = Builder->CreateGEP(val,c16(-1),"minusptr");
@@ -712,23 +720,26 @@ llvm::Value* BinaryAss::codegen(){
 	llvm::Value* addr = this->_leftOperand->calculateAddressOf();
 	llvm::Value* right = this->_rightOperand->codegen();
 	llvm::Value* left = Builder->CreateLoad(addr,"left");
-	llvm::Value* nval;
+	llvm::Value* nval = nullptr;
 	switch (this->_BinAss){
 		case ASS: 
+			nval = right;
 			break;
 		case MULTASS: 
 			if(this->_t == typeInteger)
 				nval = Builder->CreateMul(left,right,"multint");
 			else
 				nval = Builder->CreateFMul(left,right,"multfp");
-			
+			break;
 		case DIVASS:
 			if(this->_t == typeInteger)
 				nval = Builder->CreateSDiv(left,right,"divint");
 			else
 				nval = Builder->CreateFDiv(left,right,"divfp");
+			break;
 		case MODASS:
-			nval = Builder->CreateSRem(left,right,"modint");
+				nval = Builder->CreateSRem(left,right,"modint");
+				break;
 		case PLUSASS:
 			if(this->_t == typeInteger)
 				nval = Builder->CreateAdd(left,right,"plusint");
@@ -736,6 +747,7 @@ llvm::Value* BinaryAss::codegen(){
 				nval = Builder->CreateFAdd(left,right,"plusfp");
 			else
 				nval = Builder->CreateGEP(left,right,"plusptr");
+			break;
 		case MINUSASS:
 			if(this->_t == typeInteger)
 				nval = Builder->CreateSub(left,right,"minusint");
@@ -750,9 +762,81 @@ llvm::Value* BinaryAss::codegen(){
 	return nval;
 }
 llvm::Value* TypeCast::codegen(){
+	llvm::Value* inner = this->_expr->codegen();
+	size_t index = this->_type->toType()->kind * 9 +  this->_expr->getType()->kind;
+	llvm::Value* casted = inner;
+	llvm::Value* castedInter;
+	#define getCast(to, from) Type_tag::to * 9 + Type_tag::from
+	switch (index)
+	{
+	// TO INTEGER TYPECASTS
+	case getCast(TYPE_INTEGER, TYPE_BOOLEAN): 
+		casted = Builder->CreateZExt(inner, i16, "casted");
+		break;
+	case getCast(TYPE_INTEGER, TYPE_CHAR): 
+		casted = Builder->CreateSExt(inner, i16, "casted");
+		break;
+	case getCast(TYPE_INTEGER, TYPE_REAL): 
+		casted = Builder->CreateFPToSI(inner, i16, "casted");
+		break;
+	case getCast(TYPE_INTEGER, TYPE_POINTER): 
+		casted = Builder->CreatePtrToInt(inner, i16, "casted");
+		break;
 	
 
-	return nullptr;
+	// TO BOOL TYPECASTS
+	case getCast(TYPE_BOOLEAN, TYPE_INTEGER): 
+		casted = Builder->CreateTrunc(inner, i8, "casted");
+		break;
+	case getCast(TYPE_BOOLEAN, TYPE_REAL): 
+		casted = Builder->CreateFPToUI(inner, i8, "casted");
+		break;
+	case getCast(TYPE_BOOLEAN, TYPE_POINTER): 
+		casted = Builder->CreatePtrToInt(inner, i8, "casted");
+		break;
+
+	// TO CHAR TYPECASTS
+	case getCast(TYPE_CHAR, TYPE_INTEGER): 
+		casted = Builder->CreateTrunc(inner, i8, "casted");
+		break;
+	case getCast(TYPE_CHAR, TYPE_REAL): 
+		casted = Builder->CreateFPToSI(inner, i8, "casted");
+		break;
+	case getCast(TYPE_CHAR, TYPE_POINTER): 
+		casted = Builder->CreatePtrToInt(inner, i8, "casted");
+		break;
+
+	// TO DOUBLE TYPECASTS
+	case getCast(TYPE_REAL, TYPE_CHAR): 
+	case getCast(TYPE_REAL, TYPE_INTEGER): 
+		casted = Builder->CreateSIToFP(inner, toLLVMType(this->getType()), "casted");
+		break;
+	case getCast(TYPE_REAL, TYPE_BOOLEAN): 
+		casted = Builder->CreateUIToFP(inner, toLLVMType(this->getType()), "casted");
+		break;
+	case getCast(TYPE_REAL, TYPE_POINTER): 
+		castedInter = Builder->CreatePtrToInt(inner, i16, "inter.cast");
+		casted = Builder->CreateUIToFP(castedInter, toLLVMType(this->getType()), "casted");
+		break;
+	
+	// TO POINTER TYPECASTS
+	case getCast(TYPE_POINTER, TYPE_INTEGER): 
+	case getCast(TYPE_POINTER, TYPE_BOOLEAN): 
+	case getCast(TYPE_POINTER, TYPE_CHAR):
+		casted = Builder->CreateIntToPtr(inner, toLLVMType(this->getType()), "casted");
+		break;
+	case getCast(TYPE_POINTER, TYPE_REAL): 
+		castedInter = Builder->CreateFPToUI(inner, i16, "inter.cast");
+		casted = Builder->CreateIntToPtr(castedInter, toLLVMType(this->getType()), "casted");
+		break;
+	case getCast(TYPE_POINTER, TYPE_POINTER): 
+		casted = Builder->CreateBitCast(inner, toLLVMType(this->getType()), "casted");
+		break;
+	default:
+		break;
+	}
+
+	return casted;
 }
 llvm::Value* TernaryOp::codegen(){
 	SymbolEntry * e = lookupActiveFun();

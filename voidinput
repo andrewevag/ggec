@@ -2,6 +2,7 @@ void main(){
 	int x;
 	bool z;
 	char c;
+	double d;
 	void prime(int n, byref char c,char* str){
 		double y[10];
 		if(z);
@@ -14,5 +15,7 @@ void main(){
 	x;
 	prime(42,c,"hello"); 
 	"hello!";
+	d =	1.0;
+	d++;
 	return;
 }
