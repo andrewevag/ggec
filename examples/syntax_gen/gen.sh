@@ -24,6 +24,6 @@ mkdir -p progs
 for i in $(seq 1 $1)
 do
   $ERL -noshell -noinput -s edsger_pp p -s erlang halt > progs/p$i.eds
-  printf "."
+  printf "\rGenerating ⛏️  [%d/%d]"  $i $1
 done
 printf "\n"

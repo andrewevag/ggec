@@ -17,7 +17,7 @@ ERL_LIBS?=/opt/homebrew/opt/proper/proper-1.4
 ## needs python3 deepdiff module to run tests
 ## pip3 install deepdiff
 ##
-PROGRAMGENPATH=/home/andreas/Projects/EdsgerProgramGenerator/
+PROGRAMGENPATH=/home/andreas/Projects/haskellcomp/
 
 ## Test variables
 GEN?=100
@@ -77,7 +77,7 @@ test: lexertest parsertest semanticstest
 	@echo "🧪 Running Parser Suite :"
 	@$(PYTHON3) ./tests/parser/runner.sh
 	@echo "🧪 Running Randomly Generated Edsger Programs :"
-	@echo "Generating the input files : ⛏️"
+	@echo "Generating the input files :"
 	@export ERL
 	@export ERL_LIBS
 	@$(MAKE) -C examples/syntax_gen generate GEN="$(GEN)"
@@ -85,9 +85,10 @@ test: lexertest parsertest semanticstest
 	@$(PYTHON3) ./tests/parser/runner_gen.sh $(GEN) 
 	@echo "🧪 Running Semantics Suite :"
 	@$(PYTHON3) ./tests/semantics/runner.sh
-	@echo @echo "🧪 Running Randomly Generated Edsger Programs :"
-	@echo "Generating the input files : ⛏️"
+	@echo "🧪 Running Randomly Generated Edsger Programs :"
+	@echo "Generating the input files :"
 	@$(MAKE) -C  $(PROGRAMGENPATH) generate GEN="$(GEN)"
+	@echo "Running the input files on the semantics analyzer : ⛏️"
 	@$(PYTHON3) ./tests/semantics/runner_gen.sh $(GEN)
 	
 
