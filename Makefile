@@ -17,7 +17,7 @@ ERL_LIBS?=/opt/homebrew/opt/proper/proper-1.4
 ## needs python3 deepdiff module to run tests
 ## pip3 install deepdiff
 ##
-PROGRAMGENPATH=/home/andreas/Projects/haskellcomp/
+PROGRAMGENPATH?=/home/andreas/Projects/EdsgerProgramGenerator/
 
 ## Test variables
 GEN?=100
@@ -71,9 +71,11 @@ parsertest: lexer.o ./tests/parser/main.o parser.o error.o ast.o tojsonstring.o 
 semanticstest: ./tests/semantics/main.o lexer.o parser.o error.o ast.o tojsonstring.o general.o symbol.o semantical.o $(DEPOBJECTS)
 	$(CXX) $(CXXFLAGS) -o ./tests/semantics/$@ $^
 
-test: lexertest parsertest semanticstest
+lexersuite: lexertest
 	@echo "🧪 Running Lexer Suite :"
 	@$(PYTHON3) ./tests/lexer/runner.sh
+
+parsersuite: parsertest
 	@echo "🧪 Running Parser Suite :"
 	@$(PYTHON3) ./tests/parser/runner.sh
 	@echo "🧪 Running Randomly Generated Edsger Programs :"
@@ -83,6 +85,8 @@ test: lexertest parsertest semanticstest
 	@$(MAKE) -C examples/syntax_gen generate GEN="$(GEN)"
 	@echo "Running the input files on the parser : ⛏️"
 	@$(PYTHON3) ./tests/parser/runner_gen.sh $(GEN) 
+
+semanticssuite: semanticstest
 	@echo "🧪 Running Semantics Suite :"
 	@$(PYTHON3) ./tests/semantics/runner.sh
 	@echo "🧪 Running Randomly Generated Edsger Programs :"
@@ -90,6 +94,11 @@ test: lexertest parsertest semanticstest
 	@$(MAKE) -C  $(PROGRAMGENPATH) generate GEN="$(GEN)"
 	@echo "Running the input files on the semantics analyzer : ⛏️"
 	@$(PYTHON3) ./tests/semantics/runner_gen.sh $(GEN)
+
+test: lexersuite parsersuite semanticssuite
+	
+	
+	
 	
 
 
@@ -123,7 +132,7 @@ help:
 	@echo "\tremoves all automatically generated files except the final executable does it too need to fix it before submitting"
 	@echo "$(BLUE)make distclean: $(RESET)"
 	@echo "\tremoves all automatically generated files and the final executable"
-	@echo "$(BLUE)make test [GEN=number] [PYTHON3=python3 path] [ERL=erl path] [ERL_LIBS=proper path]: $(RESET)"
+	@echo "$(BLUE)make test [GEN=number] [PYTHON3=python3 path] [ERL=erl path] [ERL_LIBS=proper path] [PROGRAMGENPATH=EdsgerProgramGenerator path]: $(RESET)"
 	@echo "\t-Run lexer and parser suites "
 	@echo "\t-Generate number syntactically correct Edsger programs and passes them through"
 	@echo "\t the parsertest"

@@ -21,8 +21,8 @@ for prog in programs:
 	g = open(prog)
 	output = f.read()
 	inp = g.read()
-	cmd = f"{testerdir}/lexertest"
-	process = subprocess.run(cmd.split(" "),capture_output=True, text=True, input=inp)
+	cmd = f"{testerdir}/lexertest {prog}"
+	process = subprocess.run(cmd.split(" "),capture_output=True, text=True)
 	exitcode = process.returncode
 	producedOutput = process.stdout
 	if exitcode == 1:

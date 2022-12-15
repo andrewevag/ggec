@@ -23,8 +23,8 @@ for prog in programs:
 	g = open(prog)
 	output = f.read()
 	inp = g.read()
-	cmd = f"{testerdir}/parsertest"
-	process = subprocess.run(cmd.split(" "),capture_output=True, text=True, input=inp)
+	cmd = f"{testerdir}/parsertest {prog}"
+	process = subprocess.run(cmd.split(" "),capture_output=True, text=True)
 	exitcode = process.returncode
 	producedOutput = process.stdout
 

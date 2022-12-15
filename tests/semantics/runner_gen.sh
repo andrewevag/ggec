@@ -7,8 +7,8 @@ from tqdm import tqdm
 syntaxGenScriptPath=f'{os.getcwd()}/examples/syntax_gen/gen.sh'
 progsdir = f'{os.getcwd()}/examples/syntax_gen/progs'
 
-syntaxGenScriptPath=f'/home/andreas/Projects/haskellcomp/gen.sh'
-progsdir = f'/home/andreas/Projects/haskellcomp'
+syntaxGenScriptPath=f'/home/andreas/Projects/EdsgerProgramGenerator/gen.sh'
+progsdir = f'/home/andreas/Projects/EdsgerProgramGenerator'
 
 
 if len(sys.argv) < 2:
@@ -20,11 +20,12 @@ noFailed = 0
 failed = []
 for i in tqdm(range(1, num_of_tests+1)):
 	
-	p = subprocess.Popen([f'./tests/semantics/semanticstest'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-	f = open(f'{progsdir}/p{i}.eds')
-	inp = f.read()
-	f.close()
-	p.communicate(input=inp.encode())
+	p = subprocess.Popen([f'./tests/semantics/semanticstest', f'{progsdir}/p{i}.eds'], stdout=subprocess.PIPE)
+	# f = open(f'{progsdir}/p{i}.eds')
+	# inp = f.read()
+	# f.close()
+	# p.communicate(input=inp.encode())
+	p.wait()
 	if p.returncode != 0:
 		failed.append(i)
 		noFailed += 1

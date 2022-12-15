@@ -1,0 +1,4 @@
+int x;
+
+#include "./tests/lexer/programs/cyclicinclude2.eds"
+
