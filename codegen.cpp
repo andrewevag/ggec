@@ -671,7 +671,7 @@ llvm::Value* PrefixUnAss::codegen(){
 			nval = Builder->CreateAdd(val,c16(1),"nval");
 		}
 		else if(equalType(this->_t, typeReal)){
-			nval = Builder->CreateFAdd(val,llvm::ConstantFP::get(toLLVMType(this->_t), 1.0L),"nval");
+			nval = Builder->CreateFAdd(val,llvm::ConstantFP::get(toLLVMType(typeReal), 1.0L),"nval");
 		}else{
 			nval = Builder->CreateGEP(val,c64(1),"nval");
 		}
@@ -699,19 +699,11 @@ llvm::Value* PostfixUnAss::codegen(){
 	if(this->_Unass == PLUSPLUS){
 		std::cout << this->_operand->getType()->kind << std::endl;
 		if(equalType(this->_t, typeInteger)){
-			std::cout << "POUTSAAAAAAAAAAA1" << std::endl;
 			nval = Builder->CreateAdd(val,c16(1),"nval");
 		}
 		else if(equalType(this->_operand->getType(), typeReal)){
-			std::cout << "POUTSAAAAAAAAAAA2" << std::endl;
-			auto constantOne = new Constant(1.0L);
-			std::cout << "MEX" << std::endl;
-			auto buildedConstant = constantOne->codegen();
-			std::cout << "MEX1" << std::endl;
-			
-			nval = Builder->CreateFAdd(val,buildedConstant,"nval");
+			nval = Builder->CreateFAdd(val,llvm::ConstantFP::get(toLLVMType(typeReal), 1.0L),"nval");
 		}else{
-			std::cout << "POUTSAAAAAAAAAAA3" << std::endl;
 			nval = Builder->CreateGEP(val,c64(1),"nval");
 		}
 		

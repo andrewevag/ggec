@@ -224,7 +224,9 @@ void ForStatement::sem(){
 	}
 	if(this->_second != nullptr){
 		this->_second->sem();
-		if( ! equalType(this->_second->getType(), typeBoolean));
+		if( ! equalType(this->_second->getType(), typeBoolean)){
+			fatal("Expected Exprssion of type bool in the second expression of the for loop.");
+		}
 	}else{
 		this->_second = new Constant(true);
 		// this->_second->sem();
