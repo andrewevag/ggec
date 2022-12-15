@@ -12,10 +12,10 @@ void main(){
 		return;
 	}
 	if(true);
-	x;
+	x = 1;
 	prime(42,c,"hello"); 
 	"hello!";
 	d =	1.0;
-	d++;
+	x++;
 	return;
 }
