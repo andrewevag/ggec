@@ -8,10 +8,11 @@
 #include <string>
 #include "symbol.hpp"
 #include "lexer_funcs.hpp"
+#include "general.hpp"
 
 AST* syntaxTree = nullptr;
 extern std::set<std::string> fileset;
-
+extern std::string currentFilename;
 
 int main(int argc, char** argv){
 	
@@ -28,6 +29,7 @@ int main(int argc, char** argv){
 		exit(1);
 	}
 	fileset = { argv[1] };
+	currentFilename = fileset.find(argv[1])->c_str();
 	yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
 
 	int ret = yyparse();

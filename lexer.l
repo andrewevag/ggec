@@ -9,6 +9,18 @@
 std::string tempstr;
 std::set<std::string> fileset;
 int lineno = 1;
+int columnno = 1;
+std::string currentFilename;
+#define YY_USER_ACTION \
+    for(int i = 0; yytext[i] != '\0'; i++) { \
+        if(yytext[i] == '\n') { \
+            columnno = 0; \
+        } \
+        else { \
+            columnno++; \
+        } \
+    }
+
 %}
 
 L [a-zA-Z]
@@ -42,6 +54,7 @@ P [^\x00-\x1f\x7f\\\'\"]
                             exit(1);
                         }
                         fileset.insert(tempstr);
+                    	currentFilename = fileset.find(tempstr)->c_str();
                         yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
                         BEGIN(INITIAL);
                     }

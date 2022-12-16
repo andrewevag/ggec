@@ -207,7 +207,7 @@ void ForStatement::sem(){
 		e = newLabel();
 	}
 	if(e == nullptr){
-		ErrorInfo::Fatal(this, "Failed to Register For Loop");
+		fatal("Failed to Register For Loop");
 	}
 	if(this->_first != nullptr){
 		this->_first->sem();

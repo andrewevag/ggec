@@ -22,7 +22,7 @@
 #ifndef __ERROR_HPP__
 #define __ERROR_HPP__
 #include <string>
-
+#include <set>
 /* ---------------------------------------------------------------------
    --------- Πρωτότυπα των συναρτήσεων του χειριστή σφαλμάτων ----------
    --------------------------------------------------------------------- */
@@ -38,9 +38,11 @@ public:
    ErrorInfo();
    ~ErrorInfo();
    int getLineAppeared();
-   static void Fatal(ErrorInfo* where, std::string msg);
+   void fatal(const char * fmt, ...);
 private:
    int _lineappeared;
+   int _columnappeared;
+   std::set<std::string>::iterator _fileappeared;
 };
 
 #endif
