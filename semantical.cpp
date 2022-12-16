@@ -52,8 +52,10 @@ void Program::sem(){
 	
 	if( ! mainDefined)
 		fatal("Function \"void main ()\" not defined on global scope");
-	closeScope();
 	
+	// ErrorInfo::Fatal(this, "Just Wanted to see");
+	closeScope();
+	// destroySymbolTable();
 }
 
 void VariableDeclaration::sem() {
@@ -68,6 +70,7 @@ void ArrayDeclaration::sem(){
 		fatal("Not positive int constant used as size for a constant array!\n");
 	}
 	newVariable(this->getName().c_str(), typeArray(size, this->_typeExpr->toType()));
+	// ErrorInfo::Fatal(this, "Fatal At variable to see");
 
 }
 
@@ -218,7 +221,6 @@ void ForStatement::sem(){
 	if(lblEntry == NULL){
 		fatal("Failed to Register Label in Symbol Table");
 	}
-
 	if(this->_first != nullptr){
 		this->_first->sem();
 	}
@@ -287,12 +289,12 @@ void ContinueStatement::sem(){
 		e = lookupLabel(nullptr, false);
 		// existance check
 		if(e == NULL){
-			fatal("Continue Statement outside of a for loop\n");
+			fatal("Continue Statement outside of a for loop with no label\n");
 		}
 		else{
 			// activeness check
 			if( ! e->u.eLabel.active ){
-				fatal("Continue Statement outside of a for loop\n");
+				fatal("Continue Statement outside of a for loop with no label\n");
 			}
 		}
 	}

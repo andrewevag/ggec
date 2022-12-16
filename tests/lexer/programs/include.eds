@@ -1,0 +1,2 @@
+#include "./tests/lexer/programs/constchar.eds"
+#include "./tests/lexer/programs/doubles.eds"

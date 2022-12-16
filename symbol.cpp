@@ -645,6 +645,7 @@ SymbolEntry * lookupLabel(const char * name, bool explicitelyNamed)
             if (i->entryType == ENTRY_LABEL){
                 if(i->u.eLabel.unnamedConst > maxTilNow){
                     e = i;
+                    maxTilNow = i->u.eLabel.unnamedConst;
                 }
             }
         }

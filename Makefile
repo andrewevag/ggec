@@ -19,6 +19,7 @@ ERL_LIBS?=/opt/homebrew/opt/proper/proper-1.4
 ## needs python3 deepdiff module to run tests
 ## pip3 install deepdiff
 ##
+PROGRAMGENPATH?=/home/andreas/Projects/EdsgerProgramGenerator/
 
 ## Test variables
 GEN?=100
@@ -33,7 +34,7 @@ ggec: lexer.o main.o parser.o error.o ast.o tojsonstring.o general.o symbol.o se
 	$(CXX) $(INCLUDE) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 
-lexer.cpp: lexer.l ast.hpp
+lexer.cpp lexer_funcs.hpp: lexer.l ast.hpp
 	flex -s -o lexer.cpp lexer.l
 
 lexer.o: lexer.cpp parser.hpp
@@ -76,20 +77,34 @@ parsertest: lexer.o ./tests/parser/main.o parser.o error.o ast.o tojsonstring.o 
 semanticstest: ./tests/semantics/main.o lexer.o parser.o error.o ast.o tojsonstring.o general.o symbol.o semantical.o codegen.o $(DEPOBJECTS)
 	$(CXX) $(CXXFLAGS) -o ./tests/semantics/$@ $^ $(LDFLAGS)
 
-test: lexertest parsertest semanticstest
+lexersuite: lexertest
 	@echo "🧪 Running Lexer Suite :"
 	@$(PYTHON3) ./tests/lexer/runner.sh
+
+parsersuite: parsertest
 	@echo "🧪 Running Parser Suite :"
 	@$(PYTHON3) ./tests/parser/runner.sh
 	@echo "🧪 Running Randomly Generated Edsger Programs :"
-	@echo "Generating the input files : ⛏️"
+	@echo "Generating the input files :"
 	@export ERL
 	@export ERL_LIBS
 	@$(MAKE) -C examples/syntax_gen generate GEN="$(GEN)"
 	@echo "Running the input files on the parser : ⛏️"
 	@$(PYTHON3) ./tests/parser/runner_gen.sh $(GEN) 
+
+semanticssuite: semanticstest
 	@echo "🧪 Running Semantics Suite :"
 	@$(PYTHON3) ./tests/semantics/runner.sh
+	@echo "🧪 Running Randomly Generated Edsger Programs :"
+	@echo "Generating the input files :"
+	@$(MAKE) -C  $(PROGRAMGENPATH) generate GEN="$(GEN)"
+	@echo "Running the input files on the semantics analyzer : ⛏️"
+	@$(PYTHON3) ./tests/semantics/runner_gen.sh $(GEN)
+
+test: lexersuite parsersuite semanticssuite
+	
+	
+	
 	
 
 
@@ -106,12 +121,13 @@ test: lexertest parsertest semanticstest
 clean:
 	$(RM) *.o $(BINS) lexer.cpp
 	$(RM) parser.hpp parser.output parser.cpp
+	$(RM) lexer_funcs.hpp
 	$(RM) ./src/*.o
 	$(MAKE) -C ./tests/lexer clean
 	$(MAKE) -C ./tests/parser clean
 	$(MAKE) -C ./examples/syntax_gen clean
 	$(MAKE) -C ./tests/semantics clean
-
+	$(MAKE) -C $(PROGRAMGENPATH) clean
 distclean: clean
 	$(RM) $(BINS)
 BLUE=\e[0;34m
@@ -123,7 +139,7 @@ help:
 	@echo "\tremoves all automatically generated files except the final executable does it too need to fix it before submitting"
 	@echo "$(BLUE)make distclean: $(RESET)"
 	@echo "\tremoves all automatically generated files and the final executable"
-	@echo "$(BLUE)make test [GEN=number] [PYTHON3=python3 path] [ERL=erl path] [ERL_LIBS=proper path]: $(RESET)"
+	@echo "$(BLUE)make test [GEN=number] [PYTHON3=python3 path] [ERL=erl path] [ERL_LIBS=proper path] [PROGRAMGENPATH=EdsgerProgramGenerator path]: $(RESET)"
 	@echo "\t-Run lexer and parser suites "
 	@echo "\t-Generate number syntactically correct Edsger programs and passes them through"
 	@echo "\t the parsertest"

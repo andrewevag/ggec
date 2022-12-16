@@ -26,7 +26,10 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstdarg>
-
+#include <string>
+#include <set>
+#include <iostream>
+#include <fstream>
 #include "general.hpp"
 #include "error.hpp"
 
@@ -36,7 +39,9 @@
    --------------------------------------------------------------------- */
 
 extern int lineno;
-
+extern int columnno;
+extern std::set<std::string> fileset;
+extern std::string currentFilename;
 
 void internal (const char * fmt, ...)
 {
@@ -107,4 +112,50 @@ void yyerror(const char *msg)
 	exit(EXIT_FAILURE);
 }
 
+
+ErrorInfo::ErrorInfo(){
+   this->_lineappeared = lineno;
+   this->_columnappeared = columnno;
+   this->_fileappeared = fileset.find(currentFilename);
+}
+
+ErrorInfo::~ErrorInfo(){}
+
+int ErrorInfo::getLineAppeared(){
+   return this->_lineappeared;
+}
+
+std::string getLine(std::string file, int lineno, int columnno){
+   std::ifstream inputfile;
+   inputfile.open(file);
+   for(int i =0 ; i < lineno-1; i++){
+      inputfile.ignore(10000, '\n');
+   }
+   char lex[columnno+20];
+   inputfile.getline(lex, columnno+20);
+   inputfile.close();
+   return std::string(lex);
+}
+
+void ErrorInfo::fatal(const char * fmt, ...){   
+   va_list ap;
+
+   va_start(ap, fmt);
+   if (fmt[0] == '\r')
+      fmt++;
+   else
+      fprintf(stderr, "Fatal Error @ \"%s\":%d:%d \n", this->_fileappeared->c_str(), this->_lineappeared, this->_columnappeared);
+   vfprintf(stderr, fmt, ap);
+   fprintf(stderr, "\n");
+   auto s = getLine(*this->_fileappeared, this->_lineappeared, this->_columnappeared);
+   printf("%s\n", s.c_str());
+   for(int i = 0; i < this->_columnappeared-1; i++){
+		if(s[i] == '\t')
+			std::cout << "_______";
+		std::cout << "_";
+   }
+	std::cout << "^\n";   
+   va_end(ap);
+   exit(1);   
+}
 

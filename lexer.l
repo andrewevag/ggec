@@ -1,12 +1,26 @@
 %{
 #include <vector>
+#include <set>
 #include "ast.hpp"
 #include "lexer.hpp"
 #include "parser.hpp"
 #include <cstdio>
 
 std::string tempstr;
+std::set<std::string> fileset;
 int lineno = 1;
+int columnno = 0;
+std::string currentFilename;
+#define YY_USER_ACTION \
+    for(int i = 0; yytext[i] != '\0'; i++) { \
+        if(yytext[i] == '\n') { \
+            columnno = 0; \
+        } \
+        else { \
+            columnno++; \
+        } \
+    }
+
 %}
 
 L [a-zA-Z]
@@ -14,13 +28,43 @@ D [0-9]
 W [ \t\r]
 P [^\x00-\x1f\x7f\\\'\"]
 
+%option header-file="lexer_funcs.hpp"
 %option noyywrap
 %option nounput noinput
 %x CHAR
 %x STRING
 %x COMMENT
+%x INCLUDE
+%x INCLUDESTRING
 
 %%
+
+^"#include"         { BEGIN(INCLUDE); }
+<INCLUDE>{W}+       { /* nothing */   }
+<INCLUDE>\"         { BEGIN(INCLUDESTRING); tempstr = ""; }
+                        
+<INCLUDESTRING>\"   { 
+                        if(fileset.count(tempstr) != 0){
+                            fprintf(stderr, "File \"%s\" already included\n", tempstr.c_str());
+                            exit(1);
+                        }
+                        yyin = fopen( tempstr.c_str(), "r" );
+                        if( ! yyin){
+                            fprintf(stderr, "failed to open %s\n", tempstr.c_str());
+                            exit(1);
+                        }
+                        fileset.insert(tempstr);
+                    	currentFilename = fileset.find(tempstr)->c_str();
+                        yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
+                        BEGIN(INITIAL);
+                    }
+
+<INCLUDESTRING>\\x[0-9a-fA-F][0-9a-fA-F]   { tempstr.append(yytext); }
+<INCLUDESTRING>\\[ntr0\\\'\"]              { tempstr.append(yytext); }
+<INCLUDESTRING>{P}                         { tempstr.append(yytext); }
+<INCLUDESTRING>.|\n                        { fprintf(stderr, "didnot expect non printable in string %d\n", yytext[0]); exit(1);}
+<INCLUDESTRING><<EOF>>                     { fprintf(stderr, "received EOF without string closing\n"); exit(1);}
+
 
 "bool"	    { return T_bool; }
 "break"	    { return T_break; }
@@ -89,6 +133,7 @@ P [^\x00-\x1f\x7f\\\'\"]
 .	                                { fprintf(stderr,"Illegal character %c at line %d\n",yytext[0],lineno);
                                         exit(1); }
 
+<<EOF>>                             { yypop_buffer_state(); if (!YY_CURRENT_BUFFER) {yytext = ""; return 0;} }
 %%
 
 
