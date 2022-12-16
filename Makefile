@@ -67,14 +67,14 @@ ast.hpp: symbol.hpp llvmhead.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $^
 
 
-lexertest: lexer.o ./tests/lexer/main.o error.o ast.o tojsonstring.o parser.o general.o symbol.o semantical.o $(DEPOBJECTS)
-	$(CXX) $(CXXFLAGS) -o ./tests/lexer/$@ $^
+lexertest: lexer.o ./tests/lexer/main.o error.o ast.o tojsonstring.o parser.o general.o symbol.o semantical.o codegen.o $(DEPOBJECTS)
+	$(CXX) $(CXXFLAGS) -o ./tests/lexer/$@ $^ $(LDFLAGS)
 
-parsertest: lexer.o ./tests/parser/main.o parser.o error.o ast.o tojsonstring.o general.o symbol.o semantical.o $(DEPOBJECTS)
-	$(CXX) $(CXXFLAGS) -o ./tests/parser/$@ $^
+parsertest: lexer.o ./tests/parser/main.o parser.o error.o ast.o tojsonstring.o general.o symbol.o semantical.o codegen.o $(DEPOBJECTS)
+	$(CXX) $(CXXFLAGS) -o ./tests/parser/$@ $^ $(LDFLAGS)
 
-semanticstest: ./tests/semantics/main.o lexer.o parser.o error.o ast.o tojsonstring.o general.o symbol.o semantical.o $(DEPOBJECTS)
-	$(CXX) $(CXXFLAGS) -o ./tests/semantics/$@ $^
+semanticstest: ./tests/semantics/main.o lexer.o parser.o error.o ast.o tojsonstring.o general.o symbol.o semantical.o codegen.o $(DEPOBJECTS)
+	$(CXX) $(CXXFLAGS) -o ./tests/semantics/$@ $^ $(LDFLAGS)
 
 test: lexertest parsertest semanticstest
 	@echo "🧪 Running Lexer Suite :"
