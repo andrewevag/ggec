@@ -205,10 +205,12 @@ llvm::Value* FunctionDefinition::codegen(){
 	}
 	
 	this->_statements->codegen();
-	
+	if ( equalType(this->_resultType->toType(), typeVoid) ){
+		Builder->CreateRetVoid();
+	}
 
 	// TODO remove it
-	// Builder->CreateRetVoid();
+	
 	return nullptr;
 }
 
@@ -353,7 +355,7 @@ llvm::Value* ForStatement::codegen(){
 		this->_third->codegen();
 	}
 	Builder->CreateBr(LoopHeadBlock);
-
+	Builder->SetInsertPoint(EndForBlock);
 	return nullptr;
 }
 llvm::Value* ContinueStatement::codegen(){
@@ -749,7 +751,7 @@ llvm::Value* BinaryAss::codegen(){
 		case PLUSASS:
 			if(equalType(this->_t, typeInteger))
 				nval = Builder->CreateAdd(left,right,"plusint");
-			if(equalType(this->_t, typeReal))
+			else if(equalType(this->_t, typeReal))
 				nval = Builder->CreateFAdd(left,right,"plusfp");
 			else
 				nval = Builder->CreateGEP(left,right,"plusptr");
@@ -757,7 +759,7 @@ llvm::Value* BinaryAss::codegen(){
 		case MINUSASS:
 			if(equalType(this->_t, typeInteger))
 				nval = Builder->CreateSub(left,right,"minusint");
-			if(equalType(this->_t, typeReal))
+			else if(equalType(this->_t, typeReal))
 				nval = Builder->CreateFSub(left,right,"minusfp");
 			else{
 				llvm::Value* minus = Builder->CreateSub(c16(0),right,"negoff");

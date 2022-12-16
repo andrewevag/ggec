@@ -930,7 +930,9 @@ llvm::Type* toLLVMType(Type t)
 		case Type_tag::TYPE_CHAR:
 			return llvm::IntegerType::get(AST::TheContext, 8);
 		case Type_tag::TYPE_ARRAY:
-			return llvm::ArrayType::get(toLLVMType(t->refType),t->size);
+            return llvm::PointerType::get(toLLVMType(t->refType),0);
+			
+            return llvm::ArrayType::get(toLLVMType(t->refType),t->size);
 		default:
 			fatal("toLLVMType: No Such type ma boy!");
 			break;
