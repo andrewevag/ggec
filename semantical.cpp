@@ -814,7 +814,7 @@ void TernaryOp::sem(){
 void New::sem(){
 	if(this->_size != nullptr){
 		this->_size->sem(); 
-		if(! equalType(this->getType(), typeInteger)){
+		if(! equalType(this->_size->getType(), typeInteger)){
 			fatal("New operator needs type int as size");
 		}
 	}
