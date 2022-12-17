@@ -43,7 +43,7 @@ llvm::Value* Program::codegen(){
 
 llvm::Value* VariableDeclaration::codegen(){
 	SymbolEntry * e = lookupEntry(this->_name.c_str(), LOOKUP_ALL_SCOPES, false);
-	if(e->nestingLevel == 0){
+	if(e->nestingLevel == GLOBAL_SCOPE){
 		// this is a global variable!!
 		// getNewGlobalVariable in LLVM
 		llvm::Value* val = new llvm::GlobalVariable(
@@ -66,7 +66,7 @@ llvm::Value* VariableDeclaration::codegen(){
 // and put the llvm::Value* on the symbol table 
 llvm::Value* ArrayDeclaration::codegen(){
 	SymbolEntry * e = lookupEntry(this->_name.c_str(), LOOKUP_ALL_SCOPES, false);
-	if(e->nestingLevel == 0){
+	if(e->nestingLevel == GLOBAL_SCOPE){
 		// this is a global variable!!
 		// getNewGlobalVariable in LLVM
 		llvm::Value* val = new llvm::GlobalVariable(
@@ -207,9 +207,13 @@ llvm::Value* FunctionDefinition::codegen(){
 	this->_statements->codegen();
 	if ( equalType(this->_resultType->toType(), typeVoid) ){
 		Builder->CreateRetVoid();
+	}else{
+		// this means that the last block of a non void returning function is not terminated
+		// control will never reach here because all returns should have been called before getting 
+		// to this part. Thus this is dead code and will be removed by the analysis
+		Builder->CreateBr(FB);
 	}
 
-	// TODO remove it
 	
 	return nullptr;
 }
@@ -378,6 +382,7 @@ llvm::Value* BreakStatement::codegen(){
 	SymbolEntry * lblEntry ;
 	if(this->_target == ""){
 		lblEntry = lookupLabel(NULL, false);
+		std::cout << lblEntry->id << std::endl;
 	}else{
 		lblEntry = lookupLabel(this->_target.c_str(), true);
 	}
@@ -393,6 +398,11 @@ llvm::Value* ReturnStatement::codegen(){
 		llvm::Value * retExp = this->_expr->codegen();
 		Builder->CreateRet(retExp);
 	}
+	SymbolEntry * e = lookupActiveFun();
+	llvm::Function * f = e->u.eFunction.fun;
+	// Basic Blocks for Going after this is terminated
+	llvm::BasicBlock * NewEntryBlock = llvm::BasicBlock::Create(TheContext, "newEntry", f);
+	Builder->SetInsertPoint(NewEntryBlock);
 	return nullptr;
 }
 llvm::Value* Id::codegen(){
@@ -503,7 +513,7 @@ llvm::Value* BracketedIndex::codegen(){
 llvm::Value* UnaryOp::codegen(){
 	switch (this->_UnOp){
 			case ADDRESS: return this->_operand->calculateAddressOf();
-			case DEREF:   return Builder->CreateLoad(this->_operand->calculateAddressOf(),"deref");
+			case DEREF:   return Builder->CreateLoad(this->_operand->codegen(),"deref");
 			case POS: 	  return this->_operand->codegen();
 			case NEG: 	  
 				if(equalType(this->_t, typeInteger))
@@ -1009,7 +1019,7 @@ llvm::Value* UnaryOp::calculateAddressOf() {
 	if(this->_UnOp ==  DEREF){
 		// this->_operand : Pointer(t)
 		return this->_operand->codegen();
-	}else{		
+	}else{			
 		fatal("calculateAddressOf on UnaryOp(%s)\n", UnaryOp::unaryOpTypeToString(this->_UnOp).c_str());
 	}
 	return nullptr;
