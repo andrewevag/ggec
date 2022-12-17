@@ -65,13 +65,14 @@ void VariableDeclaration::sem() {
 }
 
 void ArrayDeclaration::sem(){
+	this->_expr->sem();
 	int size = this->_expr->isIntConstant();
 	if(size <= 0){
 		fatal("Not positive int constant used as size for a constant array!\n");
 	}
 	newVariable(this->getName().c_str(), typeArray(size, this->_typeExpr->toType()));
 	// ErrorInfo::Fatal(this, "Fatal At variable to see");
-
+	this->codegen();
 }
 
 void FunctionDeclaration::sem(){
@@ -298,6 +299,7 @@ void ContinueStatement::sem(){
 				fatal("Continue Statement outside of a for loop with no label\n");
 			}
 		}
+		this->_target = e->id;
 	}
 }
 
@@ -338,6 +340,7 @@ void BreakStatement::sem(){
 				fatal("Break Statement not inside of a for loop");
 			}
 		}
+		this->_target = e->id;
 	}
 }
 

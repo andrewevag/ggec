@@ -34,6 +34,7 @@ llvm::Value* Program::codegen(){
 
 	bool bad = verifyModule(*TheModule, &llvm::errs());
 	if(bad){
+		TheModule->print(llvm::outs(), nullptr);
 		fatal("Failed to verify module");
 	}
 	TheModule->print(llvm::outs(), nullptr);
@@ -50,7 +51,7 @@ llvm::Value* VariableDeclaration::codegen(){
 			*TheModule,
 			toLLVMType(this->_typeExpr->toType()),
 			false,
-			llvm::GlobalValue::PrivateLinkage,
+			llvm::GlobalValue::ExternalLinkage,
 			nullptr,
 			this->_name
 		);
@@ -71,9 +72,10 @@ llvm::Value* ArrayDeclaration::codegen(){
 		// getNewGlobalVariable in LLVM
 		llvm::Value* val = new llvm::GlobalVariable(
 			*TheModule,
-			toLLVMType(this->_typeExpr->toType()),
+			// toLLVMType(this->_typeExpr->toType()),
+			llvm::ArrayType::get(toLLVMType(this->_typeExpr->toType()),this->_expr->isIntConstant()),
 			false,
-			llvm::GlobalValue::PrivateLinkage,
+			llvm::GlobalValue::ExternalLinkage,
 			nullptr,
 			this->_name
 		);
@@ -143,7 +145,8 @@ llvm::Value* FunctionDeclaration::codegen() {
 llvm::Value* FunctionDefinition::codegen(){
 	// If we have defined it aka FunctionDeclaration then on the symbol table
 	// is the llvm::Function for it. -> so just grab it.
-	SymbolEntry * e = lookupEntry(this->getName().c_str(), LOOKUP_ALL_SCOPES, false);
+	// SymbolEntry * e = lookupEntry(this->getName().c_str(), LOOKUP_ALL_SCOPES, false);
+	SymbolEntry * e = lookupActiveFun();
 	// Else define the llvm::Function.
 	llvm::Function* f;
 	f = e->u.eFunction.fun;
@@ -211,7 +214,8 @@ llvm::Value* FunctionDefinition::codegen(){
 		// this means that the last block of a non void returning function is not terminated
 		// control will never reach here because all returns should have been called before getting 
 		// to this part. Thus this is dead code and will be removed by the analysis
-		Builder->CreateBr(FB);
+		
+		Builder->CreateBr(Builder->GetInsertBlock());
 	}
 
 	
@@ -376,6 +380,12 @@ llvm::Value* ContinueStatement::codegen(){
 	}
 
 	Builder->CreateBr(lblEntry->u.eLabel.entry);
+	SymbolEntry * e   = lookupActiveFun();
+	llvm::Function* f = e->u.eFunction.fun;
+	
+	// Basic Blocks for Jumping
+	llvm::BasicBlock *AfterContinue  = llvm::BasicBlock::Create(TheContext, "afterContinue", f);
+	Builder->SetInsertPoint(AfterContinue);
 	return nullptr;
 }
 llvm::Value* BreakStatement::codegen(){
@@ -388,6 +398,12 @@ llvm::Value* BreakStatement::codegen(){
 	}
 
 	Builder->CreateBr(lblEntry->u.eLabel.exit);
+	SymbolEntry * e   = lookupActiveFun();
+	llvm::Function* f = e->u.eFunction.fun;
+	
+	// Basic Blocks for Jumping
+	llvm::BasicBlock *AfterBreak  = llvm::BasicBlock::Create(TheContext, "afterBreak", f);
+	Builder->SetInsertPoint(AfterBreak);
 	return nullptr;
 }
 llvm::Value* ReturnStatement::codegen(){
@@ -546,7 +562,7 @@ llvm::Value* BinaryOp::codegen(){
 		case PLUS:
 			if(equalType(this->_t, typeInteger))
 				return Builder->CreateAdd(left,right,"plusint");
-			if(this->_t == typeReal)
+			else if(equalType(this->_t, typeReal))
 				return Builder->CreateFAdd(left,right,"plusfp");
 			else
 				return Builder->CreateGEP(left,right,"plusptr");
@@ -864,6 +880,9 @@ llvm::Value* TernaryOp::codegen(){
 	llvm::BasicBlock * IfTrueBlock = llvm::BasicBlock::Create(TheContext, "iftrue", f);
 	llvm::BasicBlock * IfFalseBlock = llvm::BasicBlock::Create(TheContext, "iffalse", f);
 	llvm::BasicBlock * EndIfBlock = llvm::BasicBlock::Create(TheContext, "endif", f);
+	
+	llvm::BasicBlock * EndOfIfTrueBlock;
+	llvm::BasicBlock * EndOfIfFalseBlock;
 
 	llvm::Value * conditionVal = this->_condition->codegen();
 	auto condBit = Builder->CreateICmpNE(conditionVal, c8(0), "cond");
@@ -872,17 +891,19 @@ llvm::Value* TernaryOp::codegen(){
 	Builder->SetInsertPoint(IfTrueBlock);
 	llvm::Value* ifbody = this->_ifBody->codegen();
 	Builder->CreateBr(EndIfBlock);
+	EndOfIfTrueBlock = Builder->GetInsertBlock();
 
 	// Build Else body;
 	Builder->SetInsertPoint(IfFalseBlock);
 	llvm::Value* elsebody = this->_elseBody->codegen();
 	Builder->CreateBr(EndIfBlock);
-	
+	EndOfIfFalseBlock = Builder->GetInsertBlock();
+
 	// Go to EndIfBlock
 	Builder->SetInsertPoint(EndIfBlock);
 	llvm::PHINode* phi = Builder->CreatePHI(toLLVMType(this->_t), 2, "val");
-	phi->addIncoming(ifbody,IfTrueBlock);
-	phi->addIncoming(elsebody,IfFalseBlock);
+	phi->addIncoming(ifbody,EndOfIfTrueBlock);
+	phi->addIncoming(elsebody,EndOfIfFalseBlock);
 
 
 	return phi;
@@ -965,7 +986,11 @@ llvm::Value* Id::calculateAddressOf() {
 	
 	if(e->nestingLevel == GLOBAL_SCOPE){
 		// then the value for it is in 
-		llvm::Value* value = Builder->CreateGEP(e->u.eVariable.llvmVal, c64(0), this->_name);
+		std::cout << "======================||===================\n";
+		TheModule->print(llvm::outs(), nullptr);
+		std::cout << "===========================================\n";
+		auto temp = Builder->CreateBitCast(e->u.eVariable.llvmVal,llvmPointer(toLLVMType(e->u.eVariable.type)));
+		llvm::Value* value = Builder->CreateGEP(temp, c64(0), this->_name);
 		return value;
 	}else{
 		if(e->entryType != ENTRY_PARAMETER || (e->entryType == ENTRY_PARAMETER && e->u.eParameter.mode == PASS_BY_VALUE)){

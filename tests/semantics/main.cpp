@@ -33,7 +33,7 @@ int main(int argc, char** argv){
 
 	int ret = yyparse();
 	// syntaxTree->printTree(std::cout);
-	syntaxTree->sem();
+	syntaxTree->codegen();
 	delete syntaxTree;
 	return ret;
 }

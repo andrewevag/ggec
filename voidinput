@@ -24,3 +24,11 @@ void main(){
 	
 	return;
 }
+bool bools[1000];
+bool *bools2;
+void x0(){
+	bool x;
+	bools2++;
+	x = bools[10];
+	bools++;
+}
