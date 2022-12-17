@@ -399,9 +399,9 @@ llvm::Value* Id::codegen(){
 	/*
 	 * 
 	 */
-	SymbolEntry * e = lookupEntry(this->_name.c_str(), LOOKUP_ALL_SCOPES, false);
-	auto nestingLevel = e->nestingLevel;
-	auto varOffset    = ( e->entryType == ENTRY_PARAMETER ) ? e->u.eParameter.offset : e->u.eVariable.offset;
+	// SymbolEntry * e = lookupEntry(this->_name.c_str(), LOOKUP_ALL_SCOPES, false);
+	// auto nestingLevel = e->nestingLevel;
+	// auto varOffset    = ( e->entryType == ENTRY_PARAMETER ) ? e->u.eParameter.offset : e->u.eVariable.offset;
 	
 	llvm::Value* crtPtr = this->calculateAddressOf();
 	llvm::Value* valOfVar = Builder->CreateLoad(crtPtr, this->_name);
@@ -893,7 +893,7 @@ llvm::Value* New::codegen(){
 
 llvm::Value* Delete::codegen(){
 	// free((i8*) this->_t)
-	llvm::Value* ptrToDelete = this->codegen();
+	llvm::Value* ptrToDelete = this->_expr->codegen();
 	llvm::Value* rawPtr = Builder->CreateBitCast(ptrToDelete, i8p, "rawptr");
 	Builder->CreateCall(deleteF, { rawPtr });
 	return llvm::Constant::getNullValue(toLLVMType(this->getType()));
@@ -990,10 +990,11 @@ llvm::Value* Id::calculateAddressOf() {
 }
 llvm::Value* Constant::calculateAddressOf() {
 	fatal("calculateAddressOf on Constant.");
-
+	return nullptr;
 }
 llvm::Value* FunctionCall::calculateAddressOf() {
 	fatal("calculateAddressOf on FunctionCall.");
+	return nullptr;
 }
 llvm::Value* BracketedIndex::calculateAddressOf() {
 	// Calculate the base pointer
@@ -1008,41 +1009,52 @@ llvm::Value* UnaryOp::calculateAddressOf() {
 	if(this->_UnOp ==  DEREF){
 		// this->_operand : Pointer(t)
 		return this->_operand->codegen();
-	}else{
+	}else{		
 		fatal("calculateAddressOf on UnaryOp(%s)\n", UnaryOp::unaryOpTypeToString(this->_UnOp).c_str());
 	}
+	return nullptr;
+
 }
 llvm::Value* BinaryOp::calculateAddressOf() {
 	fatal("calculateAddressOf on BinaryOp.");
-
+	return nullptr;
 }
 llvm::Value* UnAss::calculateAddressOf() {
 	fatal("calculateAddressOf on UnAss.");
+	return nullptr;
 
 }
 llvm::Value* BinaryAss::calculateAddressOf() {
 	fatal("calculateAddressOf on BinaryAss.");
+	return nullptr;
 }
 llvm::Value* TypeCast::calculateAddressOf() {
 	fatal("calculateAddressOf on TypeCast.");
+	return nullptr;
 }
 llvm::Value* TernaryOp::calculateAddressOf() {
 	fatal("calculateAddressOf on TernaryOp.");
+	return nullptr;
 }
 llvm::Value* New::calculateAddressOf() {
 	fatal("calculateAddressOf on New");
+	return nullptr;
 }
 llvm::Value* Delete::calculateAddressOf() {
 	fatal("calculateAddressOf on Delete.");
+	return nullptr;
 }
 llvm::Value* CommaExpr::calculateAddressOf() {
 	fatal("calculateAddressOf on FunctionCall.");
+	return nullptr;
 }
 
 llvm::Value* PrefixUnAss::calculateAddressOf(){
 	fatal("calculateAddressOf on PrefixUnAss.");
+	return nullptr;
 }
 
 llvm::Value* PostfixUnAss::calculateAddressOf(){
 	fatal("calculateAddressOf on PostfixUnAss");
+	return nullptr;
 }

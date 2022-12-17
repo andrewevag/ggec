@@ -81,14 +81,14 @@ public:
 	
 
 	static TypeExpression* fromType(Type t);
-	virtual void sem() = 0;
+	// virtual void sem() = 0;
 
 	virtual llvm::Value* codegen() override;
 
 	/* Printing Syntax Tree Functions */
-	virtual std::vector<Tree*> getChildren() = 0;
-	virtual void printNode(std::ostream& out) = 0;
-	virtual std::string toJSONString() = 0;
+	// virtual std::vector<Tree*> getChildren() = 0;
+	// virtual void printNode(std::ostream& out) = 0;
+	// virtual std::string toJSONString() = 0;
 private:
 };
 
@@ -845,15 +845,15 @@ public:
 	: _Unass(unass), _operand(operand) {}
 	virtual ~UnAss();
 
-	virtual int isIntConstant() = 0;
-	virtual void sem() = 0;
-	virtual llvm::Value* codegen() = 0;
+	// virtual int isIntConstant() = 0;
+	// virtual void sem() = 0;
+	// virtual llvm::Value* codegen() = 0;
 	virtual llvm::Value* calculateAddressOf() override;
 
 	/* Printing Syntax Tree Functions */
-	virtual std::vector<Tree*> getChildren() = 0;
-	virtual void printNode(std::ostream& out) = 0;
-	virtual std::string toJSONString() = 0;
+	// virtual std::vector<Tree*> getChildren() = 0;
+	// virtual void printNode(std::ostream& out) = 0;
+	// virtual std::string toJSONString() = 0;
 protected:
 	UnAssType _Unass;
 	Expression* _operand;
@@ -918,7 +918,7 @@ public:
 	: _BinAss(type), _leftOperand(left), _rightOperand(right) {}
 	virtual ~BinaryAss();
 
-	virtual int isIntConstant() {
+	virtual int isIntConstant() override{
 		return 0;
 	}
 
@@ -942,7 +942,7 @@ public:
 	: _type(type), _expr(expr) {}
 	virtual ~TypeCast();
 
-	virtual int isIntConstant() {
+	virtual int isIntConstant() override {
 		return 0;
 	}
 
@@ -965,7 +965,7 @@ public:
 	: _condition(cond), _ifBody(ifbody), _elseBody(elsebody) {}
 	virtual ~TernaryOp();
 
-	virtual int isIntConstant() {
+	virtual int isIntConstant() override {
 		return 0;
 	}
 

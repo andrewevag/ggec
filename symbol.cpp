@@ -934,7 +934,8 @@ llvm::Type* toLLVMType(Type t)
 			
             return llvm::ArrayType::get(toLLVMType(t->refType),t->size);
 		default:
-			fatal("toLLVMType: No Such type ma boy!");
+			fatal("toLLVMType: No Such type");
+            return nullptr;
 			break;
 	}
 }
