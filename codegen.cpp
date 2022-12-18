@@ -16,13 +16,13 @@ llvm::Type* AST::i64 = llvm::IntegerType::get(TheContext, 64);
 llvm::Function* AST::newF = llvm::Function::Create(
 		llvm::FunctionType::get(AST::i8p,{AST::i16},false),
 		llvm::Function::ExternalLinkage,
-		"new.F",
+		"_newF",
 		*AST::TheModule
 	);
 llvm::Function* AST::deleteF = llvm::Function::Create(
 		llvm::FunctionType::get(llvm::Type::getVoidTy(AST::TheContext),{AST::i8p},false),
 		llvm::Function::ExternalLinkage,
-		"delete.F",
+		"_deleteF",
 		*AST::TheModule
 	);
 
@@ -38,7 +38,7 @@ llvm::Value* Program::codegen(){
 		fatal("Failed to verify module");
 	}
 	TheModule->print(llvm::outs(), nullptr);
-
+	
 	return nullptr;
 }
 

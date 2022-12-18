@@ -1,10 +1,11 @@
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 #include <stdint.h>
-void writeString_char_ptr(char* s){
-	printf("%s", s);
+
+char* _newF(int16_t size){
+	return (char*) malloc(size);
 }
 
-int16_t strlen_char_ptr(char* s){
-	return strlen(s);
+void _deleteF(char* p){
+	free(p);
 }

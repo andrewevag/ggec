@@ -103,10 +103,16 @@ semanticssuite: semanticstest
 
 test: lexersuite parsersuite semanticssuite
 	
-	
-	
-	
+EDSGERLIBSOURCE = $(wildcard lib/*.c)
+EDSGEROBJ = $(patsubst %.c, %.o, $(EDSGERLIBSOURCE))
+CC=clang
+CFLAGS=-g -Wall
+%.o: %.c
+	$(CC) -c $(CFLAGS) -o $@ $^
+libEdsger.a: $(EDSGEROBJ)
+	ar rcs $@ $^
 
+	
 
 # lexer.o: lexer.cpp lexer.hpp parser.hpp
 
@@ -123,6 +129,8 @@ clean:
 	$(RM) parser.hpp parser.output parser.cpp
 	$(RM) lexer_funcs.hpp
 	$(RM) ./src/*.o
+	$(RM) $(EDSGEROBJ)
+	$(RM) libEdsger.a
 	$(MAKE) -C ./tests/lexer clean
 	$(MAKE) -C ./tests/parser clean
 	$(MAKE) -C ./examples/syntax_gen clean
