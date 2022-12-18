@@ -113,7 +113,7 @@ P [^\x00-\x1f\x7f\\\'\"]
 <CHAR><<EOF>>                       { fprintf(stderr, "received EOF without string closing\n"); exit(1);}
 
 \"                                  { BEGIN(STRING); tempstr = ""; }
-<STRING>\"                          { yylval.str = new char[strlen(tempstr.c_str())+1]; memcpy(yylval.str, tempstr.c_str(), strlen(tempstr.c_str())+1); ; BEGIN(INITIAL); return T_string_const; }
+<STRING>\"                          { yylval.str = new char[strlen(tempstr.c_str())+1]; tempstr = fixChars(tempstr) ; memcpy(yylval.str, tempstr.c_str(), strlen(tempstr.c_str())+1); ; BEGIN(INITIAL); return T_string_const; }
 <STRING>\\x[0-9a-fA-F][0-9a-fA-F]   { tempstr.append(yytext); }
 <STRING>\\[ntr0\\\'\"]              { tempstr.append(yytext); }
 <STRING>{P}                         { tempstr.append(yytext); }
@@ -137,7 +137,7 @@ P [^\x00-\x1f\x7f\\\'\"]
 %%
 
 
-uint8_t getCharFromString(char* s){
+uint8_t getCharFromString(const char* s){
     uint8_t c;
     if(s[0] == '\\'){
         if(strlen(s) < 2){
@@ -173,4 +173,16 @@ uint8_t getCharFromString(char* s){
     }else{
         return (uint8_t)s[0];
     }
+}
+
+std::string fixChars(std::string s){
+    std::string dest;
+    for(int i = 0 ; i < s.size(); i++){
+        if(s[i] == '\\'){
+            dest.push_back(getCharFromString(s.c_str() + i++));
+        }
+        else dest.push_back(getCharFromString(s.c_str() + i));
+    }
+    return dest;
+        
 }

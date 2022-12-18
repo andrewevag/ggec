@@ -2,6 +2,8 @@
 #include "symbol.hpp"
 #include "error.hpp"
 #include <iostream>
+#include <fstream>
+
 #define llvmPointer(inner) llvm::PointerType::get(inner, 0)
 
 llvm::LLVMContext AST::TheContext;
@@ -37,8 +39,13 @@ llvm::Value* Program::codegen(){
 		TheModule->print(llvm::outs(), nullptr);
 		fatal("Failed to verify module");
 	}
-	TheModule->print(llvm::outs(), nullptr);
-	
+	std::ofstream f;
+	std::string str;
+	llvm::raw_string_ostream output(str);
+	f.open("out.ll", std::ios::trunc | std::ios::out);
+	TheModule->print(output, nullptr);
+	f << str;
+	f.close();
 	return nullptr;
 }
 
@@ -51,8 +58,8 @@ llvm::Value* VariableDeclaration::codegen(){
 			*TheModule,
 			toLLVMType(this->_typeExpr->toType()),
 			false,
-			llvm::GlobalValue::ExternalLinkage,
-			nullptr,
+			llvm::GlobalValue::CommonLinkage,
+			llvm::ConstantAggregateZero::get(toLLVMType(this->_typeExpr->toType())),
 			this->_name
 		);
 		e->u.eVariable.llvmVal = val;
@@ -75,8 +82,8 @@ llvm::Value* ArrayDeclaration::codegen(){
 			// toLLVMType(this->_typeExpr->toType()),
 			llvm::ArrayType::get(toLLVMType(this->_typeExpr->toType()),this->_expr->isIntConstant()),
 			false,
-			llvm::GlobalValue::ExternalLinkage,
-			nullptr,
+			llvm::GlobalValue::CommonLinkage,
+			llvm::ConstantAggregateZero::get(llvm::ArrayType::get(toLLVMType(this->_typeExpr->toType()),this->_expr->isIntConstant())),
 			this->_name
 		);
 		e->u.eVariable.llvmVal = val;

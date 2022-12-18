@@ -27,7 +27,7 @@ GEN?=100
 
 default: $(BINS)
 
-main: ggec
+main: ggec libEdsger.a
 	cp $< $@
 
 ggec: lexer.o main.o parser.o error.o ast.o tojsonstring.o general.o symbol.o semantical.o codegen.o $(DEPOBJECTS)
