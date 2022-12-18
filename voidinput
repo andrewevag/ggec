@@ -27,8 +27,14 @@ void main(){
 bool bools[1000];
 bool *bools2;
 void x0(){
-	bool x;
-	bools2++;
-	x = bools[10];
-	bools++;
+	int xs[100];
+	int x;
+	x = *(xs+10);
+}
+
+int* ys[100];
+void x1(){
+	if(! ((bool)ys)){
+		return;
+	}
 }

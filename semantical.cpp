@@ -405,7 +405,8 @@ void Id::sem()
 			break;
 		}
 	}
-	this->_isLval = true;
+	// if this is an array type this should be immutable
+	this->_isLval = (this->_t->kind == Type_tag::TYPE_ARRAY) ? false : true;
 }
 
 

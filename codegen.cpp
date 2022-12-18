@@ -208,14 +208,18 @@ llvm::Value* FunctionDefinition::codegen(){
 	}
 	
 	this->_statements->codegen();
+
 	if ( equalType(this->_resultType->toType(), typeVoid) ){
 		Builder->CreateRetVoid();
 	}else{
 		// this means that the last block of a non void returning function is not terminated
 		// control will never reach here because all returns should have been called before getting 
 		// to this part. Thus this is dead code and will be removed by the analysis
-		
-		Builder->CreateBr(Builder->GetInsertBlock());
+		// This creates errors if the last block has a phi so a trap block is better.
+		llvm::BasicBlock *LB = llvm::BasicBlock::Create(TheContext, "lastBlock", f);
+		Builder->CreateBr(LB);
+		Builder->SetInsertPoint(LB);
+		Builder->CreateBr(LB);
 	}
 
 	
@@ -425,12 +429,15 @@ llvm::Value* Id::codegen(){
 	/*
 	 * 
 	 */
-	// SymbolEntry * e = lookupEntry(this->_name.c_str(), LOOKUP_ALL_SCOPES, false);
-	// auto nestingLevel = e->nestingLevel;
-	// auto varOffset    = ( e->entryType == ENTRY_PARAMETER ) ? e->u.eParameter.offset : e->u.eVariable.offset;
+	SymbolEntry * e = lookupEntry(this->_name.c_str(), LOOKUP_ALL_SCOPES, false);
+	auto nestingLevel = e->nestingLevel;
 	
 	llvm::Value* crtPtr = this->calculateAddressOf();
-	llvm::Value* valOfVar = Builder->CreateLoad(crtPtr, this->_name);
+	llvm::Value* valOfVar = crtPtr;
+	
+	if (! (e->nestingLevel > GLOBAL_SCOPE && e->u.eVariable.type->kind == Type_tag::TYPE_ARRAY)){
+		valOfVar = Builder->CreateLoad(crtPtr, this->_name);
+	}
 	return valOfVar;
 }
 
@@ -814,6 +821,7 @@ llvm::Value* TypeCast::codegen(){
 		casted = Builder->CreateFPToSI(inner, i16, "casted");
 		break;
 	case getCast(TYPE_INTEGER, TYPE_POINTER): 
+	case getCast(TYPE_INTEGER, TYPE_ARRAY):
 		casted = Builder->CreatePtrToInt(inner, i16, "casted");
 		break;
 	
@@ -826,6 +834,7 @@ llvm::Value* TypeCast::codegen(){
 		casted = Builder->CreateFPToUI(inner, i8, "casted");
 		break;
 	case getCast(TYPE_BOOLEAN, TYPE_POINTER): 
+	case getCast(TYPE_BOOLEAN, TYPE_ARRAY): 
 		casted = Builder->CreatePtrToInt(inner, i8, "casted");
 		break;
 
@@ -837,6 +846,7 @@ llvm::Value* TypeCast::codegen(){
 		casted = Builder->CreateFPToSI(inner, i8, "casted");
 		break;
 	case getCast(TYPE_CHAR, TYPE_POINTER): 
+	case getCast(TYPE_CHAR, TYPE_ARRAY): 
 		casted = Builder->CreatePtrToInt(inner, i8, "casted");
 		break;
 
@@ -849,6 +859,7 @@ llvm::Value* TypeCast::codegen(){
 		casted = Builder->CreateUIToFP(inner, toLLVMType(this->getType()), "casted");
 		break;
 	case getCast(TYPE_REAL, TYPE_POINTER): 
+	case getCast(TYPE_REAL, TYPE_ARRAY): 
 		castedInter = Builder->CreatePtrToInt(inner, i16, "inter.cast");
 		casted = Builder->CreateUIToFP(castedInter, toLLVMType(this->getType()), "casted");
 		break;
@@ -864,6 +875,7 @@ llvm::Value* TypeCast::codegen(){
 		casted = Builder->CreateIntToPtr(castedInter, toLLVMType(this->getType()), "casted");
 		break;
 	case getCast(TYPE_POINTER, TYPE_POINTER): 
+	case getCast(TYPE_POINTER, TYPE_ARRAY): 
 		casted = Builder->CreateBitCast(inner, toLLVMType(this->getType()), "casted");
 		break;
 	default:
@@ -986,13 +998,25 @@ llvm::Value* Id::calculateAddressOf() {
 	
 	if(e->nestingLevel == GLOBAL_SCOPE){
 		// then the value for it is in 
-		std::cout << "======================||===================\n";
-		TheModule->print(llvm::outs(), nullptr);
-		std::cout << "===========================================\n";
+		// std::cout << "======================||===================\n";
+		// TheModule->print(llvm::outs(), nullptr);
+		// std::cout << "===========================================\n";
 		auto temp = Builder->CreateBitCast(e->u.eVariable.llvmVal,llvmPointer(toLLVMType(e->u.eVariable.type)));
 		llvm::Value* value = Builder->CreateGEP(temp, c64(0), this->_name);
 		return value;
 	}else{
+		if(e->nestingLevel > GLOBAL_SCOPE && e->u.eVariable.type->kind == Type_tag::TYPE_ARRAY) {
+			llvm::Value* envOfVariable = getEnvAt(e->nestingLevel);
+			// get pointer to the offset. TypeCast it to type of Id * 
+			llvm::Value* rawBytePtr = Builder->CreateGEP(envOfVariable, c64(e->u.eVariable.offset), "rawBytePtr");
+			llvm::Value* actualVarPointer = Builder->CreateBitCast(
+				rawBytePtr, 
+				(toLLVMType(e->u.eVariable.type)),
+				this->_name + ".ptr"
+			);
+			// return the pointer.
+			return actualVarPointer;		
+		}
 		if(e->entryType != ENTRY_PARAMETER || (e->entryType == ENTRY_PARAMETER && e->u.eParameter.mode == PASS_BY_VALUE)){
 			llvm::Value* envOfVariable = getEnvAt(e->nestingLevel);
 			// get pointer to the offset. TypeCast it to type of Id * 

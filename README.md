@@ -35,8 +35,8 @@ A Compiler for the Edsger Programming Language
 - Types in TypedExpression Objects need to be explicitely deeply destroyed.
 - Memory Cleaning
 - Return ret void in void functions!! in LLVM to exit the last block
-- FIX == to equalType in Codegen() FFS
 - LIBRARY ADDITION FOR new, delete!!
+- LABEL NAMES AND VISIBILITY ON CURRENT SCOPE
 
 # Codegen Invariants
 1. Δινεις παντα σε κατωτερες nested συναρτησεις το δικο σου local environmnent.
