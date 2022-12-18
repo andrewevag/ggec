@@ -1,9 +1,9 @@
 CC=clang
 CFLAGS=
-BINS=bsort hanoi mean primes strrev 
+BINS=$(patsubst %.c, %, $(wildcard *.c))
+
 
 default: $(BINS)
-
 %: %.c
 	$(CC) $(CFLAGS) -o $@ $^
 
