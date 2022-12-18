@@ -20,7 +20,7 @@ noFailed = 0
 failed = []
 for i in tqdm(range(1, num_of_tests+1)):
 	
-	p = subprocess.Popen([f'./tests/semantics/semanticstest', f'{progsdir}/p{i}.eds'], stdout=subprocess.PIPE)
+	p = subprocess.Popen([f'./tests/semantics/semanticstest', f'{progsdir}/p{i}.eds'], stdout=subprocess.DEVNULL)
 	# f = open(f'{progsdir}/p{i}.eds')
 	# inp = f.read()
 	# f.close()

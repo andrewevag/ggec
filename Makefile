@@ -74,8 +74,11 @@ lexertest: lexer.o ./tests/lexer/main.o error.o ast.o tojsonstring.o parser.o ge
 parsertest: lexer.o ./tests/parser/main.o parser.o error.o ast.o tojsonstring.o general.o symbol.o semantical.o codegen.o $(DEPOBJECTS)
 	$(CXX) $(CXXFLAGS) -o ./tests/parser/$@ $^ $(LDFLAGS)
 
-semanticstest: ./tests/semantics/main.o lexer.o parser.o error.o ast.o tojsonstring.o general.o symbol.o semantical.o codegen.o $(DEPOBJECTS)
+semanticstest:  lexer.o parser.o error.o ast.o tojsonstring.o general.o symbol.o semantical.o codegen.o $(DEPOBJECTS) ./tests/semantics/main.o
 	$(CXX) $(CXXFLAGS) -o ./tests/semantics/$@ $^ $(LDFLAGS)
+
+codegentest:   lexer.o parser.o error.o ast.o tojsonstring.o general.o symbol.o semantical.o codegen.o $(DEPOBJECTS) ./tests/codegen/main.o
+	$(CXX) $(CXXFLAGS) -o ./tests/codegen/$@ $^ $(LDFLAGS)
 
 lexersuite: lexertest
 	@echo "🧪 Running Lexer Suite :"
@@ -101,7 +104,14 @@ semanticssuite: semanticstest
 	@echo "Running the input files on the semantics analyzer : ⛏️"
 	@$(PYTHON3) ./tests/semantics/runner_gen.sh $(GEN)
 
-test: lexersuite parsersuite semanticssuite
+codegenInCpp:
+	$(MAKE) -C ./tests/codegen/inC
+
+codegensuite: codegentest codegenInCpp libEdsger.a
+	@echo "🧪 Running Codegen Suite :"
+	@$(PYTHON3) ./tests/codegen/runner.sh
+
+test: lexersuite parsersuite semanticssuite codegensuite
 	
 EDSGERLIBSOURCE = $(wildcard lib/*.c)
 EDSGEROBJ = $(patsubst %.c, %.o, $(EDSGERLIBSOURCE))
@@ -137,6 +147,8 @@ clean:
 	$(MAKE) -C ./examples/syntax_gen clean
 	$(MAKE) -C ./tests/semantics clean
 	$(MAKE) -C $(PROGRAMGENPATH) clean
+	$(MAKE) -C ./tests/codegen clean
+	$(MAKE) -C ./tests/codegen/inC clean
 distclean: clean
 	$(RM) $(BINS)
 BLUE=\e[0;34m
