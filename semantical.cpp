@@ -54,7 +54,7 @@ void Program::sem(){
 		fatal("Function \"void main ()\" not defined on global scope");
 	
 	// ErrorInfo::Fatal(this, "Just Wanted to see");
-	closeScope();
+	// closeScope();
 	// destroySymbolTable();
 }
 

@@ -3,7 +3,7 @@
 #include "error.hpp"
 #include <iostream>
 #include <fstream>
-
+#define forCurrentScope(e) for(SymbolEntry* e = currentScope->entries; e != NULL; e = e->nextInScope)
 #define llvmPointer(inner) llvm::PointerType::get(inner, 0)
 
 llvm::LLVMContext AST::TheContext;
@@ -34,11 +34,40 @@ llvm::Value* Program::codegen(){
 	
 	this->sem();
 
+	//==========================================================
+	// Main Wrapper for exiting to system with exit code 0
+	//==========================================================
+	llvm::Function* ProgramMain;
+	llvm::Function* main = 
+		llvm::Function::Create(
+			llvm::FunctionType::get(i8, {}, false),
+			llvm::Function::ExternalLinkage,
+			"main",
+			*TheModule
+		);
+	llvm::BasicBlock *FB = llvm::BasicBlock::Create(TheContext, "entry", main);
+	Builder->SetInsertPoint(FB);
+	
+	SymbolEntry* e;
+	forCurrentScope(e)
+		if(e->entryType == ENTRY_FUNCTION && std::string(e->id) == "main")
+			if(! e->u.eFunction.isForward)
+				ProgramMain = e->u.eFunction.fun;
+	Builder->CreateCall(ProgramMain, {});
+	Builder->CreateRet(c8(0));
+	closeScope();
+	
+	//==========================================================
+	//==========================================================
+	//==========================================================
+
+
 	bool bad = verifyModule(*TheModule, &llvm::errs());
 	if(bad){
 		TheModule->print(llvm::outs(), nullptr);
 		fatal("Failed to verify module");
 	}
+
 	std::ofstream f;
 	std::string str;
 	llvm::raw_string_ostream output(str);
@@ -131,7 +160,7 @@ void FunctionHead::declare(){
 			llvm::FunctionType::get(toLLVMType(this->_resultType->toType()), 
 									parameterTypes, false),
 			llvm::Function::ExternalLinkage,
-			this->getName(),
+			this->getName() == "main" ? "_main" : this->getName(),
 			*TheModule
 		);
 	

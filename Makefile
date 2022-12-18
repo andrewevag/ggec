@@ -131,6 +131,7 @@ clean:
 	$(RM) ./src/*.o
 	$(RM) $(EDSGEROBJ)
 	$(RM) libEdsger.a
+	$(RM) out out.ll out.s
 	$(MAKE) -C ./tests/lexer clean
 	$(MAKE) -C ./tests/parser clean
 	$(MAKE) -C ./examples/syntax_gen clean
