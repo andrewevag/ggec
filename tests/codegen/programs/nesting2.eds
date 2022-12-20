@@ -1,0 +1,28 @@
+void writeString(char * str);
+void writeInteger(int i);
+
+
+
+void main(){
+    int x;
+    int y;
+    int is2(){
+		int z[10];
+		void printX(){
+			writeInteger(x);
+			writeString("\n");
+			z[2]++;
+		}
+		z[2] = 1;
+		printX();
+        x = 10;
+		printX();
+		x = 20;
+		printX();
+		return z[2];
+    }
+    x = y = 2;
+    writeInteger(is2());
+	writeString("\n");
+}
+

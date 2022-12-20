@@ -1,0 +1,19 @@
+
+void writeString(char * str);
+void writeInteger(int i);
+
+
+
+void main(){
+    int x;
+    int y;
+    int is2(){
+        if (x == 2){
+            return 1;
+        }
+        else return 0;
+    }
+    x = y = 2;
+    writeInteger(is2());
+}
+
