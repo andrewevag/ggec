@@ -7,8 +7,8 @@ from tqdm import tqdm
 syntaxGenScriptPath=f'{os.getcwd()}/examples/syntax_gen/gen.sh'
 progsdir = f'{os.getcwd()}/examples/syntax_gen/progs'
 
-syntaxGenScriptPath=f'/home/andreas/Projects/EdsgerProgramGenerator/gen.sh'
-progsdir = f'/home/andreas/Projects/EdsgerProgramGenerator'
+syntaxGenScriptPath=f'/home/andreas/Projects/EdsgerProgramGenerator3/gen.sh' if os.getenv('PROGRAMGENPATH')==None else f'{os.getenv("PROGRAMGENPATH")}/gen.sh'
+progsdir = f'/home/andreas/Projects/EdsgerProgramGenerator3' if os.getenv('PROGRAMGENPATH')==None else f'{os.getenv("PROGRAMGENPATH")}'
 
 
 if len(sys.argv) < 2:
