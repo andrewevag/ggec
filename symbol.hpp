@@ -176,8 +176,9 @@ struct SymbolEntry_tag {
          bool         explicitelyNamed;       /* Όνομα απο χρήστη ή οχι*/
          bool         active;                 /* in loop or not        */
          size_t       unnamedConst;           /* Int used to generate  */
-         llvm::BasicBlock * entry;            /* Used for Continue */
+         llvm::BasicBlock * entry;            
          llvm::BasicBlock * exit;             /* Used for Break */
+         llvm::BasicBlock * loopAfter;        /* Used for Continue */
                                               /* its name              */
       } eLabel;
    } u;                               /* Τέλος του union               */

@@ -1,0 +1,38 @@
+void writeString(char * str);
+void writeInteger(int i);
+void writeChar(char c);
+
+
+void main(){
+	int i, j;
+	int n;
+
+	for1: for(i = 0; i < 11; i++){
+		for2: for(j = 0; j < 13; j++){
+			if(i == 3 && j == 7 ){
+				break for2;
+				//goto forafter2;
+			}
+			if(i==4 && j == 6){
+				continue for2;
+				//goto forafter1;
+			}
+			if(i==5 && j == 7){
+				continue for1;
+				//goto forafter2;
+			}
+			if(i==8 && j == 9){
+				break for1;
+				//goto forafter3;
+			}
+			writeInteger(i);
+			writeChar(' ');
+			writeInteger(j);
+			writeChar('\n');
+			//forafter1: ;
+		}
+		//forafter2: ; 
+	}
+	//forafter3: ;
+}
+

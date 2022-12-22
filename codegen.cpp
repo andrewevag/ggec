@@ -371,8 +371,9 @@ llvm::Value* ForStatement::codegen(){
 	llvm::BasicBlock * EndForBlock    = llvm::BasicBlock::Create(TheContext, "endfor", f);
 	
 	// Put the basic blocks so they can be available to continue && break statements.
-	lblEntry->u.eLabel.entry = LoopHeadBlock;
-	lblEntry->u.eLabel.exit  = EndForBlock;
+	lblEntry->u.eLabel.entry     = LoopHeadBlock;
+	lblEntry->u.eLabel.exit      = EndForBlock;
+	lblEntry->u.eLabel.loopAfter = LoopAfterBlock;
 	
 
 	if(this->_first != nullptr){
@@ -419,7 +420,7 @@ llvm::Value* ContinueStatement::codegen(){
 		lblEntry = lookupLabel(this->_target.c_str(), true);
 	}
 
-	Builder->CreateBr(lblEntry->u.eLabel.entry);
+	Builder->CreateBr(lblEntry->u.eLabel.loopAfter);
 	SymbolEntry * e   = lookupActiveFun();
 	llvm::Function* f = e->u.eFunction.fun;
 	
