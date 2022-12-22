@@ -1,0 +1,18 @@
+
+void writeString(char * str);
+void writeInteger(int i);
+void writeChar(char c);
+int strlen(char * s);
+
+char x[100];
+char* ys;
+void main(){
+	int i;
+	ys = "Hello World!\n";
+	for(i = 0; i < strlen(ys); i++){
+		x[i] = ys[i];
+	}
+	x[i] = (char) 0;
+	writeString(x);
+}
+

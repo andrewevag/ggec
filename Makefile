@@ -122,7 +122,18 @@ CFLAGS=-g -Wall
 libEdsger.a: $(EDSGEROBJ)
 	ar rcs $@ $^
 
-	
+LASTCODEGENTEST?=globals2
+NEWNAME?=newname
+newcodegentest:
+	cp ./tests/codegen/inC/$(LASTCODEGENTEST).c ./tests/codegen/inC/$(NEWNAME).c
+newcodegenfix:
+	cp ./tests/codegen/inC/$(NEWNAME).c ./tests/codegen/programs/$(NEWNAME).eds
+	sed -i 's/int16_t/int/g' ./tests/codegen/programs/$(NEWNAME).eds
+	touch ./tests/codegen/inputs/$(NEWNAME).inp
+undonewcodegentest:
+	rm ./tests/codegen/inC/$(NEWNAME).c
+	rm ./tests/codegen/programs/$(NEWNAME).eds
+	rm ./tests/codegen/inputs/$(NEWNAME).inp
 
 # lexer.o: lexer.cpp lexer.hpp parser.hpp
 

@@ -471,7 +471,7 @@ llvm::Value* Id::codegen(){
 	llvm::Value* crtPtr = this->calculateAddressOf();
 	llvm::Value* valOfVar = crtPtr;
 	
-	if (! (e->nestingLevel > GLOBAL_SCOPE && e->u.eVariable.type->kind == Type_tag::TYPE_ARRAY)){
+	if (! (e->u.eVariable.type->kind == Type_tag::TYPE_ARRAY)){
 		valOfVar = Builder->CreateLoad(crtPtr, this->_name);
 	}
 	return valOfVar;
@@ -1037,9 +1037,15 @@ llvm::Value* Id::calculateAddressOf() {
 		// std::cout << "======================||===================\n";
 		// TheModule->print(llvm::outs(), nullptr);
 		// std::cout << "===========================================\n";
-		auto temp = Builder->CreateBitCast(e->u.eVariable.llvmVal,llvmPointer(toLLVMType(e->u.eVariable.type)));
-		llvm::Value* value = Builder->CreateGEP(temp, c64(0), this->_name);
-		return value;
+		
+		// auto temp = Builder->CreateBitCast(e->u.eVariable.llvmVal,llvmPointer(toLLVMType(e->u.eVariable.type)));
+		// llvm::Value* value = Builder->CreateGEP(temp, c64(0), this->_name);
+		// return value;
+		llvm::Value* val = e->u.eVariable.llvmVal;
+		if(e->u.eVariable.type->kind == Type_tag::TYPE_ARRAY){
+			val = Builder->CreateBitCast(val,(toLLVMType(e->u.eVariable.type)));
+		}
+		return val;
 	}else{
 		if(e->nestingLevel > GLOBAL_SCOPE && e->u.eVariable.type->kind == Type_tag::TYPE_ARRAY) {
 			llvm::Value* envOfVariable = getEnvAt(e->nestingLevel);
