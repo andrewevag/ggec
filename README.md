@@ -38,6 +38,7 @@ A Compiler for the Edsger Programming Language
 - LIBRARY ADDITION FOR new, delete!!
 - LABEL NAMES AND VISIBILITY ON CURRENT SCOPE
 - Fix Error Messages in Lexer and parser to match fatal's format
+- YY_VERBOSE on parser for better error messages
 # Codegen Invariants
 1. Δινεις παντα σε κατωτερες nested συναρτησεις το δικο σου local environmnent.
 2. Possible offsets when calling functions
@@ -50,7 +51,7 @@ A Compiler for the Edsger Programming Language
 **In the symbol table for every function we need it's context.**
 
 # Known bugs
-
+- flex scanner jammed on unexpected #include
 # Warnings to take into account
 - Διπλού βάθους declaration list on functions
   ``` C

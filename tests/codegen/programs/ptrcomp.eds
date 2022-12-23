@@ -1,0 +1,35 @@
+void writeString(char * str);
+void writeInteger(int i);
+void writeChar(char c);
+void writeReal(double d);
+
+void writeIntegerLn(int i){
+	writeInteger(i);
+	writeChar('\n');
+}
+void writeRealLn(double i){
+	writeReal(i);
+	writeChar('\n');
+}
+void writeBoolean(bool b);
+
+int x[1000];
+void main(){
+	int i;
+	int j;
+	j = 50;
+	for(i =0 ; i < 1000; i+=25){
+		writeBoolean(x + i > x + j);
+		writeChar('\n');
+		writeBoolean(x + i < x + j);
+		writeChar('\n');
+		writeBoolean(x + i >= x + j);
+		writeChar('\n');
+		writeBoolean(x + i <= x + j);
+		writeChar('\n');
+		writeBoolean(x + i == x + j);
+		writeChar('\n');
+		writeBoolean(x + i != x + j);
+		writeChar('\n');
+	}
+}
