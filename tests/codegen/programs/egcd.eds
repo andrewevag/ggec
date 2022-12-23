@@ -1,0 +1,63 @@
+void writeString(char * str);
+void writeInteger(int i);
+void writeChar(char c);
+void writeReal(double d);
+double x[2];
+void writeIntegerLn(int i){
+	writeInteger(i);
+	writeChar('\n');
+}
+void writeRealLn(double i){
+	writeReal(i);
+	writeChar('\n');
+}
+int gcd(int a, int b){
+	if ( a == 0)
+		return b;
+	else return gcd(b % a, a);
+}
+int egcd(int a, int b, byref int x, byref int y){
+	int x1, y1;
+	int gcd;
+	if (a == 0){
+		x = 0;
+		y = 1;
+		return b;
+	}
+
+	gcd = egcd(b%a, a, x1, y1);
+
+	x = y1 - (b/a) * x1;
+	y = x1;
+	return gcd;
+}
+
+void formatPrintEGCD(int a, int b){
+	int res;
+	int x, y;
+	res = egcd(a, b, x, y);
+	writeString("gcd(");
+	writeInteger(a);
+	writeString(", ");
+	writeInteger(b);
+	writeString(") = (");
+	writeInteger(x);
+	writeString(") * ");
+	writeInteger(a);
+	writeString(" + (");
+	writeInteger(y);
+	writeString(") * ");
+	writeInteger(b);
+	writeString(" = ");
+	writeInteger(res);
+	writeChar('\n');
+}
+
+void main(){
+	int a, b, i, j;
+	a = 13;
+	b = 120;
+	formatPrintEGCD(12, 152);
+	formatPrintEGCD(a, b);
+	formatPrintEGCD(130, 1919);
+}

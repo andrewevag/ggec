@@ -1,0 +1,27 @@
+void writeString(char * str);
+void writeInteger(int i);
+void writeChar(char c);
+void writeReal(double d);
+double x[2];
+void writeIntegerLn(int i){
+	writeInteger(i);
+	writeChar('\n');
+}
+void writeRealLn(double i){
+	writeReal(i);
+	writeChar('\n');
+}
+int gcd(int a, int b){
+	if ( a == 0)
+		return b;
+	else return gcd(b % a, a);
+}
+
+void main(){
+	int a, b, i, j;
+	a = 13;
+	b = 120;
+	writeIntegerLn(gcd(a, b));
+	writeIntegerLn(gcd(11, 121));
+	writeIntegerLn(gcd(8, 942));
+}
