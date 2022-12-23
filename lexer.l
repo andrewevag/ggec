@@ -42,7 +42,8 @@ P [^\x00-\x1f\x7f\\\'\"]
 ^"#include"         { BEGIN(INCLUDE); }
 <INCLUDE>{W}+       { /* nothing */   }
 <INCLUDE>\"         { BEGIN(INCLUDESTRING); tempstr = ""; }
-                        
+<INCLUDE>.|\n       { fprintf(stderr, "Expected #inlude \"filename\"\n"); exit(1); }
+<INCLUDE><<EOF>>    { fprintf(stderr, "Expected #inlude \"filename\" Got EOF\n"); exit(1); }
 <INCLUDESTRING>\"   { 
                         if(fileset.count(tempstr) != 0){
                             fprintf(stderr, "File \"%s\" already included\n", tempstr.c_str());
