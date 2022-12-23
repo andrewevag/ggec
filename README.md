@@ -37,7 +37,7 @@ A Compiler for the Edsger Programming Language
 - Return ret void in void functions!! in LLVM to exit the last block
 - LIBRARY ADDITION FOR new, delete!!
 - LABEL NAMES AND VISIBILITY ON CURRENT SCOPE
-
+- Fix Error Messages in Lexer and parser to match fatal's format
 # Codegen Invariants
 1. Δινεις παντα σε κατωτερες nested συναρτησεις το δικο σου local environmnent.
 2. Possible offsets when calling functions

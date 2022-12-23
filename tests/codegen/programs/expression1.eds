@@ -1,0 +1,33 @@
+void writeString(char * str);
+void writeInteger(int i);
+void writeChar(char c);
+void writeIntegerLn(int i){
+	writeInteger(i);
+	writeChar('\n');
+}
+void writeReal(double d);
+void main(){
+	bool f, g;
+	int i, j, k;
+	char * s;
+	double d;
+	// Bool Constants	
+	f = true;
+	writeIntegerLn((int)f);
+	f = false;
+	writeInteger((int)f);
+	// Int Constants
+	i = 0;
+	j = 123;
+	k = 999;
+	writeIntegerLn(i);
+	writeIntegerLn(j);
+	writeIntegerLn(k);
+	s = NULL;
+	d = 100.0e-6;
+	writeReal(d);
+	writeChar('\n');
+	s = "Hello people\n";
+	writeString(s);
+}
+

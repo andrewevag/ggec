@@ -792,7 +792,7 @@ llvm::Value* PostfixUnAss::codegen(){
 
 	}
 	Builder->CreateStore(nval,addr);
-	return nval;
+	return val;
 }
 llvm::Value* BinaryAss::codegen(){
 	llvm::Value* addr = this->_leftOperand->calculateAddressOf();

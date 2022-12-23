@@ -1,0 +1,27 @@
+void writeString(char * str);
+void writeInteger(int i);
+void writeChar(char c);
+void writeReal(double d);
+double x[2];
+void writeIntegerLn(int i){
+	writeInteger(i);
+	writeChar('\n');
+}
+void writeRealLn(double i){
+	writeReal(i);
+	writeChar('\n');
+}
+
+void main(){
+	double res;
+	bool f, g, h;
+	int z, x;
+	double* p;
+	x = 2;
+	z = 2;
+	x = z++ + z;
+	writeIntegerLn(x);
+	x = ++z + z;
+	writeIntegerLn(x);
+}
+

@@ -129,6 +129,7 @@ newcodegentest:
 newcodegenfix:
 	cp ./tests/codegen/inC/$(NEWNAME).c ./tests/codegen/programs/$(NEWNAME).eds
 	sed -i 's/int16_t/int/g' ./tests/codegen/programs/$(NEWNAME).eds
+	sed -i 's/long double/double/g' ./tests/codegen/programs/$(NEWNAME).eds
 	touch ./tests/codegen/inputs/$(NEWNAME).inp
 undonewcodegentest:
 	rm ./tests/codegen/inC/$(NEWNAME).c
