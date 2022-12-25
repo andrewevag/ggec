@@ -73,6 +73,7 @@ ForStatement::~ForStatement(){
 	nullsafedelete(_first);
 	nullsafedelete(_second);
 	nullsafedelete(_third);
+	nullsafedelete(_body);
 }
 
 ContinueStatement::~ContinueStatement(){}

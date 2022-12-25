@@ -59,8 +59,10 @@ void Program::sem(){
 }
 
 void VariableDeclaration::sem() {
-	newVariable(this->getName().c_str(), this->_typeExpr->toType());
+	auto tt = this->_typeExpr->toType();
+	newVariable(this->getName().c_str(), tt);
 	llvm::Value* calc = this->codegen();
+	destroyType(tt);
 	// if this is a local variable this is null --> offset sto symbolTable.
 }
 
@@ -70,9 +72,11 @@ void ArrayDeclaration::sem(){
 	if(size <= 0){
 		fatal("Not positive int constant used as size for a constant array!\n");
 	}
-	newVariable(this->getName().c_str(), typeArray(size, this->_typeExpr->toType()));
+	auto tt = this->_typeExpr->toType();
+	newVariable(this->getName().c_str(), typeArray(size, tt));
 	// ErrorInfo::Fatal(this, "Fatal At variable to see");
 	this->codegen();
+	destroyType(tt);
 }
 
 void FunctionDeclaration::sem(){
@@ -99,8 +103,10 @@ void FunctionDeclaration::sem(){
 	// !!!!!!!!!!!!!!!!!!!!!!
 	entryForFunction = f;
 	this->_parameters->sem();
-	endFunctionHeader(f, this->_resultType->toType());
+	auto tt = this->_resultType->toType();
+	endFunctionHeader(f, tt);
 	this->declare();
+	destroyType(tt);
 	closeScope();
 	printSymbolTable();
 
@@ -115,14 +121,15 @@ void FunctionDefinition::sem() {
 	openScope();
 	entryForFunction = f;
 	this->_parameters->sem();
-	endFunctionHeader(f, this->_resultType->toType());
+	auto tt = this->_resultType->toType();
+	endFunctionHeader(f, tt);
 
 	printSymbolTable();
 	this->declare();
 	this->_decls->sem();
 	this->_statements->sem();
 	
-	if (! (this->_statements->returns() || equalType(this->_resultType->toType(), typeVoid))){
+	if (! (this->_statements->returns() || equalType(tt, typeVoid))){
 		fatal("Not all paths return in function definition %s", this->_name.c_str());
 	}
 	// before we close scope check that all functions in scope are defined and not only declared
@@ -140,6 +147,7 @@ void FunctionDefinition::sem() {
 	// TheFunction <- from this->codegen();
 	// gets execution in a new basic block inside TheFunction
 	// this->_statements->codegen();
+	destroyType(tt);
 	closeScope();
 	printSymbolTable();
 	
@@ -147,12 +155,14 @@ void FunctionDefinition::sem() {
 
 void Parameter::sem(){
 	// printSymbolTable();
+	auto tt = this->_type->toType();
 	newParameter(
 		this->_name.c_str(), 
-		this->_type->toType(), 
+		tt, 
 		(this->_pw == ByCall) ? PASS_BY_VALUE : PASS_BY_REFERENCE,
 		entryForFunction
 	);
+	destroyType(tt);
 }
 
 void ParameterList::sem(){
@@ -809,7 +819,7 @@ void TypeCast::sem(){
 	// Type t = this->_expr->getType();
 	Type t = this->_type->toType();
 	this->_t = copyType(t);
-	// destroyType(t);
+	destroyType(t);
 	this->_isLval = false;
 }
 
@@ -845,6 +855,7 @@ void New::sem(){
 	// destroyType(t);
 	this->_t = typePointer(copyType(t));
 	this->_isLval = false;
+	destroyType(t);
 }
 
 /**

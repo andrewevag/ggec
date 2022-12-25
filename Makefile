@@ -13,7 +13,7 @@ LLVMCONFIG=llvm-config
 ##
 
 ## Test dependencies
-PYTHON3?=/opt/homebrew/bin/python3
+PYTHON3?=/usr/bin/python3
 ERL?=/opt/homebrew/bin/erl
 ERL_LIBS?=/opt/homebrew/opt/proper/proper-1.4
 ## needs python3 deepdiff module to run tests
@@ -158,7 +158,7 @@ clean:
 	$(MAKE) -C ./tests/parser clean
 	$(MAKE) -C ./examples/syntax_gen clean
 	$(MAKE) -C ./tests/semantics clean
-	$(MAKE) -C $(PROGRAMGENPATH) clean
+	# $(MAKE) -C $(PROGRAMGENPATH) clean
 	$(MAKE) -C ./tests/codegen clean
 	$(MAKE) -C ./tests/codegen/inC clean
 distclean: clean
