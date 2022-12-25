@@ -68,7 +68,7 @@ void ArrayDeclaration::sem(){
 	this->_expr->sem();
 	int size = this->_expr->isIntConstant();
 	if(size <= 0){
-		fatal("Not positive int constant used as size for a constant array!\n");
+		fatal("Not positive int constant used as size for a constant array!");
 	}
 	newVariable(this->getName().c_str(), typeArray(size, this->_typeExpr->toType()));
 	// ErrorInfo::Fatal(this, "Fatal At variable to see");
@@ -277,12 +277,12 @@ void ContinueStatement::sem(){
 		e = lookupLabel(this->_target.c_str(), true);
 		// existance check
 		if(e == NULL){
-			fatal("Continue Statement not inside of a for loop named %s\n", this->_target.c_str());
+			fatal("Continue Statement not inside of a for loop named %s", this->_target.c_str());
 		}
 		else{
 			// activeness check
 			if( ! e->u.eLabel.active ){
-				fatal("Continue Statement not inside of a for loop named %s\n", this->_target.c_str());
+				fatal("Continue Statement not inside of a for loop named %s", this->_target.c_str());
 			}
 		}
 	}
@@ -291,12 +291,12 @@ void ContinueStatement::sem(){
 		e = lookupLabel(nullptr, false);
 		// existance check
 		if(e == NULL){
-			fatal("Continue Statement outside of a for loop with no label\n");
+			fatal("Continue Statement outside of a for loop with no label");
 		}
 		else{
 			// activeness check
 			if( ! e->u.eLabel.active ){
-				fatal("Continue Statement outside of a for loop with no label\n");
+				fatal("Continue Statement outside of a for loop with no label");
 			}
 		}
 		this->_target = e->id;
@@ -319,11 +319,11 @@ void BreakStatement::sem(){
 		e = lookupLabel(this->_target.c_str(), true);
 		// existance check
 		if(e == NULL){
-			fatal("Break Statement not inside of a for loop named %s\n", this->_target.c_str());
+			fatal("Break Statement not inside of a for loop named %s", this->_target.c_str());
 		}else{
 			// activeness check
 			if( ! e->u.eLabel.active ){
-				fatal("Break Statement not inside of a for loop named %s\n", this->_target.c_str());
+				fatal("Break Statement not inside of a for loop named %s", this->_target.c_str());
 			}
 		}
 	}
@@ -401,7 +401,7 @@ void Id::sem()
 			break;
 		
 		default:
-			fatal("Identifier %s not variable or parameter\n", this->_name.c_str());
+			fatal("Identifier %s not variable or parameter", this->_name.c_str());
 			break;
 		}
 	}
@@ -505,10 +505,10 @@ void BracketedIndex::sem(){
 	this->_in->sem();
 	this->_out->sem();
 	if( ! this->_out->isPtrType() ){
-		fatal("No pointer type used in array indexing\n");
+		fatal("No pointer type used in array indexing");
 	}
 	if ( ! equalType(this->_in->getType(), typeInteger) ){
-		fatal("No integer type used as index in array indexing\n");
+		fatal("No integer type used as index in array indexing");
 	}
 
 	// Figure out type

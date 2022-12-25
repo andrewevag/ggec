@@ -43,6 +43,19 @@ extern int columnno;
 extern std::set<std::string> fileset;
 extern std::string currentFilename;
 
+std::string getLine(std::string file, int lineno, int columnno){
+   std::ifstream inputfile;
+   inputfile.open(file);
+   for(int i =0 ; i < lineno-1; i++){
+      inputfile.ignore(10000, '\n');
+   }
+   char lex[columnno+20];
+   inputfile.getline(lex, columnno+20);
+   inputfile.close();
+   return std::string(lex);
+}
+
+
 void internal (const char * fmt, ...)
 {
    va_list ap;
@@ -67,10 +80,17 @@ void fatal (const char * fmt, ...)
    if (fmt[0] == '\r')
       fmt++;
    else
-      fprintf(stderr, "%s:%d: ", filename, lineno);
-   fprintf(stderr, "Fatal error, ");
+      fprintf(stderr, "Fatal Error @ \"%s\":%d:%d \n", currentFilename.c_str(), lineno, columnno);
    vfprintf(stderr, fmt, ap);
    fprintf(stderr, "\n");
+   auto s = getLine(currentFilename, lineno, columnno);
+   printf("%s\n", s.c_str());
+   for(int i = 0; i < columnno-1; i++){
+		if(s[i] == '\t')
+			std::cout << "_______";
+		std::cout << "_";
+   }
+	std::cout << "^\n";   
    va_end(ap);
    exit(1);
 }
@@ -107,9 +127,10 @@ void warning (const char * fmt, ...)
 
 void yyerror(const char *msg)
 {
-	fprintf(stderr, "Error in line: %d\n", lineno);
-	fprintf(stderr, "%s\n", msg);
-	exit(EXIT_FAILURE);
+   fatal(msg);
+	// fprintf(stderr, "Error in line: %d\n", lineno);
+	// fprintf(stderr, "%s\n", msg);
+	// exit(EXIT_FAILURE);
 }
 
 
@@ -125,17 +146,6 @@ int ErrorInfo::getLineAppeared(){
    return this->_lineappeared;
 }
 
-std::string getLine(std::string file, int lineno, int columnno){
-   std::ifstream inputfile;
-   inputfile.open(file);
-   for(int i =0 ; i < lineno-1; i++){
-      inputfile.ignore(10000, '\n');
-   }
-   char lex[columnno+20];
-   inputfile.getline(lex, columnno+20);
-   inputfile.close();
-   return std::string(lex);
-}
 
 void ErrorInfo::fatal(const char * fmt, ...){   
    va_list ap;

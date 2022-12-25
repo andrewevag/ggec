@@ -4,7 +4,7 @@
 #include <vector>
 #include "ast.hpp"
 #include "lexer.hpp"
-
+#define YYERROR_VERBOSE 1
 extern AST* syntaxTree;
 %}
 
