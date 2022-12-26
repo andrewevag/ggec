@@ -981,9 +981,8 @@ llvm::Value* New::codegen(){
 		index = Builder->CreateMul(size,sizeOfT,"idx");
 	}
 	llvm::Value* rawptr = Builder->CreateCall(newF,{index},"rawptr");
-	auto bitcast = Builder->CreateBitCast(rawptr,toLLVMType(tt),"castptr");
 	destroyType(tt);
-	return bitcast;
+	return Builder->CreateBitCast(rawptr,toLLVMType(this->_t),"castptr");
 }
 
 llvm::Value* Delete::codegen(){

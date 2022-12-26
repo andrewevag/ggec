@@ -73,9 +73,11 @@ void ArrayDeclaration::sem(){
 		fatal("Not positive int constant used as size for a constant array!\n");
 	}
 	auto tt = this->_typeExpr->toType();
-	newVariable(this->getName().c_str(), typeArray(size, tt));
+	auto ta = typeArray(size, tt);
+	newVariable(this->getName().c_str(), ta);
 	// ErrorInfo::Fatal(this, "Fatal At variable to see");
 	this->codegen();
+	destroyType(ta);
 	destroyType(tt);
 }
 

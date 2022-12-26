@@ -409,7 +409,9 @@ SymbolEntry * newParameter (const char * name, Type type,
                 e->u.eParameter.offset = currentScope->varOffset;
                 // TODO 
                 if(e->u.eParameter.mode == PASS_BY_REFERENCE){
-                    currentScope->varOffset += sizeOfType(typePointer(type));    
+                    auto tt = typePointer(type);
+                    currentScope->varOffset += sizeOfType(tt);
+                    destroyType(tt);    
                 }else
                     currentScope->varOffset += sizeOfType(type);
                 
