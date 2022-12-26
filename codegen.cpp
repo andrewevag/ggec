@@ -32,8 +32,15 @@ llvm::Function* AST::deleteF = llvm::Function::Create(
 
 llvm::Value* Program::codegen(){
 	
-	this->sem();
+	TheFPM->add(llvm::createPromoteMemoryToRegisterPass());
+    TheFPM->add(llvm::createInstructionCombiningPass());
+    TheFPM->add(llvm::createReassociatePass());
+    TheFPM->add(llvm::createGVNPass());
+    TheFPM->add(llvm::createCFGSimplificationPass());
+    TheFPM->doInitialization();
 
+	this->sem();
+	
 	//==========================================================
 	// Main Wrapper for exiting to system with exit code 0
 	//==========================================================
@@ -266,6 +273,9 @@ llvm::Value* FunctionDefinition::codegen(){
 		Builder->CreateBr(LB);
 	}
 	destroyType(tt);
+	
+	// Oprimize the Function
+	TheFPM->run(*f);
 	
 	return nullptr;
 }

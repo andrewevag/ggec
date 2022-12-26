@@ -9,7 +9,7 @@ INCLUDE=-I$(PWD)/inc
 INCLUDE+= -I$(PWD)
 DEPSOURCE=$(wildcard src/*.cpp)
 DEPOBJECTS=$(patsubst %.cpp, %.o, $(DEPSOURCE))
-LLVMCONFIG=llvm-config
+LLVMCONFIG=llvm-config-10
 ##
 
 ## Test dependencies

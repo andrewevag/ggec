@@ -24,21 +24,10 @@ A Compiler for the Edsger Programming Language
 - Scope nesting level of a function body is always > 1. Global scope is with nesting level 1.
 - Non Nested Function Declarations can be defined externally by using the same name convention
 # Tasks do not forget:
-- #include
-- https://stackoverflow.com/questions/62115979/how-to-implement-better-error-messages-for-flex-bison
-  - global state to keep line and column
-  - have each syntactic node keep track of the state where we found it
-  - everyone call call error-abort by giving a state.
-- Split sem() into parts of before and after codegen..  
-- Fix Symbol offset in symbol table.
+- Fix Symbol offset in symbol table. (Pointers are different size in LLVM)
 - grep -rnw TODO to find todo in code.
-- Types in TypedExpression Objects need to be explicitely deeply destroyed.
-- Memory Cleaning
-- Return ret void in void functions!! in LLVM to exit the last block
-- LIBRARY ADDITION FOR new, delete!!
-- LABEL NAMES AND VISIBILITY ON CURRENT SCOPE
-- Fix Error Messages in Lexer and parser to match fatal's format
-- YY_VERBOSE on parser for better error messages
+- Fix short circuit on && and ||.
+
 # Codegen Invariants
 1. Δινεις παντα σε κατωτερες nested συναρτησεις το δικο σου local environmnent.
 2. Possible offsets when calling functions
