@@ -158,7 +158,7 @@ clean:
 	$(MAKE) -C ./tests/parser clean
 	$(MAKE) -C ./examples/syntax_gen clean
 	$(MAKE) -C ./tests/semantics clean
-	# $(MAKE) -C $(PROGRAMGENPATH) clean
+	$(MAKE) -C $(PROGRAMGENPATH) clean
 	$(MAKE) -C ./tests/codegen clean
 	$(MAKE) -C ./tests/codegen/inC clean
 distclean: clean
