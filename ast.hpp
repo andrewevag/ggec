@@ -388,7 +388,10 @@ public:
 		return this->_inner->getDefName() + "_ptr";
 	}
 	virtual Type toType() override {
-		return typePointer(this->_inner->toType());
+		Type inner = this->_inner->toType();
+		Type p = typePointer(inner);
+		destroyType(inner);
+		return p;
 	}
 
 	virtual void sem() override;

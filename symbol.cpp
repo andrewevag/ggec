@@ -170,7 +170,7 @@ void destroySymbolTable ()
         if (hashTable[i] != NULL)
             destroyEntry(hashTable[i]);
 
-    delete(hashTable);
+    delete [] hashTable;
 }
 
 void openScope ()
@@ -409,7 +409,9 @@ SymbolEntry * newParameter (const char * name, Type type,
                 e->u.eParameter.offset = currentScope->varOffset;
                 // TODO 
                 if(e->u.eParameter.mode == PASS_BY_REFERENCE){
-                    currentScope->varOffset += sizeOfType(typePointer(type));    
+                    auto tt = typePointer(type);
+                    currentScope->varOffset += sizeOfType(tt);
+                    destroyType(tt);    
                 }else
                     currentScope->varOffset += sizeOfType(type);
                 
@@ -565,7 +567,7 @@ void destroyEntry (SymbolEntry * e)
             break;
         case ENTRY_CONSTANT:
             if (e->u.eConstant.type->kind == Type_tag::TYPE_ARRAY)
-                delete((char *) (e->u.eConstant.value.vString));
+                delete[] (char *) (e->u.eConstant.value.vString);
             destroyType(e->u.eConstant.type);
             break;
         case ENTRY_FUNCTION:
@@ -574,9 +576,9 @@ void destroyEntry (SymbolEntry * e)
                 SymbolEntry * p = args;
                 
                 destroyType(args->u.eParameter.type);
-                delete((char *) (args->id));
+                delete[] (char *) (args->id);
                 args = args->u.eParameter.next;
-                delete(p);
+                delete p;
             }
             destroyType(e->u.eFunction.resultType);
             break;
@@ -589,8 +591,8 @@ void destroyEntry (SymbolEntry * e)
         default:
             break;
     }
-    delete((char *) (e->id));
-    delete(e);        
+    delete[] (char *)(e->id);
+    delete e;        
 }
 
 SymbolEntry * lookupEntry (const char * name, LookupType type, bool err)
@@ -744,7 +746,7 @@ void destroyType (Type type)
         case Type_tag::TYPE_POINTER:
             if (--(type->refCount) == 0) {
                 destroyType(type->refType);
-                delete(type);
+                delete type;
             }
             break;
         default: break;
@@ -938,4 +940,27 @@ llvm::Type* toLLVMType(Type t)
             return nullptr;
 			break;
 	}
+}
+
+void deleteType(Type t){
+    if (t == NULL)
+        return;
+    switch (t->kind) {
+        case Type_tag::TYPE_ARRAY:
+            deleteType(t->refType);
+            break;
+        case Type_tag::TYPE_IARRAY:
+            deleteType(t->refType);
+            break;
+        case Type_tag::TYPE_POINTER:
+            deleteType(t->refType);
+            break;
+        default:
+            break;
+    }
+    delete t;
+}
+
+TypedExpression::~TypedExpression(){
+    deleteType(_t);
 }

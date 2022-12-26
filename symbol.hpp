@@ -228,6 +228,12 @@ llvm::Type* toLLVMType(Type t);
 
 class TypedExpression {
 public:
+   TypedExpression(){
+      this->_t = NULL;
+      this->_isLval = false;
+   }
+   virtual ~TypedExpression();
+
    Type getType() { return this->_t; }
    bool isLval() { return this->_isLval; }
    bool isPtrType() {
@@ -263,7 +269,6 @@ public:
    // Type getTypeCopy(){
    //    return copyType(this->_t);
    // }
-
    
 protected:
    Type _t;

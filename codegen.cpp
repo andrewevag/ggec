@@ -75,6 +75,7 @@ llvm::Value* Program::codegen(){
 	TheModule->print(output, nullptr);
 	f << str;
 	f.close();
+	destroySymbolTable();
 	return nullptr;
 }
 
@@ -83,15 +84,17 @@ llvm::Value* VariableDeclaration::codegen(){
 	if(e->nestingLevel == GLOBAL_SCOPE){
 		// this is a global variable!!
 		// getNewGlobalVariable in LLVM
+		auto tt = this->_typeExpr->toType();
 		llvm::Value* val = new llvm::GlobalVariable(
 			*TheModule,
-			toLLVMType(this->_typeExpr->toType()),
+			toLLVMType(tt),
 			false,
 			llvm::GlobalValue::CommonLinkage,
-			llvm::ConstantAggregateZero::get(toLLVMType(this->_typeExpr->toType())),
+			llvm::ConstantAggregateZero::get(toLLVMType(tt)),
 			this->_name
 		);
 		e->u.eVariable.llvmVal = val;
+		destroyType(tt);
 	}else{
 		// the offset will suffice
 		// this offset if fixed in the symbol table by calling it
@@ -106,16 +109,18 @@ llvm::Value* ArrayDeclaration::codegen(){
 	if(e->nestingLevel == GLOBAL_SCOPE){
 		// this is a global variable!!
 		// getNewGlobalVariable in LLVM
+		auto tt = this->_typeExpr->toType();
 		llvm::Value* val = new llvm::GlobalVariable(
 			*TheModule,
 			// toLLVMType(this->_typeExpr->toType()),
-			llvm::ArrayType::get(toLLVMType(this->_typeExpr->toType()),this->_expr->isIntConstant()),
+			llvm::ArrayType::get(toLLVMType(tt),this->_expr->isIntConstant()),
 			false,
 			llvm::GlobalValue::CommonLinkage,
-			llvm::ConstantAggregateZero::get(llvm::ArrayType::get(toLLVMType(this->_typeExpr->toType()),this->_expr->isIntConstant())),
+			llvm::ConstantAggregateZero::get(llvm::ArrayType::get(toLLVMType(tt),this->_expr->isIntConstant())),
 			this->_name
 		);
 		e->u.eVariable.llvmVal = val;
+		destroyType(tt);
 	}else{
 		// the offset will suffice
 		// this offset if fixed in the symbol table by calling it
@@ -149,15 +154,17 @@ void FunctionHead::declare(){
 	}
 	// Get the types for all parameters
 	for (auto &par : this->_parameters->_parameters){
+		auto tt = par->getType()->toType();
 		if(par->getPassingWay() == Parameter::PassingWay::ByRef){
-			parameterTypes.push_back(llvmPointer(toLLVMType(par->getType()->toType()))); 
+			parameterTypes.push_back(llvmPointer(toLLVMType(tt))); 
 		}else 
-			parameterTypes.push_back(toLLVMType(par->getType()->toType()));
+			parameterTypes.push_back(toLLVMType(tt));
+		destroyType(tt);
 	}
-
+	auto tt = this->_resultType->toType();
 	llvm::Function* f = 
 		llvm::Function::Create(
-			llvm::FunctionType::get(toLLVMType(this->_resultType->toType()), 
+			llvm::FunctionType::get(toLLVMType(tt), 
 									parameterTypes, false),
 			llvm::Function::ExternalLinkage,
 			this->getName() == "main" ? "_main" : this->getName(),
@@ -167,6 +174,7 @@ void FunctionHead::declare(){
 
 	e->u.eFunction.fun = f;
 	e->u.eFunction.hasHead = true;
+	destroyType(tt);
 }
 
 llvm::Value* FunctionDeclaration::codegen() {
@@ -244,8 +252,8 @@ llvm::Value* FunctionDefinition::codegen(){
 	}
 	
 	this->_statements->codegen();
-
-	if ( equalType(this->_resultType->toType(), typeVoid) ){
+	auto tt = this->_resultType->toType();
+	if ( equalType(tt, typeVoid) ){
 		Builder->CreateRetVoid();
 	}else{
 		// this means that the last block of a non void returning function is not terminated
@@ -257,7 +265,7 @@ llvm::Value* FunctionDefinition::codegen(){
 		Builder->SetInsertPoint(LB);
 		Builder->CreateBr(LB);
 	}
-
+	destroyType(tt);
 	
 	return nullptr;
 }
@@ -841,7 +849,8 @@ llvm::Value* BinaryAss::codegen(){
 }
 llvm::Value* TypeCast::codegen(){
 	llvm::Value* inner = this->_expr->codegen();
-	size_t index = this->_type->toType()->kind * 9 +  this->_expr->getType()->kind;
+	auto tt = this->_type->toType();
+	size_t index = tt->kind * 9 +  this->_expr->getType()->kind;
 	llvm::Value* casted = inner;
 	llvm::Value* castedInter;
 	#define getCast(to, from) Type_tag::to * 9 + Type_tag::from
@@ -918,7 +927,7 @@ llvm::Value* TypeCast::codegen(){
 	default:
 		break;
 	}
-
+	destroyType(tt);
 	return casted;
 }
 llvm::Value* TernaryOp::codegen(){
@@ -960,8 +969,9 @@ llvm::Value* TernaryOp::codegen(){
 
 llvm::Value* New::codegen(){
 	llvm::Value* index;
+	auto tt = this->_type->toType();
 	if(this->_size == nullptr)
-		index = c16(sizeOfType(this->_type->toType()));
+		index = c16(sizeOfType(tt));
 	else{
 		// ex. new int[16] 
 		llvm::Value* size = this->_size->codegen();
@@ -971,6 +981,7 @@ llvm::Value* New::codegen(){
 		index = Builder->CreateMul(size,sizeOfT,"idx");
 	}
 	llvm::Value* rawptr = Builder->CreateCall(newF,{index},"rawptr");
+	destroyType(tt);
 	return Builder->CreateBitCast(rawptr,toLLVMType(this->_t),"castptr");
 }
 
