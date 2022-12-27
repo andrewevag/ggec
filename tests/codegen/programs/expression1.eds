@@ -23,7 +23,7 @@ void main(){
 	writeIntegerLn(i);
 	writeIntegerLn(j);
 	writeIntegerLn(k);
-	s = NULL;
+	s = (char*) NULL;
 	d = 100.0e-6;
 	writeReal(d);
 	writeChar('\n');

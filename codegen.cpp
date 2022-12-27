@@ -502,8 +502,8 @@ llvm::Value* Constant::codegen(){
 			return c8(this->_bool ? 1 : 0);
 		case Null:   
 			// by semantic analysis this needs to be typecasted to be
-			// usable
-			return llvm::Constant::getNullValue(i8p);
+			// usable so defaulting to a i8p ptr
+			return llvm::Constant::getNullValue(i8p); 
 		case Int: 
 			return c16(this->_int);
 		case Char :  

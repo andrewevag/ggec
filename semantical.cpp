@@ -435,7 +435,7 @@ void Constant::sem()
 		this->_t = copyType(typeBoolean);
 		break;
 	case Null:
-		this->_t = typePointer(copyType(typeAny));
+		this->_t = typePointer(copyType(typeVoid));
 		break;
 	case Char:
 		this->_t = copyType(typeChar);
