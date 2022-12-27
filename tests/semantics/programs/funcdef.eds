@@ -27,8 +27,8 @@ char* getName(char* PATHNAME){
 	char* str;
 	str = "hello people\n\t";
 	if(true){
-		return NULL;
+		return (char*) NULL;
 	}else{
-		return NULL;
+		return (char*) NULL;
 	}
 }
