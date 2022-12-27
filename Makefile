@@ -10,7 +10,6 @@ INCLUDE+= -I$(PWD)
 DEPSOURCE=$(wildcard src/*.cpp)
 DEPOBJECTS=$(patsubst %.cpp, %.o, $(DEPSOURCE))
 LLVMCONFIG=llvm-config-10
-##
 
 ## Test dependencies
 PYTHON3?=/usr/bin/python3
@@ -34,35 +33,36 @@ ggec: lexer.o main.o parser.o error.o ast.o tojsonstring.o general.o symbol.o se
 	$(CXX) $(INCLUDE) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 
-lexer.cpp lexer_funcs.hpp: lexer.l ast.hpp
+lexer.cpp lexer_funcs.hpp: lexer.l 
 	flex -s -o lexer.cpp lexer.l
 
-lexer.o: lexer.cpp parser.hpp
+lexer.o: lexer.cpp parser.hpp lexer.hpp ast.hpp error.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
 
-parser.cpp parser.hpp: parser.y ast.hpp
+parser.cpp parser.hpp: parser.y 
 	bison -dv -o parser.cpp $<
 
-parser.o: parser.cpp parser.hpp
+parser.o: parser.cpp parser.hpp ast.hpp lexer.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
 
-general.o: general.cpp error.hpp
+general.o: general.cpp error.hpp general.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
 
 error.o: error.cpp general.hpp error.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
 
-symbol.o: symbol.cpp symbol.hpp general.hpp error.hpp
+symbol.o: symbol.cpp symbol.hpp general.hpp error.hpp ast.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
 
-semantical.o: semantical.cpp ast.hpp
+semantical.o: semantical.cpp ast.hpp error.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
 
 codegen.o: codegen.cpp symbol.hpp ast.hpp error.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
 
 
-ast.hpp: symbol.hpp llvmhead.hpp
+ast.hpp: symbol.hpp llvmhead.hpp error.hpp
+symbol.hpp: llvmhead.hpp
 
 %.o: %.cpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $^

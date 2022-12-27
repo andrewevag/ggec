@@ -452,20 +452,20 @@ SymbolEntry * newParameter (const char * name, Type type,
     return NULL;
 }
 
-static unsigned int fixOffset (SymbolEntry * args)
-{
-    if (args == NULL)
-        return 0;
-    else {
-        unsigned int rest = fixOffset(args->u.eParameter.next);
+// static unsigned int fixOffset (SymbolEntry * args)
+// {
+//     if (args == NULL)
+//         return 0;
+//     else {
+//         unsigned int rest = fixOffset(args->u.eParameter.next);
         
-        args->u.eParameter.offset = currentScope->varOffset + rest;
-        if (args->u.eParameter.mode == PASS_BY_REFERENCE)
-            return rest + 2;
-        else
-            return rest + sizeOfType(args->u.eParameter.type);
-    }
-}
+//         args->u.eParameter.offset = currentScope->varOffset + rest;
+//         if (args->u.eParameter.mode == PASS_BY_REFERENCE)
+//             return rest + 2;
+//         else
+//             return rest + sizeOfType(args->u.eParameter.type);
+//     }
+// }
 
 void forwardFunction (SymbolEntry * f)
 {

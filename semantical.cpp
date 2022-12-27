@@ -61,7 +61,7 @@ void Program::sem(){
 void VariableDeclaration::sem() {
 	auto tt = this->_typeExpr->toType();
 	newVariable(this->getName().c_str(), tt);
-	llvm::Value* calc = this->codegen();
+	this->codegen();
 	destroyType(tt);
 	// if this is a local variable this is null --> offset sto symbolTable.
 }

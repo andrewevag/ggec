@@ -55,7 +55,6 @@ llvm::Value* Program::codegen(){
 	llvm::BasicBlock *FB = llvm::BasicBlock::Create(TheContext, "entry", main);
 	Builder->SetInsertPoint(FB);
 	
-	SymbolEntry* e;
 	forCurrentScope(e)
 		if(e->entryType == ENTRY_FUNCTION && std::string(e->id) == "main")
 			if(! e->u.eFunction.isForward)
@@ -485,7 +484,7 @@ llvm::Value* Id::codegen(){
 	 * 
 	 */
 	SymbolEntry * e = lookupEntry(this->_name.c_str(), LOOKUP_ALL_SCOPES, false);
-	auto nestingLevel = e->nestingLevel;
+	// auto nestingLevel = e->nestingLevel;
 	
 	llvm::Value* crtPtr = this->calculateAddressOf();
 	llvm::Value* valOfVar = crtPtr;
@@ -1076,7 +1075,7 @@ llvm::Value* Delete::codegen(){
 }
 
 llvm::Value* CommaExpr::codegen(){
-	llvm::Value* left = this->_left->codegen();
+	this->_left->codegen();
 	llvm::Value* right = this->_right->codegen();
 	return right;
 }
