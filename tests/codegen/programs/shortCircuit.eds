@@ -1,0 +1,56 @@
+void writeString(char * str);
+void writeInteger(int i);
+void writeChar(char c);
+void writeReal(double d);
+double x[2];
+void writeIntegerLn(int i){
+	writeInteger(i);
+	writeChar('\n');
+}
+void writeRealLn(double i){
+	writeReal(i);
+	writeChar('\n');
+}
+void writeBoolean(bool b);
+
+void writeBooleanLn(bool b){
+	writeBoolean(b);
+	writeChar('\n');
+}
+
+void main(){
+	int a, b, i, j;
+	bool f, g, h;
+	a = 13;
+	b = 120;
+
+	f = true;
+	g = false;
+
+	// this should be 0
+	a = ((f ? true : false) || (g ? true : false)) ? 1 : 0;
+	writeIntegerLn(a);
+
+	// another one
+	b = ((f ? true : false) && (g ? true : false)) ? 100 : 0;
+	writeIntegerLn(b);
+
+	h = true && true;
+	writeBooleanLn(h);
+	h = true && false;
+	writeBooleanLn(h);
+	h = false && true;
+	writeBooleanLn(h);
+	h = false && false;
+	writeBooleanLn(h);
+
+	h = true || true;
+	writeBooleanLn(h);
+	h = true || false;
+	writeBooleanLn(h);
+	h = false || true;
+	writeBooleanLn(h);
+	h = false || false;
+	writeBooleanLn(h);
+
+}

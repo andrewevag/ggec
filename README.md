@@ -26,7 +26,7 @@ A Compiler for the Edsger Programming Language
 # Tasks do not forget:
 - Fix Symbol offset in symbol table. (Pointers are different size in LLVM)
 - grep -rnw TODO to find todo in code.
-- Fix short circuit on && and ||.
+
 
 # Codegen Invariants
 1. Δινεις παντα σε κατωτερες nested συναρτησεις το δικο σου local environmnent.

@@ -276,7 +276,7 @@ llvm::Value* FunctionDefinition::codegen(){
 	
 	// Oprimize the Function
 	TheFPM->run(*f);
-	
+
 	return nullptr;
 }
 
@@ -606,22 +606,30 @@ llvm::Value* UnaryOp::codegen(){
 	return nullptr;
 }
 llvm::Value* BinaryOp::codegen(){
-	llvm::Value* left = this->_leftOperand->codegen();
-	llvm::Value* right = this->_rightOperand->codegen();
+	llvm::Value* left;
+	llvm::Value* right;
 	switch (this->_BinOp){
-		case MULT: 
+		case MULT:
+			left = this->_leftOperand->codegen();
+			right = this->_rightOperand->codegen();
 			if(equalType(this->_t, typeInteger))
 				return Builder->CreateMul(left,right,"multint");
 			else
 				return Builder->CreateFMul(left,right,"multfp");
 		case DIV:
+			left = this->_leftOperand->codegen();
+			right = this->_rightOperand->codegen();
 			if(equalType(this->_t, typeInteger))
 				return Builder->CreateSDiv(left,right,"divint");
 			else
 				return Builder->CreateFDiv(left,right,"divfp");
 		case MOD:
+			left = this->_leftOperand->codegen();
+			right = this->_rightOperand->codegen();
 			return Builder->CreateSRem(left,right,"modint");
 		case PLUS:
+			left = this->_leftOperand->codegen();
+			right = this->_rightOperand->codegen();
 			if(equalType(this->_t, typeInteger))
 				return Builder->CreateAdd(left,right,"plusint");
 			else if(equalType(this->_t, typeReal))
@@ -629,6 +637,8 @@ llvm::Value* BinaryOp::codegen(){
 			else
 				return Builder->CreateGEP(left,right,"plusptr");
 		case MINUS:
+			left = this->_leftOperand->codegen();
+			right = this->_rightOperand->codegen();
 			if(equalType(this->_t, typeInteger))
 				return Builder->CreateSub(left,right,"minusint");
 			if(equalType(this->_t, typeReal))
@@ -638,6 +648,8 @@ llvm::Value* BinaryOp::codegen(){
 				return Builder->CreateGEP(left,minus,"minusptr");
 			}
 		case LESS: 
+			left = this->_leftOperand->codegen();
+			right = this->_rightOperand->codegen();
 			if(equalType(this->_leftOperand->getType(), typeInteger) ||
 			   equalType(this->_leftOperand->getType(), typeChar) ||
 			   equalType(this->_leftOperand->getType(), typeBoolean)){
@@ -654,6 +666,8 @@ llvm::Value* BinaryOp::codegen(){
 				return Builder->CreateZExt(cmp,i8,"less");
 			}
 		case GREATER:
+			left = this->_leftOperand->codegen();
+			right = this->_rightOperand->codegen();
 			if(equalType(this->_leftOperand->getType(), typeInteger) || 
 			   equalType(this->_leftOperand->getType(), typeChar) ||
 			   equalType(this->_leftOperand->getType(), typeBoolean)){
@@ -670,6 +684,8 @@ llvm::Value* BinaryOp::codegen(){
 				return Builder->CreateZExt(cmp,i8,"gr");
 			}
 		case LESSEQ:
+			left = this->_leftOperand->codegen();
+			right = this->_rightOperand->codegen();
 			if(equalType(this->_leftOperand->getType(), typeInteger) || 
 			   equalType(this->_leftOperand->getType(), typeChar) || 
 			   equalType(this->_leftOperand->getType(), typeBoolean)){
@@ -686,6 +702,8 @@ llvm::Value* BinaryOp::codegen(){
 				return Builder->CreateZExt(cmp,i8,"leq");
 			}
 		case GREATEREQ:
+			left = this->_leftOperand->codegen();
+			right = this->_rightOperand->codegen();
 			if(equalType(this->_leftOperand->getType(), typeInteger) || 
 			   equalType(this->_leftOperand->getType(), typeChar) || 
 			   equalType(this->_leftOperand->getType(), typeBoolean)){
@@ -702,6 +720,8 @@ llvm::Value* BinaryOp::codegen(){
 				return Builder->CreateZExt(cmp,i8,"greq");
 			}
 		case EQUALS:
+			left = this->_leftOperand->codegen();
+			right = this->_rightOperand->codegen();
 			if(equalType(this->_leftOperand->getType(), typeInteger) || 
 			   equalType(this->_leftOperand->getType(), typeChar) || 
 			   equalType(this->_leftOperand->getType(), typeBoolean)){
@@ -718,6 +738,8 @@ llvm::Value* BinaryOp::codegen(){
 				return Builder->CreateZExt(cmp,i8,"eq");
 			}
 		case NOTEQ:
+			left = this->_leftOperand->codegen();
+			right = this->_rightOperand->codegen();
 			if(equalType(this->_leftOperand->getType(), typeInteger) || 
 			   equalType(this->_leftOperand->getType(), typeChar) || 
 			   equalType(this->_leftOperand->getType(), typeBoolean)){
@@ -734,16 +756,66 @@ llvm::Value* BinaryOp::codegen(){
 				return Builder->CreateZExt(cmp,i8,"neq");
 			}
 		case LAND:{
-			llvm::Value* cmpl = Builder->CreateICmpNE(left,c8(0),"cmp");
-			llvm::Value* cmpr = Builder->CreateICmpNE(right,c8(0),"cmp");
-			llvm::Value* cmp = Builder->CreateAnd(cmpl,cmpr,"cmp");
-			return Builder->CreateZExt(cmp,i8,"and");
+			llvm::Value* cmpl;
+			SymbolEntry * e = lookupActiveFun();
+			llvm::Function * f = e->u.eFunction.fun;
+			llvm::BasicBlock* CurrentBB = Builder->GetInsertBlock();
+			llvm::BasicBlock* ResultKnown        = llvm::BasicBlock::Create(TheContext, "resultKnown", f);
+			llvm::BasicBlock* NeedEvaluateSecond = llvm::BasicBlock::Create(TheContext, "needEvaluateSecond", f);
+
+			// Evaluate the left hand side. If it is 0 then the result is known
+			// to be zero 
+			left = this->_leftOperand->codegen();
+			cmpl = Builder->CreateICmpEQ(left,c8(0),"cmp");
+			Builder->CreateCondBr(cmpl, ResultKnown, NeedEvaluateSecond);
+			CurrentBB = Builder->GetInsertBlock();
+
+			// Evaluate the right hand side since the left hand side wasn't enough to know the result
+			Builder->SetInsertPoint(NeedEvaluateSecond);
+			right = this->_rightOperand->codegen();
+			Builder->CreateBr(ResultKnown);
+			NeedEvaluateSecond = Builder->GetInsertBlock();
+
+			// Adjust the result based on the path
+			Builder->SetInsertPoint(ResultKnown);
+			llvm::PHINode* phi = Builder->CreatePHI(toLLVMType(this->getType()), 2, "val");
+			// If from currentBB => the result was known to be 0.
+			phi->addIncoming(c8(0), CurrentBB);
+			// if from NeedEvaluateSecond the result is right since 
+			// true && x = x;
+			phi->addIncoming(right, NeedEvaluateSecond);
+			return phi;
 			}
 		case LOR:{
-			llvm::Value* cmpl = Builder->CreateICmpNE(left,c8(0),"cmp");
-			llvm::Value* cmpr = Builder->CreateICmpNE(right,c8(0),"cmp");
-			llvm::Value* cmp = Builder->CreateOr(cmpl,cmpr,"cmp");
-			return Builder->CreateZExt(cmp,i8,"or");
+			llvm::Value* cmpl;
+			SymbolEntry * e = lookupActiveFun();
+			llvm::Function * f = e->u.eFunction.fun;
+			llvm::BasicBlock* CurrentBB = Builder->GetInsertBlock();
+			llvm::BasicBlock* ResultKnown        = llvm::BasicBlock::Create(TheContext, "resultKnown", f);
+			llvm::BasicBlock* NeedEvaluateSecond = llvm::BasicBlock::Create(TheContext, "needEvaluateSecond", f);
+
+			// Evaluate the left hand side. If it is true then the result is known
+			// to be true
+			left = this->_leftOperand->codegen();
+			cmpl = Builder->CreateICmpNE(left,c8(0),"cmp");
+			Builder->CreateCondBr(cmpl, ResultKnown, NeedEvaluateSecond);
+			CurrentBB = Builder->GetInsertBlock();
+
+			// Evaluate the right hand side since the left hand side wasn't enough to know the result
+			Builder->SetInsertPoint(NeedEvaluateSecond);
+			right = this->_rightOperand->codegen();
+			Builder->CreateBr(ResultKnown);
+			NeedEvaluateSecond = Builder->GetInsertBlock();
+
+			// Adjust the result based on the path
+			Builder->SetInsertPoint(ResultKnown);
+			llvm::PHINode* phi = Builder->CreatePHI(toLLVMType(this->getType()), 2, "val");
+			// If from currentBB => the result was known to be 1.
+			phi->addIncoming(c8(1), CurrentBB);
+			// if from NeedEvaluateSecond the result is right since 
+			// false || x = x;
+			phi->addIncoming(right, NeedEvaluateSecond);
+			return phi;
 			}
 		case COMMA: return nullptr;
 	}
