@@ -110,7 +110,7 @@ void FunctionDeclaration::sem(){
 	this->declare();
 	destroyType(tt);
 	closeScope();
-	printSymbolTable();
+	// printSymbolTable();
 
 }
 
@@ -118,7 +118,7 @@ void FunctionDefinition::sem() {
 	SymbolEntry* f;
 	f = newFunction(this->getName().c_str());
 	if(f == NULL){
-		fatal("Duplicate Function Definition In Current Scope");
+		fatal("Duplicate Function Definition (%s) In Current Scope", this->_name.c_str());
 	}
 	openScope();
 	entryForFunction = f;
@@ -126,7 +126,7 @@ void FunctionDefinition::sem() {
 	auto tt = this->_resultType->toType();
 	endFunctionHeader(f, tt);
 
-	printSymbolTable();
+	// printSymbolTable();
 	this->declare();
 	this->_decls->sem();
 	this->_statements->sem();
@@ -151,7 +151,7 @@ void FunctionDefinition::sem() {
 	// this->_statements->codegen();
 	destroyType(tt);
 	closeScope();
-	printSymbolTable();
+	// printSymbolTable();
 	
 }
 
@@ -364,14 +364,14 @@ void BreakStatement::sem(){
  */
 void ReturnStatement::sem() {
 	SymbolEntry *e;
-	printSymbolTable();
+	// printSymbolTable();
 	e = lookupActiveFun();
 	if (e == NULL)
 		fatal("Return Statement Outside of a function");
 	else{
 		Type resultType = e->u.eFunction.resultType;
 		if (this->_expr == nullptr && (! equalType(typeVoid, resultType))){
-			printSymbolTable();
+			// printSymbolTable();
 			printType(resultType);
 			fatal("Expected an expression in the return statement");
 		}

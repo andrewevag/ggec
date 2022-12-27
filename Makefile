@@ -45,7 +45,7 @@ parser.cpp parser.hpp: parser.y
 parser.o: parser.cpp parser.hpp ast.hpp lexer.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
 
-general.o: general.cpp error.hpp general.hpp
+general.o: general.cpp error.hpp general.hpp lexer_funcs.hpp ast.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
 
 error.o: error.cpp general.hpp error.hpp
@@ -57,9 +57,11 @@ symbol.o: symbol.cpp symbol.hpp general.hpp error.hpp ast.hpp
 semantical.o: semantical.cpp ast.hpp error.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
 
-codegen.o: codegen.cpp symbol.hpp ast.hpp error.hpp
+codegen.o: codegen.cpp symbol.hpp ast.hpp error.hpp general.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
 
+main.o: main.cpp general.hpp ast.hpp parser.hpp
+	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $<
 
 ast.hpp: symbol.hpp llvmhead.hpp error.hpp
 symbol.hpp: llvmhead.hpp

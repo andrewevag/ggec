@@ -97,17 +97,17 @@ void fatal (const char * fmt, ...)
 
 void error (const char * fmt, ...)
 {
-   va_list ap;
+   // va_list ap;
 
-   va_start(ap, fmt);
-   if (fmt[0] == '\r')
-      fmt++;
-   else
-      fprintf(stderr, "%s:%d: ", filename, lineno);
-   fprintf(stderr, "Error, ");
-   vfprintf(stderr, fmt, ap);
-   fprintf(stderr, "\n");
-   va_end(ap);
+   // va_start(ap, fmt);
+   // if (fmt[0] == '\r')
+   //    fmt++;
+   // else
+   //    fprintf(stderr, "%s:%d: ", filename, lineno);
+   // fprintf(stderr, "Error, ");
+   // vfprintf(stderr, fmt, ap);
+   // fprintf(stderr, "\n");
+   // va_end(ap);
 }
 
 void warning (const char * fmt, ...)

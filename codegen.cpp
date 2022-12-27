@@ -1,6 +1,7 @@
 #include "ast.hpp"
 #include "symbol.hpp"
 #include "error.hpp"
+#include "general.hpp"
 #include <iostream>
 #include <fstream>
 #define forCurrentScope(e) for(SymbolEntry* e = currentScope->entries; e != NULL; e = e->nextInScope)
@@ -31,12 +32,13 @@ llvm::Function* AST::deleteF = llvm::Function::Create(
 // DISCLAIMER IF NOTHING WORKS CHANGE *TheModule to TheModule.get()
 
 llvm::Value* Program::codegen(){
-	
-	TheFPM->add(llvm::createPromoteMemoryToRegisterPass());
-    TheFPM->add(llvm::createInstructionCombiningPass());
-    TheFPM->add(llvm::createReassociatePass());
-    TheFPM->add(llvm::createGVNPass());
-    TheFPM->add(llvm::createCFGSimplificationPass());
+	if (optimize_flag){
+		TheFPM->add(llvm::createPromoteMemoryToRegisterPass());
+		TheFPM->add(llvm::createInstructionCombiningPass());
+		TheFPM->add(llvm::createReassociatePass());
+		TheFPM->add(llvm::createGVNPass());
+		TheFPM->add(llvm::createCFGSimplificationPass());
+	}
     TheFPM->doInitialization();
 
 	this->sem();
@@ -70,17 +72,11 @@ llvm::Value* Program::codegen(){
 
 	bool bad = verifyModule(*TheModule, &llvm::errs());
 	if(bad){
-		TheModule->print(llvm::outs(), nullptr);
+		// TheModule->print(llvm::outs(), nullptr);
 		fatal("Failed to verify module");
 	}
 
-	std::ofstream f;
-	std::string str;
-	llvm::raw_string_ostream output(str);
-	f.open("out.ll", std::ios::trunc | std::ios::out);
-	TheModule->print(output, nullptr);
-	f << str;
-	f.close();
+	
 	destroySymbolTable();
 	return nullptr;
 }
@@ -147,7 +143,7 @@ void FunctionHead::declare(){
 	// Get the Function to put in Symbol Table
 	// If this is a nested Function then it needs to have an extra argument
 	// of type i8* which is the %env.
-	std::cout << "In declare!!!\n";
+	// std::cout << "In declare!!!\n";
 	SymbolEntry * e = lookupEntry(this->getName().c_str(), LOOKUP_ALL_SCOPES, false);
 
 	
@@ -201,9 +197,9 @@ llvm::Value* FunctionDefinition::codegen(){
 	llvm::Function* f;
 	f = e->u.eFunction.fun;
 
-	std::cout << "<><><>When Definining The function<><><>" << std::endl;
-	f->print(llvm::outs());
-	std::cout << "<><><><><><>" << std::endl;
+	// std::cout << "<><><>When Definining The function<><><>" << std::endl;
+	// f->print(llvm::outs());
+	// std::cout << "<><><><><><>" << std::endl;
 
 	// Begin the first block of the function!! 
 	llvm::BasicBlock *FB = llvm::BasicBlock::Create(TheContext, "entry", f);
@@ -450,7 +446,7 @@ llvm::Value* BreakStatement::codegen(){
 	SymbolEntry * lblEntry ;
 	if(this->_target == ""){
 		lblEntry = lookupLabel(NULL, false);
-		std::cout << lblEntry->id << std::endl;
+		// std::cout << lblEntry->id << std::endl;
 	}else{
 		lblEntry = lookupLabel(this->_target.c_str(), true);
 	}
@@ -549,17 +545,17 @@ llvm::Value* Constant::codegen(){
 
 
 llvm::Value* FunctionCall::codegen(){
-	std::cout<< "mpika fCall\n";
-	std::cout<< this->_functionName << std::endl;
+	// std::cout<< "mpika fCall\n";
+	// std::cout<< this->_functionName << std::endl;
 	SymbolEntry* e = lookupEntry(this->_functionName.c_str(), LOOKUP_ALL_SCOPES, false);
 
-	if(e == NULL)
-		std::cout<< "enai null i malakia\n";
+	// if(e == NULL);
+		// std::cout<< "enai null i malakia\n";
 
 	std::vector<llvm::Value*> evalArgs;
 
 	if(e->nestingLevel != GLOBAL_SCOPE){
-		std::cout<< e->nestingLevel << std::endl;
+		// std::cout<< e->nestingLevel << std::endl;
 		evalArgs.push_back(getEnvAt(e->nestingLevel));
 	}
 
@@ -572,10 +568,10 @@ llvm::Value* FunctionCall::codegen(){
 			evalArgs.push_back(arg->codegen());
 		i = i->u.eParameter.next;
 	}
-	printSymbolTable();
+	// printSymbolTable();
 	llvm::Function* f = e->u.eFunction.fun;
-	std::cout<< f<< std::endl;
-	f->print(llvm::outs());
+	// std::cout<< f<< std::endl;
+	// f->print(llvm::outs());
 
 	return Builder->CreateCall(f,evalArgs);
 	
@@ -858,7 +854,7 @@ llvm::Value* PostfixUnAss::codegen(){
 	llvm::Value* nval;
 	
 	if(this->_Unass == PLUSPLUS){
-		std::cout << this->_operand->getType()->kind << std::endl;
+		// std::cout << this->_operand->getType()->kind << std::endl;
 		if(equalType(this->_t, typeInteger)){
 			nval = Builder->CreateAdd(val,c16(1),"nval");
 		}

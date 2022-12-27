@@ -25,8 +25,7 @@ A Compiler for the Edsger Programming Language
 - Non Nested Function Declarations can be defined externally by using the same name convention
 # Tasks do not forget:
 - Fix Symbol offset in symbol table. (Pointers are different size in LLVM)
-- grep -rnw TODO to find todo in code.
-- NULL
+- Prettify source code!!
 
 # Codegen Invariants
 1. Δινεις παντα σε κατωτερες nested συναρτησεις το δικο σου local environmnent.
