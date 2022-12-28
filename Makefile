@@ -1,7 +1,7 @@
 .PHONY: clean distclean default help
 
 ## Normal Build Variables
-CXX=clang++-10
+CXX=clang++-11
 CXXFLAGS=-Wall -std=c++14 -g `$(LLVMCONFIG) --cxxflags` -fexceptions
 LDFLAGS=$(shell $(LLVMCONFIG) --ldflags --system-libs --libs all)
 BINS=ggec main
@@ -9,7 +9,7 @@ INCLUDE=-I$(PWD)/inc
 INCLUDE+= -I$(PWD)
 DEPSOURCE=$(wildcard src/*.cpp)
 DEPOBJECTS=$(patsubst %.cpp, %.o, $(DEPSOURCE))
-LLVMCONFIG=llvm-config-10
+LLVMCONFIG=llvm-config-11
 
 ## Test dependencies
 PYTHON3?=/usr/bin/python3
@@ -117,7 +117,7 @@ test: lexersuite parsersuite semanticssuite codegensuite
 	
 EDSGERLIBSOURCE = $(wildcard lib/*.c)
 EDSGEROBJ = $(patsubst %.c, %.o, $(EDSGERLIBSOURCE))
-CC=clang-10
+CC=clang-11
 CFLAGS=-g -Wall
 %.o: %.c
 	$(CC) -c $(CFLAGS) -o $@ $^

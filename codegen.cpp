@@ -1052,10 +1052,10 @@ llvm::Value* New::codegen(){
 	else{
 		// ex. new int[16] 
 		llvm::Value* size = this->_size->codegen();
-		auto castedNull = llvm::Constant::getNullValue(toLLVMType(this->_t));
-		auto indexBy1   = Builder->CreateGEP(castedNull, c64(1), "indexedNull");
-		auto sizeOfT    = Builder->CreatePtrToInt(indexBy1, i16);
-		index = Builder->CreateMul(size,sizeOfT,"idx");
+		// auto castedNull = llvm::Constant::getNullValue(toLLVMType(this->_t));
+		// auto indexBy1   = Builder->CreateGEP(castedNull, c64(1), "indexedNull");
+		// auto sizeOfT    = Builder->CreatePtrToInt(indexBy1, i16);
+		index = Builder->CreateMul(size,c16(sizeOfType(tt)),"idx");
 	}
 	llvm::Value* rawptr = Builder->CreateCall(newF,{index},"rawptr");
 	destroyType(tt);
