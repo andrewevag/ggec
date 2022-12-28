@@ -31,7 +31,7 @@
 #include "lexer_funcs.hpp"
 #include "ast.hpp"
 #include "llvmhead.hpp"
-
+#include <fstream>
 #include <iostream>
 /* ---------------------------------------------------------------------
    ------- Αρχείο εισόδου του μεταγλωττιστή και αριθμός γραμμής --------
@@ -194,16 +194,16 @@ void handleOutput()
    llvm::legacy::PassManager pass;
    auto FileType = llvm::CGFT_AssemblyFile;
 
-   if(_f_flag){
+   if(_f_flag){      
       llvm::raw_fd_ostream outDest("-", EC);
-
+      
       if (TheTargetMachine->addPassesToEmitFile(pass, outDest, nullptr, FileType)) {
          llvm::errs() << "TargetMachine can't emit a file of this type";
          exit(1);
       }
 
       pass.run(*AST::TheModule);
-      llvm::outs().flush();
+      outDest.flush();
       return;
    }
 
