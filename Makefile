@@ -1,7 +1,7 @@
 .PHONY: clean distclean default help
 
 ## Normal Build Variables
-CXX=clang++
+CXX=clang++-10
 CXXFLAGS=-Wall -std=c++14 -g `$(LLVMCONFIG) --cxxflags` -fexceptions
 LDFLAGS=$(shell $(LLVMCONFIG) --ldflags --system-libs --libs all)
 BINS=ggec main
@@ -117,7 +117,7 @@ test: lexersuite parsersuite semanticssuite codegensuite
 	
 EDSGERLIBSOURCE = $(wildcard lib/*.c)
 EDSGEROBJ = $(patsubst %.c, %.o, $(EDSGERLIBSOURCE))
-CC=clang
+CC=clang-10
 CFLAGS=-g -Wall
 %.o: %.c
 	$(CC) -c $(CFLAGS) -o $@ $^

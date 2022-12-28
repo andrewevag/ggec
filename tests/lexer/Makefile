@@ -1,4 +1,4 @@
-CXX=c++
+CXX=clang++-11
 CXXFLAGS=-Wall
 
 # We want to compile with the original lexer and link it to local main

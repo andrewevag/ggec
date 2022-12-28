@@ -8,6 +8,8 @@
 extern AST* syntaxTree;
 %}
 
+%require "3.5.1"
+
 %token T_bool          "bool"
 %token T_break         "break"
 %token T_byref         "byref"

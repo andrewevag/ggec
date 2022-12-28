@@ -71,3 +71,25 @@ ex. int x, y; is it's own declaration List.
 # DO NOT FORGET
 - Να καθορίσουμε στο makefile ακριβως ποιες version χρησιμοποιούμε 
 - τα paths στα .sh αρχεια είναι για το mac 
+
+
+# Requirements for Building
+- clang++-10
+- clang-10
+- llvm-10
+- flex 2.6.4
+- bison 3.5.1
+  
+# Requirements for Testing
+- clang++-10
+- clang-10
+- llvm-10
+- flex 2.6.4
+- bison 3.5.1
+- llc-10
+- python3 with (subprocess, os, deepdiff)
+- erl
+- erlang proper
+- (haskell) stack
+- EdsgerProgramGenerator..
+
