@@ -767,6 +767,8 @@ unsigned int sizeOfType (Type type)
         // std::cerr << "Size of"; printType(type); std::cerr << size << std::endl;
         return size;
     }
+
+    
     switch (type->kind) {
         case Type_tag::TYPE_VOID:
             internal("Type void has no size");

@@ -46,7 +46,7 @@ bool _i_flag = false;
 std::string interMediateOutFileName;
 std::string assemblyOutFileName;
 
-
+llvm::TargetMachine* TheTargetMachine;
 extern std::set<std::string> fileset;
 extern std::string currentFilename;
 
@@ -146,15 +146,6 @@ void handleArguments(int argc, char** argv)
 
    // std::cout << "interMediateOutFileName = " << interMediateOutFileName << std::endl;
    // std::cout << "assemblyOutFileName     = " << assemblyOutFileName << std::endl;
-}
-
-void handleOutput()
-{
-   // Only intermediate code in stdout
-   if(_i_flag){
-      AST::TheModule->print(llvm::outs(), nullptr);
-      return;
-   }
 
    // see Kaleidoscope Ch.8 
    // https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl08.html
@@ -184,9 +175,19 @@ void handleOutput()
 
    llvm::TargetOptions opt;
    auto RM = llvm::Optional<llvm::Reloc::Model>();
-   auto TheTargetMachine = Target->createTargetMachine(TargetTriple, CPU, Features, opt, RM);
+   TheTargetMachine = Target->createTargetMachine(TargetTriple, CPU, Features, opt, RM);
 
    AST::TheModule->setDataLayout(TheTargetMachine->createDataLayout());
+
+}
+
+void handleOutput()
+{
+   // Only intermediate code in stdout
+   if(_i_flag){
+      AST::TheModule->print(llvm::outs(), nullptr);
+      return;
+   }
 
    //====================================================================================//
    // Create the Pass for printing                                                       //
@@ -196,8 +197,8 @@ void handleOutput()
    auto FileType = llvm::CGFT_AssemblyFile;
 
    if(_f_flag){
-      // llvm::raw_fd_ostream outDest("-", EC);
-      llvm::raw_fd_ostream outDest(STDOUT_FILENO, false);
+      llvm::raw_fd_ostream outDest("-", EC);
+      // llvm::raw_fd_ostream outDest(STDOUT_FILENO, false);
 
       if (TheTargetMachine->addPassesToEmitFile(pass, outDest, nullptr, FileType)) {
          llvm::errs() << "TargetMachine can't emit a file of this type";
