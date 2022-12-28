@@ -9,34 +9,61 @@
 #include "error.hpp"
 
 
-/* ---------------------------------------------------------------------
-   ----------- Καθολικές μεταβλητές για τον χειρισμό Label -------------
-   --------------------------------------------------------------------- */
+//====================================================================================//
+// Global Variables For Handling Nested Labels                                        //
+//====================================================================================//
 class Label;
 extern std::vector<Label*> NestingNamedloops;
+
+
+//====================================================================================//
+// Nodes for AST 																	  //
+//====================================================================================//
 
 class AST : public Tree, public ErrorInfo {
 public:
 	virtual ~AST();
+	/**
+	 * @brief Print Syntax Tree in json format 
+	 */
 	virtual std::string toJSONString() = 0;
+	
+	/**
+	 * @brief Function that does the semantic analysis of the syntax tree
+	 */
 	virtual void sem() = 0;
 
+	/**
+	 * @brief Function That performs the code generation for the syntax tree.
+	 * 
+	 * @return llvm::Value* NULL if not needed to calculate something else the value 
+	 * where it is calculated.
+	 */
 	virtual llvm::Value* codegen() = 0;
 
-	/* Printing Syntax Tree Functions */
+	
+	/* Printing Syntax Tree Functions See README */
 	virtual std::vector<Tree*> getChildren() = 0;
 	virtual void printNode(std::ostream& out) = 0;
 
+
+
+	/* Global LLVM Variables For Code Generation */
 	static llvm::LLVMContext TheContext;
 	static std::unique_ptr<llvm::Module> TheModule;
 	static std::unique_ptr<llvm::legacy::FunctionPassManager> TheFPM;
 	static std::unique_ptr<llvm::IRBuilder<> > Builder;
 
-	/* More Constant LLVM stuff */
+	
+	
+	
+	/* More Constant LLVM Variables */
 	static llvm::Type *i8;
   	static llvm::Type *i16;
 	static llvm::Type *i8p;
 	static llvm::Type *i64;
+
+	/* Functions For Creating Constants */
 	static llvm::ConstantInt* c8(char c) {
     	return llvm::ConstantInt::get(TheContext, llvm::APInt(8, c, true));
   	}
@@ -64,6 +91,11 @@ class ExpressionList;
 class DeclarationList;
 class BasicType;
 
+
+//====================================================================================//
+// Base Node For Types       														  //
+//====================================================================================//
+
 class TypeExpression : public AST {
 public:
 	virtual ~TypeExpression();
@@ -77,9 +109,17 @@ public:
 	 * @return std::string
 	 */
 	virtual std::string getDefName() = 0;
+	/**
+	 * @brief Transforms the Syntax Type to Semantic Type
+	 *
+	 * @return Type 
+	 */
 	virtual Type toType() = 0;
 	
-
+	/**
+	 * @brief Transforms Semantic Type to Syntax Type
+	 *
+	 */
 	static TypeExpression* fromType(Type t);
 	// virtual void sem() = 0;
 
@@ -91,6 +131,11 @@ public:
 	// virtual std::string toJSONString() = 0;
 private:
 };
+
+
+//====================================================================================//
+// Syntax Nodes For Paraemeters														  //
+//====================================================================================//
 
 
 class Parameter : public AST {
@@ -163,6 +208,9 @@ public:
 };
 
 
+//====================================================================================//
+// Syntax Node For The Whole Program   											      //
+//====================================================================================//
 
 class Program : public AST {
 public:
@@ -180,6 +228,11 @@ private:
 	DeclarationList* _decls;
 };
 
+//====================================================================================//
+// Syntax Nodes For Declarations													  //
+//====================================================================================//
+
+
 class Declaration : public AST {
 public:
 	virtual ~Declaration();
@@ -190,7 +243,7 @@ public:
 	/**
 	 * @brief Get the Name of the declaration. It is important for
 	 * functions to handle overloading since new names are generated
-	 * for the parameterList.
+	 * from the parameterList.
 	 * 
 	 * @return std::string 
 	 */
@@ -244,7 +297,7 @@ public:
 
 	virtual llvm::Value* codegen() override;
 
-	/* Printing Syntax Tree Functiontgs */
+	/* Printing Syntax Tree Functions */
 	virtual std::vector<Tree*> getChildren() override { return {(Tree*)this->_typeExpr, (Tree*)this->_expr}; }
 	virtual void printNode(std::ostream& out) override { out << "ArrayDeclaration(" << _name << ')';  }
 	virtual std::string toJSONString() override;
@@ -252,12 +305,18 @@ private:
 	Expression* _expr;
 };
 
+
 class FunctionHead : public Declaration{
 public:
+	// The Common Part of FunctionDeclaration & FunctionDefinition
 	virtual void embedType(TypeExpression* type) = 0;
 	virtual void sem() = 0;
 	virtual std::string getName() = 0;
 	virtual llvm::Value* codegen() = 0;
+	/**
+	 * @brief Used in codegen to declare the function and put llvm::Function* in the 
+	 * Symbol Table.
+	 */
 	virtual void declare();
 	virtual std::vector<Tree*> getChildren() = 0;
 	virtual void printNode(std::ostream& out) = 0;
@@ -280,6 +339,9 @@ public:
 
 	virtual void sem() override;
 
+	/**
+	 * The Name to handle overloading
+	 */
 	virtual std::string getName() override {
 		return this->_name + this->_parameters->getAggregatedName();
 	}
@@ -303,6 +365,9 @@ public:
 	~FunctionDefinition();
 	virtual void embedType(TypeExpression* type) override {}
 
+	/**
+	 * The Name to handle overloading
+	 */
 	virtual std::string getName() override {
 		return this->_name + this->_parameters->getAggregatedName();
 	}
@@ -321,6 +386,9 @@ private:
 };
 
 
+//====================================================================================//
+// Syntax Nodes For Types       												      //
+//====================================================================================//
 
 class BasicType : public TypeExpression {
 public:
@@ -337,15 +405,7 @@ public:
 	virtual std::string getDefName() override {
 		return this->_name;
 	}
-	/**
-	 * @brief Doesn't perform a deep copy of the type
-	 * just returns with symbol.hpp convention.. 
-	 *
-	 * TODO
-	 * needs delete with the symbol.hpp convention
-	 * after using. -- 
-	 * @return Type 
-	 */
+	
 	virtual Type toType() override {
 		if(this->_name == "void")
 			return typeVoid;
@@ -405,16 +465,28 @@ public:
 	TypeExpression* _inner;
 };
 
+
+//====================================================================================//
+// Base Node For Statements    														  //
+//====================================================================================//
+
 class Statement : public AST {
 public:
+	// Base Statement Class
 	virtual ~Statement();
 	virtual void sem() = 0;
 	virtual llvm::Value* codegen() = 0;
+	/**
+	 * @brief Check if a statement returns. Used to determine that all paths
+	 * return in a function and this it is well defined.
+	 *
+	 */
 	virtual bool returns() = 0;
 };
 
 class EmptyStatement : public Statement {
 public:
+	// ;
 	EmptyStatement() {}
 	virtual ~EmptyStatement();
 	
@@ -606,6 +678,10 @@ private:
 };
 
 
+//====================================================================================//
+// Syntax Nodes For Expressions (They also have types)								  //
+//====================================================================================//
+
 class Expression : public AST, public TypedExpression {
 public:
 	virtual ~Expression();
@@ -614,12 +690,18 @@ public:
 	 * @brief Get if the expression is an IntConstant for defining
 	 * the size of an array
 	 * 
-	 * @return int if zero non correct if non-zero correct.
+	 * @return int if zero non correct if non-zero correct and is the size.
 	 */
 	virtual int isIntConstant() = 0;
 
 	virtual void sem() = 0;
 	virtual llvm::Value* codegen() = 0;
+	/**
+	 * @brief This calculates the address of an lvalue and returns
+	 * a llvm::Value with the pointer. Should not be called on r-vals.
+	 * 
+	 * @return llvm::Value* 
+	 */
 	virtual llvm::Value* calculateAddressOf() = 0;
 
 	/* Printing Syntax Tree Functions */
@@ -658,6 +740,8 @@ public:
 	Constant(bool f) : _ct(ConstantType::Bool), _bool(f) {}
 	Constant() : _ct(ConstantType::Null) {}
 	virtual ~Constant();
+	
+	// What constant this nodes represents
 	enum ConstantType { Bool, Null, Int, Char, Double, String };
 
 	virtual int isIntConstant() override {
@@ -783,6 +867,7 @@ private:
 
 class BinaryOp : public Expression {
 public:
+	// Comma not used here but in specific node CommaExpr
 	enum BinaryOpType { MULT, DIV, MOD, PLUS, MINUS, LESS, GREATER, LESSEQ, GREATEREQ, EQUALS, NOTEQ, LAND, LOR, COMMA };
 	static std::string binaryOpTypeToString(BinaryOpType t){
 		switch (t){
@@ -817,6 +902,7 @@ public:
 	virtual llvm::Value* codegen() override;
 	virtual llvm::Value* calculateAddressOf() override;
 
+	// see semantical.cpp
 	friend void binaryOpAnalysis(BinaryOp&);
 
 	void setLeft(Expression* l) { this->_leftOperand = l; }
@@ -835,6 +921,7 @@ private:
 
 class UnAss : public Expression {
 public:
+	// Base class to handle the common part of postfix and prefix unary assignment.
 	enum UnAssType { PLUSPLUS, MINUSMINUS };
 	static std::string UnAssTypeToString(UnAssType t){
 		switch (t) {
@@ -881,7 +968,7 @@ public:
 	virtual std::string toJSONString() override;
 
 };
-// kalo einai na fygei to CP kanei kako || factoring
+
 class PostfixUnAss : public UnAss {
 public:
 	PostfixUnAss(UnAss::UnAssType unass, Expression* operand) 
@@ -900,7 +987,6 @@ public:
 	virtual void printNode(std::ostream& out) override { out << "PostfixUnAss(" << UnAss::UnAssTypeToString(this->_Unass) << ")"; }
 	virtual std::string toJSONString() override;
 };
-
 
 class BinaryAss : public Expression {
 public:
@@ -1056,6 +1142,11 @@ private:
 	Expression* _left, *_right;
 };
 
+
+//====================================================================================//
+// Class For Handling Labels   														  //
+//====================================================================================//
+
 class Label : public AST {
 public:
 	Label(std::string lblname) : _lblname(lblname) {}
@@ -1078,6 +1169,9 @@ private:
 
 
 
+//====================================================================================//
+// Syntax Nodes For Handling Multiples Of Statements, Expressions, Declarations  	  //
+//====================================================================================//
 
 class StatementList : public Statement {
 public:

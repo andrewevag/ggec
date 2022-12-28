@@ -1,27 +1,7 @@
-/******************************************************************************
- *  CVS version:
- *     $Id: error.c,v 1.2 2004/05/05 22:00:08 nickie Exp $
- ******************************************************************************
- *
- *  C code file : error.c
- *  Project     : PCL Compiler
- *  Version     : 1.0 alpha
- *  Written by  : Nikolaos S. Papaspyrou (nickie@softlab.ntua.gr)
- *  Date        : May 14, 2003
- *  Description : Generic symbol table in C, simple error.hppandler
- *
- *  Comments: (in Greek iso-8859-7)
- *  ---------
- *  Εθνικό Μετσόβιο Πολυτεχνείο.
- *  Σχολή Ηλεκτρολόγων Μηχανικών και Μηχανικών Υπολογιστών.
- *  Τομέας Τεχνολογίας Πληροφορικής και Υπολογιστών.
- *  Εργαστήριο Τεχνολογίας Λογισμικού
+/*
+ *  Written by    : Nikolaos S. Papaspyrou
+ *  Modified by   : Nikoletta Barmpa, Andreas Evangelatos
  */
-
-
-/* ---------------------------------------------------------------------
-   ---------------------------- Header files ---------------------------
-   --------------------------------------------------------------------- */
 
 #include <cstdio>
 #include <cstdlib>
@@ -33,16 +13,23 @@
 #include "general.hpp"
 #include "error.hpp"
 
-
-/* ---------------------------------------------------------------------
-   --------- Υλοποίηση των συναρτήσεων του χειριστή σφαλμάτων ----------
-   --------------------------------------------------------------------- */
-
+/**
+ * Global variables for error handling
+ * 
+ */
 extern int lineno;
 extern int columnno;
 extern std::set<std::string> fileset;
 extern std::string currentFilename;
 
+//====================================================================================//
+// Functions For Error Handling                       								        //
+//====================================================================================//
+
+/**
+ * @brief Open The file and get the line where an error appeared
+ *
+ */
 std::string getLine(std::string file, int lineno, int columnno){
    std::ifstream inputfile;
    inputfile.open(file);
@@ -55,7 +42,10 @@ std::string getLine(std::string file, int lineno, int columnno){
    return std::string(lex);
 }
 
-
+/**
+ * @brief Used only for the symbol table
+ * 
+ */
 void internal (const char * fmt, ...)
 {
    va_list ap;
@@ -72,6 +62,11 @@ void internal (const char * fmt, ...)
    exit(1);
 }
 
+/**
+ * @brief Static version of ErrorInfo::fatal. Implements panic error messaging.
+ * Prints the column, line, and file where the error appeared.
+ *
+ */
 void fatal (const char * fmt, ...)
 {
    va_list ap;
@@ -95,21 +90,13 @@ void fatal (const char * fmt, ...)
    exit(1);
 }
 
-void error (const char * fmt, ...)
-{
-   // va_list ap;
-
-   // va_start(ap, fmt);
-   // if (fmt[0] == '\r')
-   //    fmt++;
-   // else
-   //    fprintf(stderr, "%s:%d: ", filename, lineno);
-   // fprintf(stderr, "Error, ");
-   // vfprintf(stderr, fmt, ap);
-   // fprintf(stderr, "\n");
-   // va_end(ap);
-}
-
+/*
+ * Not used
+ */
+void error (const char * fmt, ...){}
+/*
+ * Not used
+ */
 void warning (const char * fmt, ...)
 {
    va_list ap;
@@ -125,15 +112,20 @@ void warning (const char * fmt, ...)
    va_end(ap);
 }
 
+/**
+ * @brief A Way for the parser to call fatal
+ * 
+ */
 void yyerror(const char *msg)
 {
    fatal(msg);
-	// fprintf(stderr, "Error in line: %d\n", lineno);
-	// fprintf(stderr, "%s\n", msg);
-	// exit(EXIT_FAILURE);
 }
 
-
+/**
+ * @brief Construct a new Error Info:: Error Info object
+ * Save the state for current line, column and filename.
+ * 
+ */
 ErrorInfo::ErrorInfo(){
    this->_lineappeared = lineno;
    this->_columnappeared = columnno;
@@ -146,7 +138,10 @@ int ErrorInfo::getLineAppeared(){
    return this->_lineappeared;
 }
 
-
+/**
+ * @brief Main function to implement panic from Nodes in AST
+ * 
+ */
 void ErrorInfo::fatal(const char * fmt, ...){   
    va_list ap;
 
@@ -158,13 +153,13 @@ void ErrorInfo::fatal(const char * fmt, ...){
    vfprintf(stderr, fmt, ap);
    fprintf(stderr, "\n");
    auto s = getLine(*this->_fileappeared, this->_lineappeared, this->_columnappeared);
-   printf("%s\n", s.c_str());
+   fprintf(stderr, "%s\n", s.c_str());
    for(int i = 0; i < this->_columnappeared-1; i++){
 		if(s[i] == '\t')
-			std::cout << "_______";
-		std::cout << "_";
+			fprintf(stderr, "_______");
+		fprintf(stderr, "_");
    }
-	std::cout << "^\n";   
+	fprintf(stderr, "^\n"); 
    va_end(ap);
    exit(1);   
 }

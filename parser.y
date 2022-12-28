@@ -65,15 +65,15 @@ extern AST* syntaxTree;
 
 
 
-%type<decList> declaration_list //??
+%type<decList> declaration_list
 %type<decl> declaration  declarator
 %type<decl> variable_declaration
 %type<decl> function_declaration
 %type<decl> function_definition
 %type<typeExpr> type star_list basic_type
 %type<par> parameter
-%type<parList> parameter_list //??
-%type<stmtList> statement_list //??
+%type<parList> parameter_list 
+%type<stmtList> statement_list
 %type<stmt> statement
 %type<lbl> label
 %type<expr> expression_or_empty

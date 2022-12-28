@@ -1,27 +1,6 @@
-/******************************************************************************
- *  CVS version:
- *     $Id: general.c,v 1.1 2004/05/05 22:00:08 nickie Exp $
- ******************************************************************************
- *
- *  C code file : general.c
- *  Project     : PCL Compiler
- *  Version     : 1.0 alpha
- *  Written by  : Nikolaos S. Papaspyrou (nickie@softlab.ntua.gr)
- *  Date        : May 5, 2004
- *  Description : Generic symbol table in C, general variables and functions
- *
- *  Comments: (in Greek iso-8859-7)
- *  ---------
- *  Εθνικό Μετσόβιο Πολυτεχνείο.
- *  Σχολή Ηλεκτρολόγων Μηχανικών και Μηχανικών Υπολογιστών.
- *  Τομέας Τεχνολογίας Πληροφορικής και Υπολογιστών.
- *  Εργαστήριο Τεχνολογίας Λογισμικού
+/*
+ *  Written by    : Nikoletta Barmpa, Andreas Evangelatos
  */
-
-
-/* ---------------------------------------------------------------------
-   ---------------------------- Header files ---------------------------
-   --------------------------------------------------------------------- */
 
 #include <cstdlib>
 #include <string>
@@ -34,9 +13,6 @@
 #include <cstdlib>
 
 #include <iostream>
-/* ---------------------------------------------------------------------
-   ------- Αρχείο εισόδου του μεταγλωττιστή και αριθμός γραμμής --------
-   --------------------------------------------------------------------- */
 
 const char * filename;
 int linecount;
@@ -138,14 +114,6 @@ void handleArguments(int argc, char** argv)
       
       fileset = { currentFilename };
    }
-   // std::cout << "optimize_flag           = " << optimize_flag << std::endl;
-   // std::cout << "_i_flag                 = " << _i_flag << std::endl;
-   // std::cout << "_f_flag                 = " << _f_flag << std::endl;
-   // std::cout << "fileset.size()          = " << fileset.size() << std::endl;
-   // std::cout << "currentFilename         = " << currentFilename << std::endl;
-
-   // std::cout << "interMediateOutFileName = " << interMediateOutFileName << std::endl;
-   // std::cout << "assemblyOutFileName     = " << assemblyOutFileName << std::endl;
 
    // see Kaleidoscope Ch.8 
    // https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl08.html

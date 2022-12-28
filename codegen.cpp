@@ -4,8 +4,14 @@
 #include "general.hpp"
 #include <iostream>
 #include <fstream>
+
 #define forCurrentScope(e) for(SymbolEntry* e = currentScope->entries; e != NULL; e = e->nextInScope)
 #define llvmPointer(inner) llvm::PointerType::get(inner, 0)
+
+//====================================================================================//
+// Initialization of Globals for Codegen                                              //
+//====================================================================================//
+
 
 llvm::LLVMContext AST::TheContext;
 std::unique_ptr<llvm::Module> AST::TheModule =  std::make_unique<llvm::Module>("mainprogram", TheContext);
@@ -29,7 +35,9 @@ llvm::Function* AST::deleteF = llvm::Function::Create(
 		*AST::TheModule
 	);
 
-// DISCLAIMER IF NOTHING WORKS CHANGE *TheModule to TheModule.get()
+//====================================================================================//
+// Root Of Code Generation                                                            //
+//====================================================================================//
 
 llvm::Value* Program::codegen(){
 	if (optimize_flag){
@@ -43,9 +51,9 @@ llvm::Value* Program::codegen(){
 
 	this->sem();
 	
-	//==========================================================
-	// Main Wrapper for exiting to system with exit code 0
-	//==========================================================
+	//==========================================================//
+	// Main Wrapper for exiting to system with exit code 0      //
+	//==========================================================//
 	llvm::Function* ProgramMain;
 	llvm::Function* main = 
 		llvm::Function::Create(
@@ -72,7 +80,6 @@ llvm::Value* Program::codegen(){
 
 	bool bad = verifyModule(*TheModule, &llvm::errs());
 	if(bad){
-		// TheModule->print(llvm::outs(), nullptr);
 		fatal("Failed to verify module");
 	}
 
@@ -103,9 +110,7 @@ llvm::Value* VariableDeclaration::codegen(){
 	}
 	return nullptr;
 }
-// TODO Same as the above one maybe refactor it
-// sem of array declaration needs to call codegen() on it
-// and put the llvm::Value* on the symbol table 
+
 llvm::Value* ArrayDeclaration::codegen(){
 	SymbolEntry * e = lookupEntry(this->_name.c_str(), LOOKUP_ALL_SCOPES, false);
 	if(e->nestingLevel == GLOBAL_SCOPE){
@@ -114,7 +119,6 @@ llvm::Value* ArrayDeclaration::codegen(){
 		auto tt = this->_typeExpr->toType();
 		llvm::Value* val = new llvm::GlobalVariable(
 			*TheModule,
-			// toLLVMType(this->_typeExpr->toType()),
 			llvm::ArrayType::get(toLLVMType(tt),this->_expr->isIntConstant()),
 			false,
 			llvm::GlobalValue::CommonLinkage,
@@ -131,19 +135,16 @@ llvm::Value* ArrayDeclaration::codegen(){
 }
 
 
-// TODO sem() needs to put this in the symbol table so it can be accessed
 
-// sem()
-// {
-//	...
-//	codegen()
-//	...
-//}
+/**
+ * @brief Declare the function In the llvm::TheModule.
+ * 
+ */
 void FunctionHead::declare(){
 	// Get the Function to put in Symbol Table
 	// If this is a nested Function then it needs to have an extra argument
 	// of type i8* which is the %env.
-	// std::cout << "In declare!!!\n";
+	
 	SymbolEntry * e = lookupEntry(this->getName().c_str(), LOOKUP_ALL_SCOPES, false);
 
 	
@@ -154,6 +155,7 @@ void FunctionHead::declare(){
 		//
 		parameterTypes.push_back(llvm::PointerType::get(i8, 0));
 	}
+
 	// Get the types for all parameters
 	for (auto &par : this->_parameters->_parameters){
 		auto tt = par->getType()->toType();
@@ -164,6 +166,9 @@ void FunctionHead::declare(){
 		destroyType(tt);
 	}
 	auto tt = this->_resultType->toType();
+	
+	// Change the name if main to _main because it is wrapped to return with 0 to system. 
+	// See Program::codegen
 	llvm::Function* f = 
 		llvm::Function::Create(
 			llvm::FunctionType::get(toLLVMType(tt), 
@@ -184,22 +189,13 @@ llvm::Value* FunctionDeclaration::codegen() {
 	return nullptr;
 }
 
-/* When will sem() call it.
- * 
- * 
- */
 llvm::Value* FunctionDefinition::codegen(){
-	// If we have defined it aka FunctionDeclaration then on the symbol table
-	// is the llvm::Function for it. -> so just grab it.
-	// SymbolEntry * e = lookupEntry(this->getName().c_str(), LOOKUP_ALL_SCOPES, false);
+	// If we have defined it, aka FunctionDeclaration, then on the symbol table
+	// is the llvm::Function for it. So just grab it.
+	
 	SymbolEntry * e = lookupActiveFun();
-	// Else define the llvm::Function.
 	llvm::Function* f;
 	f = e->u.eFunction.fun;
-
-	// std::cout << "<><><>When Definining The function<><><>" << std::endl;
-	// f->print(llvm::outs());
-	// std::cout << "<><><><><><>" << std::endl;
 
 	// Begin the first block of the function!! 
 	llvm::BasicBlock *FB = llvm::BasicBlock::Create(TheContext, "entry", f);
@@ -229,7 +225,7 @@ llvm::Value* FunctionDefinition::codegen(){
 	 * 	  ...
 	 */
 	auto realArg = f->arg_begin();
-	if ( e->nestingLevel > 1 ){
+	if ( e->nestingLevel > GLOBAL_SCOPE ){
 		realArg->setName("prevEnv");
 		// i8* env;
 		// i8* prevEnv;
@@ -254,6 +250,7 @@ llvm::Value* FunctionDefinition::codegen(){
 	}
 	
 	this->_statements->codegen();
+	
 	auto tt = this->_resultType->toType();
 	if ( equalType(tt, typeVoid) ){
 		Builder->CreateRetVoid();
@@ -261,7 +258,8 @@ llvm::Value* FunctionDefinition::codegen(){
 		// this means that the last block of a non void returning function is not terminated
 		// control will never reach here because all returns should have been called before getting 
 		// to this part. Thus this is dead code and will be removed by the analysis
-		// This creates errors if the last block has a phi so a trap block is better.
+		// This creates errors if the last block has a phi because llvm needs to know all paths that get there
+		// so a trap block is better.
 		llvm::BasicBlock *LB = llvm::BasicBlock::Create(TheContext, "lastBlock", f);
 		Builder->CreateBr(LB);
 		Builder->SetInsertPoint(LB);
@@ -275,7 +273,9 @@ llvm::Value* FunctionDefinition::codegen(){
 	return nullptr;
 }
 
-
+//====================================================================================//
+// Unused                                                                             //
+//====================================================================================//
 llvm::Value* TypeExpression::codegen(){
 	return nullptr;
 }
@@ -285,7 +285,6 @@ llvm::Value* Parameter::codegen(){
 llvm::Value* ParameterList::codegen(){
 	return nullptr;
 }
-
 llvm::Value* BasicType::codegen(){
 	return nullptr;
 }
@@ -293,19 +292,26 @@ llvm::Value* Pointer::codegen(){
 	return nullptr;
 }
 
+//====================================================================================//
+// Code Generation Of Statements                                                      //
+//====================================================================================//
+
 llvm::Value* EmptyStatement::codegen(){
 	return nullptr;
 }
+
 llvm::Value* SingleExpression::codegen(){
 	this->_expr->codegen();
 	return nullptr;
 }
+
 llvm::Value* IfStatement::codegen(){
+	// description of Operation: 
 	// condition = this->_condition->codegen()
 	// conidtion is i8 aka boolean 
 	// conditionEval = icmp ne i8 condition, 0
 	// br i1 conditionEval, label trueLabel, label Endif  
-	// TheModule->get functionStack
+	
 	SymbolEntry * e   = lookupActiveFun();
 	llvm::Function* f = e->u.eFunction.fun;
 	
@@ -326,6 +332,7 @@ llvm::Value* IfStatement::codegen(){
 
 	return nullptr;
 }
+
 llvm::Value* IfElseStatement::codegen(){
 	SymbolEntry * e = lookupActiveFun();
 	llvm::Function * f = e->u.eFunction.fun;
@@ -354,6 +361,7 @@ llvm::Value* IfElseStatement::codegen(){
 
 	return nullptr;
 }
+
 llvm::Value* ForStatement::codegen(){
 	// label: for(ex1 ; ex2; ex3)
 	// 				statement
@@ -420,10 +428,11 @@ llvm::Value* ForStatement::codegen(){
 	Builder->SetInsertPoint(EndForBlock);
 	return nullptr;
 }
+
 llvm::Value* ContinueStatement::codegen(){
 	/*
-	 * continue [label];
-	 *  
+	 * Label is always set from the invariant in semantic analysis (ContinueStatement::sem())
+	 * continue label;
 	 * 
 	 */
 	SymbolEntry * lblEntry ;
@@ -442,11 +451,16 @@ llvm::Value* ContinueStatement::codegen(){
 	Builder->SetInsertPoint(AfterContinue);
 	return nullptr;
 }
+
 llvm::Value* BreakStatement::codegen(){
+	/*
+	 * Label is always set from the invariant in semantic analysis (BreakStatement::sem())
+	 * break label;
+	 * 
+	 */
 	SymbolEntry * lblEntry ;
 	if(this->_target == ""){
 		lblEntry = lookupLabel(NULL, false);
-		// std::cout << lblEntry->id << std::endl;
 	}else{
 		lblEntry = lookupLabel(this->_target.c_str(), true);
 	}
@@ -460,6 +474,7 @@ llvm::Value* BreakStatement::codegen(){
 	Builder->SetInsertPoint(AfterBreak);
 	return nullptr;
 }
+
 llvm::Value* ReturnStatement::codegen(){
 	// return [e].
 	if(this->_expr == nullptr){
@@ -475,12 +490,22 @@ llvm::Value* ReturnStatement::codegen(){
 	Builder->SetInsertPoint(NewEntryBlock);
 	return nullptr;
 }
+
+
+
+//====================================================================================//
+// Code Generation Of Expressions                                                     //
+//====================================================================================//
+
 llvm::Value* Id::codegen(){
 	/*
+	 * If not array thus lval do:
+	 * ptr = this->calculateAddressOf();
+	 * val = *ptr
 	 * 
+	 * If array just get the ptr
 	 */
 	SymbolEntry * e = lookupEntry(this->_name.c_str(), LOOKUP_ALL_SCOPES, false);
-	// auto nestingLevel = e->nestingLevel;
 	
 	llvm::Value* crtPtr = this->calculateAddressOf();
 	llvm::Value* valOfVar = crtPtr;
@@ -545,21 +570,16 @@ llvm::Value* Constant::codegen(){
 
 
 llvm::Value* FunctionCall::codegen(){
-	// std::cout<< "mpika fCall\n";
-	// std::cout<< this->_functionName << std::endl;
+	
 	SymbolEntry* e = lookupEntry(this->_functionName.c_str(), LOOKUP_ALL_SCOPES, false);
-
-	// if(e == NULL);
-		// std::cout<< "enai null i malakia\n";
 
 	std::vector<llvm::Value*> evalArgs;
 
+	// if the calle is not in global scope we need to provide as argument it's static link
 	if(e->nestingLevel != GLOBAL_SCOPE){
-		// std::cout<< e->nestingLevel << std::endl;
 		evalArgs.push_back(getEnvAt(e->nestingLevel));
 	}
-
-	// #define forParameters(i, g) for(SymbolEntry* i = g->u.eFunction.firstArgument; i != NULL; i = i->u.eParameter.next)
+	// calculate the arguments in order
 	SymbolEntry * i = e->u.eFunction.firstArgument;
 	for(auto &arg : this->_arguments->_expressions){
 		if(i->u.eParameter.mode == PASS_BY_REFERENCE){
@@ -568,14 +588,11 @@ llvm::Value* FunctionCall::codegen(){
 			evalArgs.push_back(arg->codegen());
 		i = i->u.eParameter.next;
 	}
-	// printSymbolTable();
-	llvm::Function* f = e->u.eFunction.fun;
-	// std::cout<< f<< std::endl;
-	// f->print(llvm::outs());
-
-	return Builder->CreateCall(f,evalArgs);
 	
 
+
+	llvm::Function* f = e->u.eFunction.fun;
+	return Builder->CreateCall(f,evalArgs);
 }
 
 llvm::Value* BracketedIndex::codegen(){
@@ -600,6 +617,7 @@ llvm::Value* UnaryOp::codegen(){
 	
 	return nullptr;
 }
+
 llvm::Value* BinaryOp::codegen(){
 	llvm::Value* left;
 	llvm::Value* right;
@@ -751,6 +769,7 @@ llvm::Value* BinaryOp::codegen(){
 				return Builder->CreateZExt(cmp,i8,"neq");
 			}
 		case LAND:{
+			// Implementing Short Circuit
 			llvm::Value* cmpl;
 			SymbolEntry * e = lookupActiveFun();
 			llvm::Function * f = e->u.eFunction.fun;
@@ -782,6 +801,7 @@ llvm::Value* BinaryOp::codegen(){
 			return phi;
 			}
 		case LOR:{
+			// Implementing Short Circuit
 			llvm::Value* cmpl;
 			SymbolEntry * e = lookupActiveFun();
 			llvm::Function * f = e->u.eFunction.fun;
@@ -840,7 +860,6 @@ llvm::Value* PrefixUnAss::codegen(){
 		else if(equalType(this->_t, typeReal)){
 			nval = Builder->CreateFSub(val,llvm::ConstantFP::get(toLLVMType(typeReal),1.0L),"nval");
 		}else{
-			// llvm::Value* minus = Builder->CreateSub(c16(0),c16(1),"negoff");
 			nval = Builder->CreateGEP(val,c16(-1),"minusptr");
 		}
 
@@ -854,7 +873,7 @@ llvm::Value* PostfixUnAss::codegen(){
 	llvm::Value* nval;
 	
 	if(this->_Unass == PLUSPLUS){
-		// std::cout << this->_operand->getType()->kind << std::endl;
+		
 		if(equalType(this->_t, typeInteger)){
 			nval = Builder->CreateAdd(val,c16(1),"nval");
 		}
@@ -871,7 +890,6 @@ llvm::Value* PostfixUnAss::codegen(){
 		else if(equalType(this->_t, typeReal)){
 			nval = Builder->CreateFSub(val,llvm::ConstantFP::get(toLLVMType(typeReal),1.0L),"nval");
 		}else{
-			// llvm::Value* minus = Builder->CreateSub(c16(0),c16(1),"negoff");
 			nval = Builder->CreateGEP(val,c16(-1),"minusptr");
 		}
 
@@ -924,6 +942,11 @@ llvm::Value* BinaryAss::codegen(){
 	Builder->CreateStore(nval,addr);
 	return nval;
 }
+
+/**
+ * @brief See Semantics.md for typecast definitions
+ * 
+ */
 llvm::Value* TypeCast::codegen(){
 	llvm::Value* inner = this->_expr->codegen();
 	auto tt = this->_type->toType();
@@ -1007,7 +1030,24 @@ llvm::Value* TypeCast::codegen(){
 	destroyType(tt);
 	return casted;
 }
+
+
 llvm::Value* TernaryOp::codegen(){
+	/*
+	 * cond();
+	 * 
+	 * iftrue:
+	 * 	calctrue = ..
+	 *
+	 *  iffalse:
+	 * 	...
+	 * 	calcfalse = ..
+	 *
+	 * endif:
+	 * 	phi =  calctrue or calcfalse
+	 * 
+	 */
+	
 	SymbolEntry * e = lookupActiveFun();
 	llvm::Function * f = e->u.eFunction.fun;
 
@@ -1044,6 +1084,12 @@ llvm::Value* TernaryOp::codegen(){
 	return phi;
 }
 
+/**
+ * @brief Codegen the size of default it to the size of the type.
+ * Multiply the size by the size of the type. Call The global function
+ * _newF which internally calls malloc to allocate the memory and typecast the result
+ * see lib/nd.c
+ */
 llvm::Value* New::codegen(){
 	llvm::Value* index;
 	auto tt = this->_type->toType();
@@ -1051,10 +1097,8 @@ llvm::Value* New::codegen(){
 		index = c16(sizeOfType(tt));
 	else{
 		// ex. new int[16] 
+		
 		llvm::Value* size = this->_size->codegen();
-		// auto castedNull = llvm::Constant::getNullValue(toLLVMType(this->_t));
-		// auto indexBy1   = Builder->CreateGEP(castedNull, c64(1), "indexedNull");
-		// auto sizeOfT    = Builder->CreatePtrToInt(indexBy1, i16);
 		index = Builder->CreateMul(size,c16(sizeOfType(tt)),"idx");
 	}
 	llvm::Value* rawptr = Builder->CreateCall(newF,{index},"rawptr");
@@ -1062,8 +1106,13 @@ llvm::Value* New::codegen(){
 	return Builder->CreateBitCast(rawptr,toLLVMType(this->_t),"castptr");
 }
 
+/**
+ * @brief Call the _deleteF global Function which internally calls free
+ * see lib/nd.c
+ * 
+ */
 llvm::Value* Delete::codegen(){
-	// free((i8*) this->_t)
+	// _deleteF((i8*) this->_t)
 	llvm::Value* ptrToDelete = this->_expr->codegen();
 	llvm::Value* rawPtr = Builder->CreateBitCast(ptrToDelete, i8p, "rawptr");
 	Builder->CreateCall(deleteF, { rawPtr });
@@ -1071,10 +1120,17 @@ llvm::Value* Delete::codegen(){
 }
 
 llvm::Value* CommaExpr::codegen(){
+	/*
+	 * left; 
+	 * right;
+	 */
 	this->_left->codegen();
 	llvm::Value* right = this->_right->codegen();
 	return right;
 }
+
+
+
 llvm::Value* Label::codegen(){
 	return nullptr;
 }
@@ -1090,7 +1146,13 @@ llvm::Value* DeclarationList::codegen(){
 	return nullptr;
 }
 
-
+/**
+ * @brief Implementation of getting the static link called env in this compiler.
+ * Used for calling functions and getting variables in higher scope.
+ * 
+ * @param nestinglevel At which level is the static link requested
+ * @return llvm::Value* The static link
+ */
 llvm::Value* AST::getEnvAt(unsigned int nestinglevel){
 	auto currNest = currentScope->nestingLevel;
 	SymbolEntry *  currFun  = lookupActiveFun();
@@ -1107,7 +1169,6 @@ llvm::Value* AST::getEnvAt(unsigned int nestinglevel){
 	 */
 
 
-
 	for(int i = 0; i < iter; i++){
 		auto bitCastedEnv = Builder->CreateBitCast(currEnv, llvmPointer(i8p), "bitcastedEnv");
 		currEnv = Builder->CreateLoad(bitCastedEnv, "prevEnv");
@@ -1117,7 +1178,10 @@ llvm::Value* AST::getEnvAt(unsigned int nestinglevel){
 
 
 
-
+/**
+ * @brief Calculate the address of an lval and return a pointer to it
+ * 
+ */
 llvm::Value* Id::calculateAddressOf() {
 	// query the Symbol Table for the name && nesting level.
 	// get the env of the nested level of the variable (can be global here).
@@ -1125,20 +1189,14 @@ llvm::Value* Id::calculateAddressOf() {
 	SymbolEntry * e = lookupEntry(this->_name.c_str(), LOOKUP_ALL_SCOPES, false);
 	
 	if(e->nestingLevel == GLOBAL_SCOPE){
-		// then the value for it is in 
-		// std::cout << "======================||===================\n";
-		// TheModule->print(llvm::outs(), nullptr);
-		// std::cout << "===========================================\n";
-		
-		// auto temp = Builder->CreateBitCast(e->u.eVariable.llvmVal,llvmPointer(toLLVMType(e->u.eVariable.type)));
-		// llvm::Value* value = Builder->CreateGEP(temp, c64(0), this->_name);
-		// return value;
+
 		llvm::Value* val = e->u.eVariable.llvmVal;
 		if(e->u.eVariable.type->kind == Type_tag::TYPE_ARRAY){
 			val = Builder->CreateBitCast(val,(toLLVMType(e->u.eVariable.type)));
 		}
 		return val;
 	}else{
+		// local to a function
 		if(e->nestingLevel > GLOBAL_SCOPE && e->u.eVariable.type->kind == Type_tag::TYPE_ARRAY) {
 			llvm::Value* envOfVariable = getEnvAt(e->nestingLevel);
 			// get pointer to the offset. TypeCast it to type of Id * 
@@ -1166,6 +1224,7 @@ llvm::Value* Id::calculateAddressOf() {
 		if(e->entryType == ENTRY_PARAMETER && e->u.eParameter.mode == PASS_BY_REFERENCE){
 			llvm::Value* envOfVariable = getEnvAt(e->nestingLevel);
 			// get pointer to the offset. TypeCast it to type of Id * 
+			// One Extra Load if it is byreference see Semantics.md
 			llvm::Value* rawBytePtr = Builder->CreateGEP(envOfVariable, c64(e->u.eVariable.offset), "rawBytePtr");
 			llvm::Value* actualVarPointer = Builder->CreateBitCast(
 				rawBytePtr, 
@@ -1181,14 +1240,20 @@ llvm::Value* Id::calculateAddressOf() {
 	}
 	return nullptr;
 }
+
+/*
+ * Should not get called on lvals
+ */
 llvm::Value* Constant::calculateAddressOf() {
 	fatal("calculateAddressOf on Constant.");
 	return nullptr;
 }
+
 llvm::Value* FunctionCall::calculateAddressOf() {
 	fatal("calculateAddressOf on FunctionCall.");
 	return nullptr;
 }
+
 llvm::Value* BracketedIndex::calculateAddressOf() {
 	// Calculate the base pointer
 	// this->_out : Expression of type Pointer, this->_in : Expression of type Int.
@@ -1198,6 +1263,7 @@ llvm::Value* BracketedIndex::calculateAddressOf() {
 	// return the added pointer
 	return Builder->CreateGEP(basePtr, offset, "calc.ptr");
 }
+
 llvm::Value* UnaryOp::calculateAddressOf() {
 	if(this->_UnOp ==  DEREF){
 		// this->_operand : Pointer(t)
@@ -1208,6 +1274,11 @@ llvm::Value* UnaryOp::calculateAddressOf() {
 	return nullptr;
 
 }
+
+
+/*
+ * Should not get called on lvals
+ */
 llvm::Value* BinaryOp::calculateAddressOf() {
 	fatal("calculateAddressOf on BinaryOp.");
 	return nullptr;
@@ -1241,12 +1312,10 @@ llvm::Value* CommaExpr::calculateAddressOf() {
 	fatal("calculateAddressOf on FunctionCall.");
 	return nullptr;
 }
-
 llvm::Value* PrefixUnAss::calculateAddressOf(){
 	fatal("calculateAddressOf on PrefixUnAss.");
 	return nullptr;
 }
-
 llvm::Value* PostfixUnAss::calculateAddressOf(){
 	fatal("calculateAddressOf on PostfixUnAss");
 	return nullptr;

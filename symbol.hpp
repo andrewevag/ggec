@@ -1,21 +1,6 @@
-/******************************************************************************
- *  CVS version:
- *     $Id: symbol.hpp,v 1.1 2003/05/13 22:21:01 nickie Exp $
- ******************************************************************************
- *
- *  C header file : symbol.hpp
- *  Project       : PCL Compiler
- *  Version       : 1.0 alpha
- *  Written by    : Nikolaos S. Papaspyrou (nickie@softlab.ntua.gr)
- *  Date          : May 14, 2003
- *  Description   : Generic symbol table in C
- *
- *  Comments: (in Greek iso-8859-7)
- *  ---------
- *  Εθνικό Μετσόβιο Πολυτεχνείο.
- *  Σχολή Ηλεκτρολόγων Μηχανικών και Μηχανικών Υπολογιστών.
- *  Τομέας Τεχνολογίας Πληροφορικής και Υπολογιστών.
- *  Εργαστήριο Τεχνολογίας Λογισμικού
+/*
+ *  Written by    : Nikolaos S. Papaspyrou
+ *  Modified by   : Nikoletta Barmpa, Andreas Evangelatos
  */
 
 
@@ -26,21 +11,7 @@
 #include <utility>
 #include <string>
 #include "llvmhead.hpp"
-
-/* ---------------------------------------------------------------------
-   -------------------------- Τύπος bool -------------------------------
-   --------------------------------------------------------------------- */
-
 #include <stdbool.h>
-
-/*
- *  Αν το παραπάνω include δεν υποστηρίζεται από την υλοποίηση
- *  της C που χρησιμοποιείτε, αντικαταστήστε το με το ακόλουθο:
- */
-
-#if 0
-typedef enum { false=0, true=1 } bool;
-#endif
 
 
 /* ---------------------------------------------------------------------
@@ -211,10 +182,10 @@ typedef enum {
    ------------- Καθολικές μεταβλητές του πίνακα συμβόλων --------------
    --------------------------------------------------------------------- */
 
-extern Scope        * currentScope;       /* Τρέχουσα εμβέλεια         */
-extern unsigned int   quadNext;           /* Αριθμός επόμενης τετράδας */
-extern unsigned int   tempNumber;         /* Αρίθμηση των temporaries  */
-extern std::vector<SymbolEntry*> lastDefFuns; /* function we're processing */
+extern Scope        * currentScope;            /* Τρέχουσα εμβέλεια         */
+extern unsigned int   quadNext;                /* Αριθμός επόμενης τετράδας */
+extern unsigned int   tempNumber;              /* Αρίθμηση των temporaries  */
+extern std::vector<SymbolEntry*> lastDefFuns;  /* function we're processing */
 
 extern const Type typeVoid;
 extern const Type typeInteger;
@@ -224,8 +195,17 @@ extern const Type typeReal;
 extern const Type typeAny;
 
 
+/**
+ * @brief Transform semantic type to llvm type
+ *
+ */
 llvm::Type* toLLVMType(Type t);
 
+/**
+ * @brief Class for carrying type information for nodes in the AST.
+ * (Also if it is an lval or not)
+ * 
+ */
 class TypedExpression {
 public:
    TypedExpression(){
@@ -235,7 +215,9 @@ public:
    virtual ~TypedExpression();
 
    Type getType() { return this->_t; }
+   
    bool isLval() { return this->_isLval; }
+   
    bool isPtrType() {
       if (this->_t != NULL){
          if(this->_t->kind == Type_tag::TYPE_POINTER)
@@ -245,9 +227,7 @@ public:
       }
       return false;
    }
-   // static bool eqType(TypedExpression* l, TypedExpression* r){
-   //    equalType(l->_t, r->_t);
-   // }
+   
    static Type copyType(Type _t){
       if( _t->kind == Type_tag::TYPE_ARRAY ||
           _t->kind == Type_tag::TYPE_IARRAY ||
@@ -266,9 +246,6 @@ public:
          return t;
        }
    }
-   // Type getTypeCopy(){
-   //    return copyType(this->_t);
-   // }
    
 protected:
    Type _t;

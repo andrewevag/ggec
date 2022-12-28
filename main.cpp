@@ -12,9 +12,6 @@ int main(int argc, char** argv){
 
 	int ret = yyparse();
 	
-	// print Syntax Tree
-	// syntaxTree->printTree(std::cout);
-
 	syntaxTree->codegen();
 	
 	handleOutput();

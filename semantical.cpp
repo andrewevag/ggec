@@ -3,11 +3,13 @@
 #include <sstream> 
 #include <string>
 
-/* ---------------------------------------------------------------------
-   ------------- Καθολικές μεταβλητές της Σημασιολογίας ----------------
-   --------------------------------------------------------------------- */
+//====================================================================================//
+// Global Variables for Semantic Analysis                                             //
+//====================================================================================//
+
 SymbolEntry* entryForFunction;
 #define forCurrentScope(e) for(SymbolEntry* e = currentScope->entries; e != NULL; e = e->nextInScope)
+
 
 TypeExpression* TypeExpression::fromType(Type t)
 {
@@ -33,10 +35,9 @@ TypeExpression* TypeExpression::fromType(Type t)
 		return nullptr;
 	}
 
-/* ---------------------------------------------------------------------
-   ------------- Semantic Analysis For Declarations --------------------
-   --------------------------------------------------------------------- */
-
+//====================================================================================//
+// Semantic Analysis For Program                                                      //
+//====================================================================================//
 
 void Program::sem(){
 	initSymbolTable(256);
@@ -44,6 +45,8 @@ void Program::sem(){
 	
 	/* perform semantic analysis of the program declarations. */
 	this->_decls->sem();
+
+	/* check that a void main() is defined */
 	bool mainDefined = false;
 	forCurrentScope(e)
 		if(e->entryType == ENTRY_FUNCTION && std::string(e->id) == "main")
@@ -53,10 +56,12 @@ void Program::sem(){
 	if( ! mainDefined)
 		fatal("Function \"void main ()\" not defined on global scope");
 	
-	// ErrorInfo::Fatal(this, "Just Wanted to see");
-	// closeScope();
-	// destroySymbolTable();
 }
+
+//====================================================================================//
+// Semantic Analysis For Declarations                                                 //
+//====================================================================================//
+
 
 void VariableDeclaration::sem() {
 	auto tt = this->_typeExpr->toType();
@@ -66,7 +71,6 @@ void VariableDeclaration::sem() {
 	}
 	this->codegen();
 	destroyType(tt);
-	// if this is a local variable this is null --> offset sto symbolTable.
 }
 
 void ArrayDeclaration::sem(){
@@ -81,7 +85,6 @@ void ArrayDeclaration::sem(){
 	if(e == NULL){
 		fatal("Variable Name is not available in Scope (%s)", this->_name.c_str());
 	}
-	// ErrorInfo::Fatal(this, "Fatal At variable to see");
 	this->codegen();
 	destroyType(ta);
 	destroyType(tt);
@@ -89,15 +92,7 @@ void ArrayDeclaration::sem(){
 
 void FunctionDeclaration::sem(){
 	/* This is a forward function declaration */
-	//    p = newFunction("f");
-	//    forwardFunction(p);
-	//    openScope();
-	//    newParameter("x", typeInteger, PASS_BY_VALUE, p);
-	//    newParameter("y", typeReal, PASS_BY_REFERENCE, p);
-	//    endFunctionHeader(p, typeVoid);
-	//    closeScope();
-	// void f(int g, int k);
-	// f_int_int;
+	
 
 	SymbolEntry* f;
 	/* Calculate the new name based on the parameter list */
@@ -107,23 +102,24 @@ void FunctionDeclaration::sem(){
 	}
 	forwardFunction(f);
 	openScope();
-	// Should register all parameters of the function
-	// !!!!!!!!!!!!!!!!!!!!!!
-	// TEMPORARY !!!!!!!!!!!!
-	// !!!!!!!!!!!!!!!!!!!!!!
-	// !!!!!!!!!!!!!!!!!!!!!!
 	entryForFunction = f;
+	/* Put Parameters */
 	this->_parameters->sem();
+	
 	auto tt = this->_resultType->toType();
 	endFunctionHeader(f, tt);
+	
+	
 	this->declare();
+	
 	destroyType(tt);
 	closeScope();
-	// printSymbolTable();
 
 }
 
 void FunctionDefinition::sem() {
+	/* This is a complete function definition */
+
 	SymbolEntry* f;
 	f = newFunction(this->getName().c_str());
 	if(f == NULL){
@@ -155,17 +151,12 @@ void FunctionDefinition::sem() {
 	
 	this->codegen();
 	
-	// TheFunction <- from this->codegen();
-	// gets execution in a new basic block inside TheFunction
-	// this->_statements->codegen();
 	destroyType(tt);
 	closeScope();
-	// printSymbolTable();
-	
 }
 
 void Parameter::sem(){
-	// printSymbolTable();
+	
 	auto tt = this->_type->toType();
 	SymbolEntry* e = newParameter(
 		this->_name.c_str(), 
@@ -186,9 +177,9 @@ void ParameterList::sem(){
 
 
 
-/* ---------------------------------------------------------------------
-   ------------- Semantic Analysis For Statements --------------------
-   --------------------------------------------------------------------- */
+//====================================================================================//
+// Semantic Analysis For Statements                                                   //
+//====================================================================================//
 
 
 void EmptyStatement::sem(){}
@@ -231,7 +222,7 @@ void IfElseStatement::sem(){
  * If a label is present add it in the stack of active labels since it can be used
  * in the loop body.
  * If a label is not present in the for loop header add it with a new name in the 
- * stack of active labels to indicate that we are in a loop
+ * stack of active labels to indicate that we are in a loop (the name has no conflicts)
  * 
  */
 void ForStatement::sem(){
@@ -257,7 +248,7 @@ void ForStatement::sem(){
 		}
 	}else{
 		this->_second = new Constant(true);
-		// this->_second->sem();
+		this->_second->sem();
 	}
 	if(this->_third != nullptr){
 		this->_third->sem();
@@ -291,7 +282,9 @@ void ForStatement::sem(){
  * and is active.
  * If not searching with a name get the last label (which is the deepest in
  * the case of nested loops) and verify that this is active.
- * If not in loop semantics fail!
+ * If not in loop, semantics fail!
+ * 
+ * \b invariant The target is always set at the end of Semantic Analysis of The Continue Statement
  */
 void ContinueStatement::sem(){
 	SymbolEntry* e;
@@ -333,7 +326,9 @@ void ContinueStatement::sem(){
  * and is active.
  * If not searching with a name get the last label (which is the deepest in
  * the case of nested loops) and verify that this is active.
- * If not in loop semantics fail!
+ * If not in loop, semantics fail!
+ * 
+ * \b invariant The target is always set at the end of Semantic Analysis of The Break Statement
  */
 void BreakStatement::sem(){
 	SymbolEntry* e;
@@ -383,7 +378,6 @@ void ReturnStatement::sem() {
 	else{
 		Type resultType = e->u.eFunction.resultType;
 		if (this->_expr == nullptr && (! equalType(typeVoid, resultType))){
-			// printSymbolTable();
 			printType(resultType);
 			fatal("Expected an expression in the return statement");
 		}
@@ -399,13 +393,13 @@ void ReturnStatement::sem() {
 }
 
 
-/* ---------------------------------------------------------------------
-   ------------- Semantic Analysis For Expressions ---------------------
-   --------------------------------------------------------------------- */
+//====================================================================================//
+// Semantic Analysis For Expressions                                                  //
+//====================================================================================//
 
 /**
  * @brief Check that it is already defined as a variable or parameter
- * and get it's type. It is lval.
+ * and get it's type. It is lval if the variable does not represent an array.
  * 
  */
 void Id::sem()
@@ -429,7 +423,7 @@ void Id::sem()
 			break;
 		}
 	}
-	// if this is an array type this should be immutable
+	// if this is an array type this should be immutable thus not lval
 	this->_isLval = (this->_t->kind == Type_tag::TYPE_ARRAY) ? false : true;
 }
 
@@ -472,7 +466,11 @@ void Constant::sem()
  * 
  */
 void FunctionCall::sem(){
-	// need to look for a fixed name based on the arguments.
+	/* need to look for a fixed name based on the arguments.
+	 * to handle polymorphism. Create a new declaration Node as called by the types of the arguments
+	 * to figure out the name of the overloaded function.
+     * to see if a function with the same types of arguments can be called (is Visible).
+	 */
 	this->_arguments->sem();
 	ParameterList* pn = new ParameterList();
 	for(auto & arg: this->_arguments->_expressions){
@@ -495,7 +493,6 @@ void FunctionCall::sem(){
 	delete decl;
 
 	// argument matching
-	// TODO mallon peritto
 	size_t i = 0;
 	forParameters(p, e){
 		if(p->entryType != ENTRY_PARAMETER){
@@ -550,6 +547,7 @@ void UnaryOp::sem() {
 	this->_operand->sem();
 	std::string printable[] = {"+", "-"};
 	switch (this->_UnOp) {		
+	
 	case UnaryOp::ADDRESS:
 		if( ! this->_operand->isLval()){
 			fatal("& not on l-value");
@@ -557,6 +555,7 @@ void UnaryOp::sem() {
 		this->_t = typePointer(copyType(this->_operand->getType()));
 		this->_isLval = false;
 		break;
+
 	case UnaryOp::DEREF:
 		if ( ! this->_operand->isPtrType() ){
 			fatal("* operator used on a non pointer type");
@@ -564,6 +563,7 @@ void UnaryOp::sem() {
 		this->_t = copyType(this->_operand->getType()->refType);
 		this->_isLval = true;
 		break;
+	
 	case UnaryOp::POS: case UnaryOp::NEG:
 		if ( ! equalType(this->_operand->getType(), typeInteger) && 
 		  	 ! equalType(this->_operand->getType(), typeReal))
@@ -575,6 +575,7 @@ void UnaryOp::sem() {
 		 this->_t = copyType(this->_operand->getType());
 		 this->_isLval = false;
 		break;
+	
 	case UnaryOp::NOT:
 		if (! equalType(this->_operand->getType(), typeBoolean)){
 			fatal("Unary ! operator used on non bool operrand");
@@ -582,12 +583,16 @@ void UnaryOp::sem() {
 		this->_t = copyType(typeBoolean);
 		this->_isLval = false;
 		break;
+	
 	default:
 		break;
 	}
 }
 
-
+/**
+ * @brief This is to abstrack the common part of analysis for binary operators and binary assignments
+ * 
+ */
 void binaryOpAnalysis(BinaryOp& b)
 {
 	// BinaryOp* bop = &b;
@@ -705,7 +710,9 @@ void binaryOpAnalysis(BinaryOp& b)
  */
 void BinaryOp::sem(){
 	try {
+
 		binaryOpAnalysis(*this);
+	
 	} catch (BinaryOpType opr){
 		std::string printable[] = {
 			"*", "/", "%", "+", "-", "<", ">", "<=", ">=", "==", "!=", "&&", "||", ","
@@ -780,10 +787,12 @@ void PostfixUnAss::sem(){
 }
 
 /**
- * @brief 
+ * @brief Use BinaryOpAnalysis to handle the semantics of the binary assignment 
+ * That's because they are the same as in binary operation.
  * 
  */
 void BinaryAss::sem(){
+	// Instead of looking back .. The redefinition
 	// enum BinaryOpType { MULT, DIV, MOD, PLUS, MINUS, LESS, GREATER, LESSEQ,
 	// GREATEREQ, EQUALS, NOTEQ, LAND, LOR, COMMA };
 	// enum BinaryAssType { ASS, MULTASS, DIVASS, MODASS, PLUSASS, MINUSASS };
@@ -796,7 +805,9 @@ void BinaryAss::sem(){
 
 	
 	try {
+
 		binaryOpAnalysis(*b);
+
 	} catch (BinaryOp::BinaryOpType opr){
 		switch(opr){
 			case BinaryOp::EQUALS:
@@ -828,15 +839,22 @@ void BinaryAss::sem(){
 
 }
 
+/**
+ * @brief Type of the node is the type of the cast. Not lval.
+ * 
+ */
 void TypeCast::sem(){
 	this->_expr->sem();
-	// Type t = this->_expr->getType();
 	Type t = this->_type->toType();
 	this->_t = copyType(t);
 	destroyType(t);
 	this->_isLval = false;
 }
 
+/**
+ * @brief Similar to if then else type of one of the clauses. Not lval.
+ * 
+ */
 void TernaryOp::sem(){
 	this->_condition->sem();
 	this->_ifBody->sem();
@@ -852,10 +870,9 @@ void TernaryOp::sem(){
 }
 
 /**
- * @brief If size is given the expression should be int => return type* 
- *        If size is not given just return type*this->getType()
- * 		  Is not lval.
- * 
+ * @brief If size is given the expression should be int, set type to _type* 
+ * If size is not given just set type to _type*. 
+ * Is not lval.
  * 
  */
 void New::sem(){
@@ -866,7 +883,7 @@ void New::sem(){
 		}
 	}
 	Type t = this->_type->toType();
-	// destroyType(t);
+	
 	this->_t = typePointer(copyType(t));
 	this->_isLval = false;
 	destroyType(t);
@@ -885,7 +902,10 @@ void Delete::sem(){
 }
 
 
-
+/**
+ * @brief The type of this Comma expression is the type of _right.
+ * 
+ */
 void CommaExpr::sem(){
 	this->_left->sem();
 	this->_right->sem();

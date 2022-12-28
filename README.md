@@ -28,9 +28,6 @@ A Compiler for the Edsger Programming Language
 - When processing a function first add the function in current scope and open a new one =>> The function whose processing is being done is the last entry of the parent scope if such exists. Since things added in the symbol table are backwards it is the first in the list of entries in parent scope. 
 - Scope nesting level of a function body is always > 1. Global scope is with nesting level 1.
 - Non Nested Function Declarations can be defined externally by using the same name convention
-# Tasks do not forget:
-- Fix Symbol offset in symbol table. (Pointers are different size in LLVM)
-- Prettify source code!!
 
 # Codegen Invariants
 1. Δινεις παντα σε κατωτερες nested συναρτησεις το δικο σου local environmnent.
@@ -98,3 +95,56 @@ ex. int x, y; is it's own declaration List.
 - (haskell) stack
 - EdsgerProgramGenerator..
 
+# Περιγραφή αρχείων
+- `main.cpp`
+  Ορισμός της main.
+
+- `inc/tree.h`, `src/tree.c`
+  
+  Ορίζεται class το τύπωμα δέντρων. Οι κόμβοι του AST την κληρονομούν
+
+- `ast.hpp`
+
+  Ορισμός των κόμβων του AST.
+
+- `ast.cpp`
+
+  Οι destructors των κλάσεων που ορίστηκαν στο `ast.hpp`
+
+- `tojsonstring.cpp`
+
+  Οι υλοποιήσεις των συναρτήσεων toJSONString για τους κόμβους του AST. Αυτή η συνάρτηση χρησιμοποιείται μόνο κατά το testing του parser για την σύγκριση συντακτικών δέντρων.
+
+- `lexer.l`
+  
+  Ο lexer. Meta-program του flex.
+- `lexer.hpp`
+  Ορισμός των συναρτήσεων του lexer για χειρισμό από άλλα μέρη.
+
+- `parser.y`
+
+  Ο Parser. Meta-program του bison.
+
+- `llvmhead.hpp`
+  
+  #include τα απαραίτητα για το llvm.
+
+- `error.hpp`, `error.cpp`
+
+  Συναρτήσεις για τον χειρισμό σφαλμάτων και ErrorInfo Class για τους κόμβους του AST.
+
+- `general.hpp`, `general.cpp`
+
+  Ορισμός καθολικών μεταβλητών του state και υλοποιήσεις συναρτήσεων χειρισμού ορισμάτων (flags) και εξόδου (print to stdout, asm, imm).
+
+- `symbol.hpp`, `symbol.cpp`
+
+  Ορισμός και υλοποίηση symbol table και τύπων.
+
+- `semantical.cpp`
+
+  Ορισμός της sem (σημασιολογικής ανάλυσης) για τους κόμβους του AST.
+
+- `codegen.cpp`
+  
+  Ορισμός της codegen (παραγωγή κώδικα και βοηθητικές) για τους κόμβους του AST.

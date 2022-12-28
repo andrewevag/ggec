@@ -6,21 +6,21 @@ AST::~AST(){}
 
 Program::~Program(){
 	nullsafedelete(_decls);
-//	std::cout << "Deleting Program\n";
+
 }
 
 Declaration::~Declaration(){
-//	std::cout << "Deleting Declaration\n";
+
 }
 
 VariableDeclaration::~VariableDeclaration(){ 
 	nullsafedelete(_typeExpr);
-//	std::cout << "Deleting Variable Declaration\n";
+
 }
 
 ArrayDeclaration::~ArrayDeclaration(){ 
 	nullsafedelete(_expr);
-//	std::cout << "Deleting Array Declaration\n";
+
 }
 
 FunctionDeclaration::~FunctionDeclaration() { 

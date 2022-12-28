@@ -1,27 +1,7 @@
-/******************************************************************************
- *  CVS version:
- *     $Id: symbol.c,v 1.3 2004/05/05 22:00:08 nickie Exp $
- ******************************************************************************
- *
- *  C code file : symbol.c
- *  Project     : PCL Compiler
- *  Version     : 1.0 alpha
- *  Written by  : Nikolaos S. Papaspyrou (nickie@softlab.ntua.gr)
- *  Date        : May 14, 2003
- *  Description : Generic symbol table in C
- *
- *  Comments: (in Greek iso-8859-7)
- *  ---------
- *  Εθνικό Μετσόβιο Πολυτεχνείο.
- *  Σχολή Ηλεκτρολόγων Μηχανικών και Μηχανικών Υπολογιστών.
- *  Τομέας Τεχνολογίας Πληροφορικής και Υπολογιστών.
- *  Εργαστήριο Τεχνολογίας Λογισμικού
+/*
+ *  Written by    : Nikolaos S. Papaspyrou
+ *  Modified by   : Nikoletta Barmpa, Andreas Evangelatos
  */
-
-
-/* ---------------------------------------------------------------------
-   ---------------------------- Header files ---------------------------
-   --------------------------------------------------------------------- */
 
 #include <cstdio>
 #include <cstring>
@@ -61,7 +41,7 @@ const Type typeInteger = &(typeConst[1]);
 const Type typeBoolean = &(typeConst[2]);
 const Type typeChar    = &(typeConst[3]);
 const Type typeReal    = &(typeConst[4]);
-const Type typeAny     = &(typeConst[5]);
+const Type typeAny     = &(typeConst[5]); // No Longer Used
 size_t labelNamingInt = 0;
 
 
@@ -452,21 +432,6 @@ SymbolEntry * newParameter (const char * name, Type type,
     return NULL;
 }
 
-// static unsigned int fixOffset (SymbolEntry * args)
-// {
-//     if (args == NULL)
-//         return 0;
-//     else {
-//         unsigned int rest = fixOffset(args->u.eParameter.next);
-        
-//         args->u.eParameter.offset = currentScope->varOffset + rest;
-//         if (args->u.eParameter.mode == PASS_BY_REFERENCE)
-//             return rest + 2;
-//         else
-//             return rest + sizeOfType(args->u.eParameter.type);
-//     }
-// }
-
 void forwardFunction (SymbolEntry * f)
 {
     if (f->entryType != ENTRY_FUNCTION)
@@ -522,6 +487,9 @@ SymbolEntry * newTemporary (Type type)
     return e;
 }
 
+//====================================================================================//
+// Function For Adding Label in The Symbol Table                                      //
+//====================================================================================//
 SymbolEntry * newLabel (const char * name)
 {
     SymbolEntry* e;
@@ -556,6 +524,10 @@ std::pair<SymbolEntry*, std::string> newUnnamedLabel ()
     }
     return std::make_pair<>(e, ss.str());
 }
+
+//====================================================================================//
+//====================================================================================//
+
 
 void destroyEntry (SymbolEntry * e)
 {
@@ -622,6 +594,9 @@ SymbolEntry * lookupEntry (const char * name, LookupType type, bool err)
     return NULL;
 }
 
+//====================================================================================//
+// Function For Looking Up Labels in the symbol Table                                 //
+//====================================================================================//
 
 SymbolEntry * lookupLabel(const char * name, bool explicitelyNamed)
 {
@@ -656,18 +631,7 @@ SymbolEntry * lookupLabel(const char * name, bool explicitelyNamed)
     
 }
 /**
- * @brief \b Invariant If currently processing the body of a function CurrentScope's
- * nesting level > 1 else if in global scope 0. Plus the entry for the function
- * currently being processed is the first entry of Current's Scope Parent Scope.
- * 
- * @return SymbolEntry* 
- * if Processing a function
- * Return the entry for that function
- * @endif
- * if Not processing a function
- * Return NULL;
- * @endif
- * 
+ * Query The Stack of Functions for the last active one
  * 
  */
 SymbolEntry * lookupActiveFun    ()
@@ -675,28 +639,12 @@ SymbolEntry * lookupActiveFun    ()
     if(lastDefFuns.size() == 0)
         return NULL;
     else return lastDefFuns.back();
-    SymbolEntry* e;
-    if (currentScope->nestingLevel > 1){
-        // we are in a function look invariants
-        // get the function defined in parent scope.
-        e = currentScope->parent->entries;
-        if( e != NULL){
-            if(e->entryType == ENTRY_FUNCTION){
-                return e;   
-            }else { 
-                fatal("Internal Error: The First element of the parent scope "
-                      "is not a function invariant breached!!");
-                return NULL;
-            }
-        }else{
-               fatal("Internal Error: The First element of the parent scope "
-                      "doesnt exist invariant breached!!");
-               return NULL;
-        }
-    }else{
-        return NULL;
-    }
 }
+
+//====================================================================================//
+// Semantic Type Operations                                                           //
+//====================================================================================//
+
 
 Type typeArray (RepInteger size, Type refType)
 {
@@ -755,40 +703,36 @@ void destroyType (Type type)
 
 unsigned int sizeOfType (Type type)
 {
-    // toLLVMType(type)
+    // Get the size of the type for DataLayout to handle alignment.
     if(type->kind == Type_tag::TYPE_ARRAY){
-        
         auto size = type->size * sizeOfType(type->refType);
-        // std::cerr << "Size of"; printType(type); std::cerr << size << std::endl;
         return size;
-    }else{
-        
+    }else{       
         auto size = AST::TheModule->getDataLayout().getTypeAllocSize(toLLVMType(type));
-        // std::cerr << "Size of"; printType(type); std::cerr << size << std::endl;
         return size;
     }
 
     
-    switch (type->kind) {
-        case Type_tag::TYPE_VOID:
-            internal("Type void has no size");
-            break;
-        case Type_tag::TYPE_INTEGER:
-            return 2;
-        case Type_tag::TYPE_IARRAY:
-        case Type_tag::TYPE_POINTER:
-            return 8;
-        case Type_tag::TYPE_BOOLEAN:
-        case Type_tag::TYPE_CHAR:
-            return 1;
-        case Type_tag::TYPE_REAL:
-            return 10;
-        case Type_tag::TYPE_ARRAY:
-            return type->size * sizeOfType(type->refType);
-        case Type_tag::TYPE_ANY:
-            return 0;
-    }
-    return 0;
+    // switch (type->kind) {
+    //     case Type_tag::TYPE_VOID:
+    //         internal("Type void has no size");
+    //         break;
+    //     case Type_tag::TYPE_INTEGER:
+    //         return 2;
+    //     case Type_tag::TYPE_IARRAY:
+    //     case Type_tag::TYPE_POINTER:
+    //         return 2;
+    //     case Type_tag::TYPE_BOOLEAN:
+    //     case Type_tag::TYPE_CHAR:
+    //         return 1;
+    //     case Type_tag::TYPE_REAL:
+    //         return 10;
+    //     case Type_tag::TYPE_ARRAY:
+    //         return type->size * sizeOfType(type->refType);
+    //     case Type_tag::TYPE_ANY:
+    //         return 0;
+    // }
+    // return 0;
 }
 
 bool equalType (Type type1, Type type2)

@@ -136,6 +136,9 @@ P [^\x00-\x1f\x7f\\\'\"]
 %%
 
 
+/**
+ * Handle Escape Characters Functions
+ */
 uint8_t getCharFromString(const char* s){
     uint8_t c;
     if(s[0] == '\\'){
