@@ -60,7 +60,10 @@ void Program::sem(){
 
 void VariableDeclaration::sem() {
 	auto tt = this->_typeExpr->toType();
-	newVariable(this->getName().c_str(), tt);
+	SymbolEntry* e = newVariable(this->getName().c_str(), tt);
+	if(e == NULL){
+		fatal("Variable Name is not available in Scope (%s)", this->_name.c_str());
+	}
 	this->codegen();
 	destroyType(tt);
 	// if this is a local variable this is null --> offset sto symbolTable.
@@ -74,7 +77,10 @@ void ArrayDeclaration::sem(){
 	}
 	auto tt = this->_typeExpr->toType();
 	auto ta = typeArray(size, tt);
-	newVariable(this->getName().c_str(), ta);
+	SymbolEntry* e = newVariable(this->getName().c_str(), ta);
+	if(e == NULL){
+		fatal("Variable Name is not available in Scope (%s)", this->_name.c_str());
+	}
 	// ErrorInfo::Fatal(this, "Fatal At variable to see");
 	this->codegen();
 	destroyType(ta);
@@ -96,6 +102,9 @@ void FunctionDeclaration::sem(){
 	SymbolEntry* f;
 	/* Calculate the new name based on the parameter list */
 	f = newFunction(this->getName().c_str());
+	if(f == NULL){
+		fatal("Duplicate Function Definition (%s) In Current Scope", this->_name.c_str());
+	}
 	forwardFunction(f);
 	openScope();
 	// Should register all parameters of the function
@@ -158,12 +167,15 @@ void FunctionDefinition::sem() {
 void Parameter::sem(){
 	// printSymbolTable();
 	auto tt = this->_type->toType();
-	newParameter(
+	SymbolEntry* e = newParameter(
 		this->_name.c_str(), 
 		tt, 
 		(this->_pw == ByCall) ? PASS_BY_VALUE : PASS_BY_REFERENCE,
 		entryForFunction
 	);
+	if(e == NULL){
+		fatal("Variable Name is not available in Scope (%s)", this->_name.c_str());
+	}
 	destroyType(tt);
 }
 

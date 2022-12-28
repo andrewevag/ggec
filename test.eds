@@ -1,6 +1,12 @@
+void writeInteger(int i);
+
 void main(){
-int x;
-x = 5;
-return;
-x = 20;
+	 char* x;
+	 double y;
+	 bool b;
+	 char c;
+	 double x10[10];
+	 x = (char*) NULL;
+	 x += 1;
+	 writeInteger((int) x);
 }

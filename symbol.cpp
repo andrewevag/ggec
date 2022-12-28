@@ -755,6 +755,20 @@ void destroyType (Type type)
 
 unsigned int sizeOfType (Type type)
 {
+    // toLLVMType(type)
+    if(type->kind == Type_tag::TYPE_ARRAY){
+        
+        auto size = type->size * sizeOfType(type->refType);
+        // std::cerr << "Size of"; printType(type); std::cerr << size << std::endl;
+        return size;
+    }else{
+        
+        auto size = AST::TheModule->getDataLayout().getTypeAllocSize(toLLVMType(type));
+        // std::cerr << "Size of"; printType(type); std::cerr << size << std::endl;
+        return size;
+    }
+
+    
     switch (type->kind) {
         case Type_tag::TYPE_VOID:
             internal("Type void has no size");
@@ -806,40 +820,40 @@ bool equalType (Type type1, Type type2)
 void printType (Type type)
 {
     if (type == NULL) {
-        printf("<undefined>");
+        fprintf(stderr, "<undefined>");
         return;
     }
     
     switch (type->kind) {
         case Type_tag::TYPE_VOID:
-            printf("void");
+            fprintf(stderr, "void");
             break;
         case Type_tag::TYPE_INTEGER:
-            printf("int");
+            fprintf(stderr, "int");
             break;
         case Type_tag::TYPE_BOOLEAN:
-            printf("bool");
+            fprintf(stderr, "bool");
             break;
         case Type_tag::TYPE_CHAR:
-            printf("char");
+            fprintf(stderr, "char");
             break;
         case Type_tag::TYPE_REAL:
-            printf("double");
+            fprintf(stderr, "double");
             break;
         case Type_tag::TYPE_ARRAY:
-            printf("array [%d] of ", type->size);
+            fprintf(stderr, "array [%d] of ", type->size);
             printType(type->refType);
             break;
         case Type_tag::TYPE_IARRAY:
-            printf("array of ");
+            fprintf(stderr, "array of ");
             printType(type->refType);
             break;
         case Type_tag::TYPE_POINTER:
-            printf("*");
+            fprintf(stderr, "*");
             printType(type->refType);
             break;
         case Type_tag::TYPE_ANY:
-            printf("Any");
+            fprintf(stderr, "Any");
             break;
     }
 }

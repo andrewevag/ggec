@@ -87,10 +87,10 @@ void fatal (const char * fmt, ...)
    printf("%s\n", s.c_str());
    for(int i = 0; i < columnno-1; i++){
 		if(s[i] == '\t')
-			std::cout << "_______";
-		std::cout << "_";
+			fprintf(stderr, "_______");
+		fprintf(stderr, "_");
    }
-	std::cout << "^\n";   
+	fprintf(stderr, "^\n");   
    va_end(ap);
    exit(1);
 }
