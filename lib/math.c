@@ -32,6 +32,6 @@ long double exp_double (long double d){
 long double ln_double (long double d){
 	return log(d);
 }
-long double pi_double (){
+long double pi (){
 	return M_PI;
 }

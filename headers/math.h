@@ -1,10 +1,10 @@
 
 
-double sqrt_double (double d);
-double sin_double (double d);
-double cos_double (double d);
-double tan_double (double d);
-double atan_double (double d);
-double exp_double (double d);
-double ln_double (double d);
-double pi ();
+double sqrt (double d);
+double sin (double d);
+double cos (double d);
+double tan (double d);
+double atan (double d);
+double exp (double d);
+double ln (double d);
+double pi ();

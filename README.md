@@ -23,6 +23,48 @@ A Compiler for the Edsger Programming Language
 ||/======================================\|/======================================\||
 `---------------------------------------~___~--------------------------------------''
 ```
+
+# Build & Install
+```
+make help
+```
+
+# For Building Executables
+Run:
+```
+make
+make library
+```
+and use 
+```
+./compile.sh test.eds
+```
+it automatically does the linking with the -lm. and -lc.
+
+Use #include "headers/stdio.h" for the Standard Library in test.eds
+
+
+# Features 
+1. 10 byte real variables
+2. Type casting
+3. Optimization with LLVM
+4. Function Overloading
+
+# Function Overloading
+Τα ονόματα των συναρτήσεων επεκτείνονται κατά τον εσωτερικό χειρισμό από τον compiler με πληροφορίες για τους τύπους των ορισμάτων.
+Έτσι για παράδειγμα η 
+``` C
+bool prime(int n);
+```
+εσωτερικά παίρνει το όνομα *prime_int*.
+
+Για αυτό το λόγο οι εξωτερικές συναρτήσεις πρέπει να χρησιμοποιούν το ίδιο naming convention. Η βιβλιοθήκη της Edsger έχει γραφεί σε C ακολουθώντας την σύμβαση (στον φάκελο `lib`)
+
+
+
+# Type Casting
+
+
 # Invariant
 ## Semantic Analysis
 - When processing a function first add the function in current scope and open a new one =>> The function whose processing is being done is the last entry of the parent scope if such exists. Since things added in the symbol table are backwards it is the first in the list of entries in parent scope. 
@@ -43,24 +85,6 @@ A Compiler for the Edsger Programming Language
 # Known bugs
 - flex scanner jammed on unexpected #include
 # Warnings to take into account
-- Διπλού βάθους declaration list on functions
-  ``` C
-	void main(){
-		int x, y;
-	}
-  ```
-  └──Program <br />
-    └──DeclarationList <br />
-        └──FunctionDefinition(main) <br />
-            ├──BasicType(void) <br />
-            ├──DeclarationList <br />
-            │   └──DeclarationList <br />
-            │       ├──VariableDeclaration(x) <br />
-            │       │   └──BasicType(int) <br />
-            │       └──VariableDeclaration(y) <br />
-            │           └──BasicType(int) <br />
-            └──StatementList <br />
-- TypeExpression::fromType handling of TYPE_ANY
 - Function Stack is kept in a global vector in the symbol table
   - This was needed because we couldn't decide which is the last function we're in
     - When newFunction is called it's entry is pushed into the stack
@@ -97,11 +121,12 @@ ex. int x, y; is it's own declaration List.
 
 # Περιγραφή αρχείων
 - `main.cpp`
+  
   Ορισμός της main.
 
 - `inc/tree.h`, `src/tree.c`
   
-  Ορίζεται class το τύπωμα δέντρων. Οι κόμβοι του AST την κληρονομούν
+  Ορίζεται class για το τύπωμα δέντρων. Οι κόμβοι του AST την κληρονομούν. Χρησιμοποιείται για την οπτικοποίηση του συντακτικού δέντρου.
 
 - `ast.hpp`
 
@@ -119,6 +144,7 @@ ex. int x, y; is it's own declaration List.
   
   Ο lexer. Meta-program του flex.
 - `lexer.hpp`
+  
   Ορισμός των συναρτήσεων του lexer για χειρισμό από άλλα μέρη.
 
 - `parser.y`

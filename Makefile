@@ -1,33 +1,35 @@
 .PHONY: clean distclean default help
 
-## Normal Build Variables
+##====================================================================================##
+## Variables for Building The Compiler                                                ##
+##====================================================================================##
+
+
 CXX=clang++-10
 CXXFLAGS=-Wall -std=c++14 -g `$(LLVMCONFIG) --cxxflags` -fexceptions
 LDFLAGS=$(shell $(LLVMCONFIG) --ldflags --system-libs --libs all)
-BINS=ggec main
+BINS=ggec
 INCLUDE=-I$(PWD)/inc
 INCLUDE+= -I$(PWD)
 DEPSOURCE=$(wildcard src/*.cpp)
 DEPOBJECTS=$(patsubst %.cpp, %.o, $(DEPSOURCE))
 LLVMCONFIG=llvm-config-10
 
-## Test dependencies
-PYTHON3?=/usr/bin/python3
-ERL?=/opt/homebrew/bin/erl
-ERL_LIBS?=/opt/homebrew/opt/proper/proper-1.4
-## needs python3 deepdiff module to run tests
-## pip3 install deepdiff
-##
-PROGRAMGENPATH?=/home/andreas/Projects/EdsgerProgramGenerator/
+##====================================================================================##
+## Variables for Running Tests                                                        ##
+##====================================================================================##
 
-## Test variables
-GEN?=100
-##
+PYTHON3?=$(shell which python3)
+ERL?=$(shell which erl)
+ERL_LIBS?=/home/andreas/other/proper
+PROGRAMGENPATH?=/home/andreas/Projects/EdsgerProgramGenerator/ 
+GEN?=10 # Number Of Programs to Generate 100 may take some time to run
 
+
+##====================================================================================##
+## Targets for Building The Compiler                                                  ##
+##====================================================================================##
 default: $(BINS)
-
-main: ggec libEdsger.a
-	cp $< $@
 
 ggec: lexer.o main.o parser.o error.o ast.o tojsonstring.o general.o symbol.o semantical.o codegen.o $(DEPOBJECTS)
 	$(CXX) $(INCLUDE) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
@@ -70,6 +72,10 @@ symbol.hpp: llvmhead.hpp
 	$(CXX) -c $(INCLUDE) $(CXXFLAGS) -o $@ $^
 
 
+##====================================================================================##
+## Targets for Building The Test Suites' Executables                                  ##
+##====================================================================================##
+
 lexertest: lexer.o ./tests/lexer/main.o error.o ast.o tojsonstring.o parser.o general.o symbol.o semantical.o codegen.o $(DEPOBJECTS)
 	$(CXX) $(CXXFLAGS) -o ./tests/lexer/$@ $^ $(LDFLAGS)
 
@@ -82,6 +88,11 @@ semanticstest:  lexer.o parser.o error.o ast.o tojsonstring.o general.o symbol.o
 codegentest:   lexer.o parser.o error.o ast.o tojsonstring.o general.o symbol.o semantical.o codegen.o $(DEPOBJECTS) ./tests/codegen/main.o
 	$(CXX) $(CXXFLAGS) -o ./tests/codegen/$@ $^ $(LDFLAGS)
 
+
+##====================================================================================##
+## Targets for Running The Test suites                                                ##
+##====================================================================================##
+
 lexersuite: lexertest
 	@echo "🧪 Running Lexer Suite :"
 	@$(PYTHON3) ./tests/lexer/runner.sh
@@ -93,7 +104,7 @@ parsersuite: parsertest
 	@echo "Generating the input files :"
 	@export ERL
 	@export ERL_LIBS
-	@$(MAKE) -C examples/syntax_gen generate GEN="$(GEN)"
+	@$(MAKE) -C examples/syntax_gen generate GEN="$(GEN)" ERL="$(ERL)" ERL_LIBS="$(ERL_LIBS)"
 	@echo "Running the input files on the parser : ⛏️"
 	@$(PYTHON3) ./tests/parser/runner_gen.sh $(GEN) 
 
@@ -104,25 +115,144 @@ semanticssuite: semanticstest
 	@echo "Generating the input files :"
 	@$(MAKE) -C  $(PROGRAMGENPATH) generate GEN="$(GEN)"
 	@echo "Running the input files on the semantics analyzer : ⛏️"
+	@export PROGRAMGENPATH
 	@$(PYTHON3) ./tests/semantics/runner_gen.sh $(GEN)
 
-codegenInCpp:
+codegenInC:
 	$(MAKE) -C ./tests/codegen/inC
 
-codegensuite: codegentest codegenInCpp libEdsger.a
+codegensuite: codegentest codegenInC libEdsger.a
 	@echo "🧪 Running Codegen Suite :"
 	@$(PYTHON3) ./tests/codegen/runner.sh
 
 test: lexersuite parsersuite semanticssuite codegensuite
-	
+
+##====================================================================================##
+## Targets for Building The Edsger Library                                            ##
+##====================================================================================##
+
 EDSGERLIBSOURCE = $(wildcard lib/*.c)
 EDSGEROBJ = $(patsubst %.c, %.o, $(EDSGERLIBSOURCE))
 CC=clang-10
 CFLAGS=-g -Wall
+
+library: libEdsger.a
+
 %.o: %.c
 	$(CC) -c $(CFLAGS) -o $@ $^
 libEdsger.a: $(EDSGEROBJ)
-	ar rcs $@ $^
+	$(AR) rcs $@ $^
+
+##====================================================================================##
+## Clean                                                                              ##
+##====================================================================================##
+.PHONY: clean distclean
+
+clean:
+	$(RM) *.o lexer.cpp
+	$(RM) parser.hpp parser.output parser.cpp
+	$(RM) lexer_funcs.hpp
+	$(RM) ./src/*.o
+	$(RM) $(EDSGEROBJ)
+	$(RM) libEdsger.a
+	$(RM) out out.ll out.s
+	$(MAKE) -C ./tests/lexer clean
+	$(MAKE) -C ./tests/parser clean
+	$(MAKE) -C ./examples/syntax_gen clean
+	$(MAKE) -C ./tests/semantics clean
+	$(MAKE) -C $(PROGRAMGENPATH) clean
+	$(MAKE) -C ./tests/codegen clean
+	$(MAKE) -C ./tests/codegen/inC clean
+
+distclean: clean
+	$(RM) $(BINS)
+
+##====================================================================================##
+## Help Message Print                                                                 ##
+##====================================================================================##
+
+.PHONY: help
+
+BLUE=\e[0;34m
+RESET=\e[0m
+help:
+	@echo "$(BLUE)make: $(RESET)"
+	@echo "\tBuilds the compiler"
+	@echo "\t     Deps:"
+	@echo "\t\t- clang++-10"
+	@echo "\t\t- llvm-10"
+	@echo "\t\t- flex  >= 2.6.4"
+	@echo "\t\t- bison >= 3.5.1"
+	@echo "$(BLUE)make library: $(RESET)"
+	@echo "\tBuild the Edsger Library"
+	@echo "\t     Deps:"
+	@echo "\t\t- clang-10"
+	@echo "$(BLUE)make pythonModules: $(RESET)"
+	@echo "\t Install Python Modules"
+	@echo "$(BLUE)make deps: $(RESET)"
+	@echo "\t Install Python Modules and Haskell Stack used for testing"
+	@echo "$(BLUE)make clean [PROGRAMGENPATH=EdsgerProgramGenerator path]: $(RESET)"
+	@echo "\tRemoves all automatically generated files except the final executable"
+	@echo "\tWill return non-zero exit code if PROGRAMGENPATH is not defined but will delete anything else"
+	@echo "$(BLUE)make distclean: $(RESET)"
+	@echo "\tremoves all automatically generated files and the final executable"
+	@echo "$(BLUE)make test [GEN=number] [PYTHON3=python3 path] [ERL=erl path] [ERL_LIBS=proper path] [PROGRAMGENPATH=EdsgerProgramGenerator path]: $(RESET)"
+	@echo "\tDefine The Variables GEN, PYTHON3, ERL, ERL_LIBS, PROGRAMGENPATH to run either on Makefile or when running make test as shown above"
+	@echo "\t- Run lexer suite"
+	@echo "\t     Deps:"
+	@echo "\t- Run parser suite"
+	@echo "\t     Deps:"
+	@echo "\t\t- python3"
+	@echo "\t\t  - os         module"
+	@echo "\t\t  - subprocess module"
+	@echo "\t\t  - json       module"
+	@echo "\t\t  - deepdiff   module"
+	@echo "\t\t  - tqdm       module"
+	@echo "\t\t- Erlang/OTP"
+	@echo "\t\t- PropEr"
+	@echo "\t\t- https://github.com/kostis/ntua_compilers"
+	@echo "\t- Run semantics suite"
+	@echo "\t     Deps:"
+	@echo "\t\t- Haskell Stack"
+	@echo "\t\t- https://github.com/andrewevag/EdsgerProgramGenerator"
+	@echo "\t\t- python3"
+	@echo "\t- Run codegen suite"
+	@echo "\t     Deps:"
+	@echo "\t\t- python3"
+	@echo "\t\t- gcc (any version that support -std=gnu11)"
+	
+
+##====================================================================================##
+## Install Python modules                                                             ##
+##====================================================================================##
+.PHONY: deps pythonModules haskellStack
+
+deps: pythonModules haskellStack
+
+pythonModules: 
+	$(PYTHON3) -m pip install deepdiff
+	$(PYTHON3) -m pip install tqdm
+	
+# https://docs.haskellstack.org/en/stable/
+haskellStack:
+	curl -sSL https://get.haskellstack.org/ | sh
+
+
+
+##====================================================================================##
+## Debug                                                                              ##
+##====================================================================================##
+
+debug:
+	@echo "python3 = $(PYTHON3)"
+	@echo "erl     = $(ERL)"
+	@echo "PropEr  = $(ERL_LIBS)"
+	@echo "genpath = $(PROGRAMGENPATH)"
+
+
+##====================================================================================##
+## Targets for Creating Tests Fast for the Code Generations                           ##
+##====================================================================================##
 
 LASTCODEGENTEST?=globals2
 NEWNAME?=newname
@@ -137,46 +267,3 @@ undonewcodegentest:
 	rm ./tests/codegen/inC/$(NEWNAME).c
 	rm ./tests/codegen/programs/$(NEWNAME).eds
 	rm ./tests/codegen/inputs/$(NEWNAME).inp
-
-# lexer.o: lexer.cpp lexer.hpp parser.hpp
-
-# parser.hpp parser.cpp: parser.y
-# 	bison -dv -o parser.cpp parser.y
-
-# parser.o: parser.cpp lexer.hpp
-
-# ggec: lexer.o parser.o
-# 	$(CXX) $(CXXFLAGS) -o minibasic lexer.o parser.o
-
-clean:
-	$(RM) *.o $(BINS) lexer.cpp
-	$(RM) parser.hpp parser.output parser.cpp
-	$(RM) lexer_funcs.hpp
-	$(RM) ./src/*.o
-	$(RM) $(EDSGEROBJ)
-	$(RM) libEdsger.a
-	$(RM) out out.ll out.s
-	$(MAKE) -C ./tests/lexer clean
-	$(MAKE) -C ./tests/parser clean
-	$(MAKE) -C ./examples/syntax_gen clean
-	$(MAKE) -C ./tests/semantics clean
-	$(MAKE) -C $(PROGRAMGENPATH) clean
-	$(MAKE) -C ./tests/codegen clean
-	$(MAKE) -C ./tests/codegen/inC clean
-distclean: clean
-	$(RM) $(BINS)
-BLUE=\e[0;34m
-RESET=\e[0m
-help:
-	@echo "$(BLUE)make: $(RESET)"
-	@echo "\tbuilds the compiler"
-	@echo "$(BLUE)make clean: $(RESET)"
-	@echo "\tremoves all automatically generated files except the final executable does it too need to fix it before submitting"
-	@echo "$(BLUE)make distclean: $(RESET)"
-	@echo "\tremoves all automatically generated files and the final executable"
-	@echo "$(BLUE)make test [GEN=number] [PYTHON3=python3 path] [ERL=erl path] [ERL_LIBS=proper path] [PROGRAMGENPATH=EdsgerProgramGenerator path]: $(RESET)"
-	@echo "\t-Run lexer and parser suites "
-	@echo "\t-Generate number syntactically correct Edsger programs and passes them through"
-	@echo "\t the parsertest"
-	@echo "\n\t requires python3 deepdiff module"
-	@echo "\t\t (pip3 install deepdiff)"

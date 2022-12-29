@@ -3,7 +3,6 @@
 from os import listdir
 from os.path import isfile, join
 import subprocess
-import difflib
 from deepdiff import DeepDiff
 import json
 
