@@ -1,0 +1,44 @@
+void writeString(char * str);
+void writeInteger(int i);
+void writeChar(char c);
+
+void main(){
+	int i;
+	int j;
+	hello: for(i = 0; i < 10; ++i){
+		if(i % 2 == 0){
+			continue hello; //aka continue hello;
+		}
+		writeInteger(i);
+		writeChar('\n');
+	}
+	
+	for(i = 9; i >= 0; i--){
+		if(i % 2 == 1){
+			continue;		
+		}
+		writeInteger(i);
+		writeChar('\n');
+	}
+	
+	label1: for(i = 0; i < 10; i++){
+		label2: for(j = 0; j < 10; j++){		
+			writeInteger(i);
+			writeChar(' ');
+			writeInteger(j);
+			writeChar('\n');
+			if(j % 7 == 0 && j % 3 == 1 && i == 6){
+				break label1; //aka break label1.
+			}
+			if(i % 3 == 2 && j % 3 == 2){
+				break label2; //aka break label2
+			}
+			if(i % 3 == 1 && j % 3 == 1){
+				continue label1;
+
+			}
+			
+		}
+	}
+}
+

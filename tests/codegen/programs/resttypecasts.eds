@@ -1,0 +1,59 @@
+void writeString(char * str);
+void writeInteger(int i);
+void writeChar(char c);
+void writeReal(double d);
+double x[2];
+void writeIntegerLn(int i){
+	writeInteger(i);
+	writeChar('\n');
+}
+void writeRealLn(double i){
+	writeReal(i);
+	writeChar('\n');
+}
+void writeCharLn(char c){
+	writeChar(c);
+	writeChar('\n');
+}
+void writeBoolean(bool b);
+void writeBooleanLn(bool b){
+	writeBoolean(b);
+	writeChar('\n');
+}
+
+void main(){
+	char i;
+	bool b;
+	double d;
+	i = (char) true;
+	writeCharLn(i);
+	i = (char) false;
+	writeCharLn(i);
+	i = (char) 12;
+	writeCharLn(i);
+	i = (char) 12.02;
+	writeCharLn(i);
+	i = (char) NULL;
+	writeCharLn(i);
+
+	b = (bool) 10;
+	writeBooleanLn(b);
+	b = (bool) 0;
+	writeBooleanLn(b);
+	b = (bool) 'c';
+	writeBooleanLn(b);
+	b = (bool) 12.02;
+	writeBooleanLn(b);
+	b = (bool) NULL;
+	writeBooleanLn(b);
+
+	
+	d = (double) true;
+	writeRealLn(d);
+	d = (double) false;
+	writeRealLn(d);
+	d = (double) 'c';
+	writeRealLn(d);
+	d = (double) 12;
+	writeRealLn(d);
+}

@@ -1,0 +1,5 @@
+
+
+int* func(int x, byref int* y);
+
+void toString(byref double x_12, byref bool*** flag12);

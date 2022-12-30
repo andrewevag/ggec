@@ -1,0 +1,28 @@
+void writeString(char * str);
+void writeInteger(int i);
+void writeChar(char c);
+void writeReal(double d);
+double x[2];
+void writeIntegerLn(int i){
+	writeInteger(i);
+	writeChar('\n');
+}
+void writeRealLn(double i){
+	writeReal(i);
+	writeChar('\n');
+}
+
+void main(){
+	int i;
+	i = (int) true;
+	writeIntegerLn(i);
+	i = (int) false;
+	writeIntegerLn(i);
+	i = (int) 'c';
+	writeIntegerLn(i);
+	i = (int) 12.02;
+	writeIntegerLn(i);
+	i = (int) NULL;	
+	writeIntegerLn(i);
+	
+}

@@ -1,0 +1,64 @@
+void writeString(char* str);
+void writeInteger(int i);
+void writeChar(char c);
+
+
+void tester(int *n){
+	void incrementer(){
+		void doubleincrementer(){
+			*n *= 2 + (*n % 4);
+		}
+		doubleincrementer();
+		(*n) ++;
+		doubleincrementer();
+		
+	}
+	incrementer();
+	incrementer();
+} 
+
+char s[10];
+void dosomething(){
+	int dosomething(int x){
+		writeInteger(x);
+		writeString("\n");
+		return x;
+	}
+	int dosomething(char c){
+		s[3] = c;
+		return 0;
+	}
+	dosomething(12);
+	dosomething('c');
+	writeChar(s[3]);
+	writeChar('\n');
+	
+}
+
+void main(){
+    int x;
+    int y;
+    int is2(){
+		int z[10];
+		void printX(){
+			writeInteger(x);
+			writeString("\n");
+			z[2]++;
+		}
+		z[2] = 1;
+		printX();
+        x = 10;
+		printX();
+		x = 20;
+		printX();
+		return z[2];
+    }
+    x = y = 2;
+    writeInteger(is2());
+	writeString("\n");
+	tester(&y);
+    writeInteger(y);
+	writeString("\n");
+	dosomething();
+}
+

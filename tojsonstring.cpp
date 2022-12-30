@@ -175,6 +175,22 @@ std::string Id::toJSONString(){
 	obj_tail;
 }
 
+std::string reverseFixString(std::string s){
+	std::string revFixed;
+	for(auto &c : s){
+		if(c == '\n'){
+			revFixed += "\\n";
+		}
+		else if(c == '\t'){
+			revFixed += "\\t";
+		}
+		else{
+			revFixed.push_back(c);
+		}
+	}
+	return revFixed;
+}
+
 std::string Constant::toJSONString(){
 	std::ostringstream ss;
 	switch (this->_ct){
@@ -183,7 +199,7 @@ std::string Constant::toJSONString(){
 	case Int: ss << open_object << "\"" "IntConstant(" << this->_int << ")" "\" : " open_array close_array close_object; break;
 	case Char : ss << open_object << "\"" "CharConstant(" << (uint)this->_char << ")" "\" : " open_array close_array close_object; break;
 	case Double : ss << open_object << "\"" "DoubleConstant(" << std::fixed << std::setprecision(4) << this->_double << ")" "\" : " open_array close_array close_object; break;
-	case String : ss << open_object << "\"" "StringConstant(" << this->_string << ")" "\" : " open_array close_array close_object; break; 
+	case String : ss << open_object << "\"" "StringConstant(" << reverseFixString(this->_string) << ")" "\" : " open_array close_array close_object; break; 
 	default: break;
 	}
 	std::string res = ss.str();
@@ -202,9 +218,9 @@ std::string FunctionCall::toJSONString(){
 std::string BracketedIndex::toJSONString(){
 	return
 	obj_head("BracketedIndex")
-		+ this->_in->toJSONString() +
-		newvalue
 		+ this->_out->toJSONString() +
+		newvalue
+		+ this->_in->toJSONString() +
 	obj_tail;
 }
 

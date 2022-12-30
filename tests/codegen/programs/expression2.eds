@@ -1,0 +1,25 @@
+void writeString(char * str);
+void writeInteger(int i);
+void writeChar(char c);
+int x[2];
+void main(){
+	int *p, q;
+	bool f;
+	x[0] = 0;
+	p = &x[0];
+	(*p)++;
+	writeInteger(*p);
+	writeChar('\n');
+	
+	*p = - (*p);
+	writeInteger(*p);
+	writeChar('\n');
+
+	*p = + (*p);
+	writeInteger(*p);
+	writeChar('\n');
+	f = ! true;
+	writeInteger((int) f);
+	writeChar('\n');
+}
+

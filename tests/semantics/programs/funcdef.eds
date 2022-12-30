@@ -1,0 +1,34 @@
+
+int* main(int argc, char** argv){
+	int x;
+	char y;
+	y = 'a';
+	return (int*)0;
+}
+
+
+void routine(double** table){
+	void another();
+
+	void another(){
+		return;
+	}
+}
+
+void onemoreroutine();
+
+void main();
+
+void main(){
+	return;
+}
+
+char* getName(char* PATHNAME){
+	char* str;
+	str = "hello people\n\t";
+	if(true){
+		return (char*) NULL;
+	}else{
+		return (char*) NULL;
+	}
+}

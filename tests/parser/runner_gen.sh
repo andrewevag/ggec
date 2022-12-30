@@ -16,11 +16,13 @@ noFailed = 0
 failed = []
 for i in tqdm(range(1, num_of_tests+1)):
 	
-	p = subprocess.Popen([f'./tests/parser/parsertest'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-	f = open(f'{progsdir}/p{i}.eds')
-	inp = f.read()
-	f.close()
-	p.communicate(input=inp.encode())
+	p = subprocess.Popen([f'./tests/parser/parsertest', f'{progsdir}/p{i}.eds'], stdout=subprocess.PIPE)
+	# f = open(f'{progsdir}/p{i}.eds')
+	# inp = f.read()
+	# f.close()
+	# p.communicate(input=inp.encode())
+	p.wait()
+	
 	if p.returncode != 0:
 		failed.append(i)
 		noFailed += 1

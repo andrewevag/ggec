@@ -1,20 +1,25 @@
-#include <cstdio>
-#include <cstdlib>
-#include <vector>
 #include "ast.hpp"
 #include "parser.hpp"
-#include "lexer.hpp"
 #include <string>
+#include "general.hpp"
 
 AST* syntaxTree = nullptr;
 
-int main(){
+
+int main(int argc, char** argv){
 	
-	//VariableDeclaration*v = new ArrayDeclaration(new BasicType("int"),"x",new Constant((int16_t)12));
-	//delete v;
+	handleArguments(argc, argv);
 
 	int ret = yyparse();
-	syntaxTree->printTree(std::cout);
+	
+	syntaxTree->codegen();
+	
+	handleOutput();
+	
 	delete syntaxTree;
+	
 	return ret;
 }
+
+
+

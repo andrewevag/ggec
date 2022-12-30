@@ -1,0 +1,52 @@
+void writeString(char * str);
+void writeInteger(int i);
+void writeChar(char c);
+void writeReal(double d);
+
+double x[2];
+void writeIntegerLn(int i){
+	writeInteger(i);
+	writeChar('\n');
+}
+void writeRealLn(double i){
+	writeReal(i);
+	writeChar('\n');
+}
+
+void main(){
+	double res;
+	bool f, g, h;
+	x[0] = 12.05;
+	x[1] = 13.9432;
+	h = true;
+	g = false;
+	res = 10.00;
+	res += x[1];
+	writeRealLn(res);
+	res *= x[1];
+	writeRealLn(res);
+	res /= x[1];
+	writeRealLn(res);
+	res -= x[1];
+	writeRealLn(res);
+	
+	
+
+	f   = x[0] < x[1];
+	writeIntegerLn((int) f);
+	f   = x[0] > x[1];
+	writeIntegerLn((int) f);
+	f   = x[0] >= x[1];
+	writeIntegerLn((int) f);
+	f   = x[0] <= x[1];
+	writeIntegerLn((int) f);
+	f   = x[0] == x[1];
+	writeIntegerLn((int) f);
+	f   = x[0] != x[1];
+	writeIntegerLn((int) f);
+	f   = g && h;
+	writeIntegerLn((int) f);
+	f   = g || h;
+	writeIntegerLn((int) f);
+}
+

@@ -1,0 +1,3 @@
+int y;
+
+#include "./tests/lexer/programs/cyclicinclude1.eds"

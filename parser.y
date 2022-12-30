@@ -4,9 +4,11 @@
 #include <vector>
 #include "ast.hpp"
 #include "lexer.hpp"
-
+#define YYERROR_VERBOSE 1
 extern AST* syntaxTree;
 %}
+
+%require "3.5.1"
 
 %token T_bool          "bool"
 %token T_break         "break"
@@ -63,15 +65,15 @@ extern AST* syntaxTree;
 
 
 
-%type<decList> declaration_list //??
+%type<decList> declaration_list
 %type<decl> declaration  declarator
 %type<decl> variable_declaration
 %type<decl> function_declaration
 %type<decl> function_definition
 %type<typeExpr> type star_list basic_type
 %type<par> parameter
-%type<parList> parameter_list //??
-%type<stmtList> statement_list //??
+%type<parList> parameter_list 
+%type<stmtList> statement_list
 %type<stmt> statement
 %type<lbl> label
 %type<expr> expression_or_empty

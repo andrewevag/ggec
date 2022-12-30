@@ -1,0 +1,41 @@
+void main(){
+	;
+	x;
+	{
+		x;
+		if(x == 0) 
+			x++;
+		;
+	}
+	if(x != 0){
+		--x;
+	}
+	else{
+		x %= 2;
+		;
+	}
+	for(i = 0; i < 10; i++)
+		i += 2;
+
+	firstFor: for(; ; ){
+		continue firstFor;
+		break firstFor;
+		break;
+	}
+
+	return 10;
+	return;
+
+	secondFor: for(j = 1; j < 12.01; j--){
+		innerFor: for(k = 0; k > 13; k++){
+			if(k >= 10){
+				k /= j;
+				break innerFor;
+			}
+				
+			
+		}
+	}
+
+
+}

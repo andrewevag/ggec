@@ -1,0 +1,11 @@
+void writeString(char * str);
+void writeInteger(int i);
+void writeChar(char c);
+
+int x[2];
+void main(){
+	x[1] = 28;
+    writeInteger(28);
+	writeString("\n");
+}
+

@@ -1,12 +1,27 @@
 %{
 #include <vector>
+#include <set>
 #include "ast.hpp"
 #include "lexer.hpp"
 #include "parser.hpp"
+#include "error.hpp"
 #include <cstdio>
 
 std::string tempstr;
+std::set<std::string> fileset;
 int lineno = 1;
+int columnno = 0;
+std::string currentFilename;
+#define YY_USER_ACTION \
+    for(int i = 0; yytext[i] != '\0'; i++) { \
+        if(yytext[i] == '\n') { \
+            columnno = 0; \
+        } \
+        else { \
+            columnno++; \
+        } \
+    }
+char emptyString[1] = { 0 };
 %}
 
 L [a-zA-Z]
@@ -14,13 +29,42 @@ D [0-9]
 W [ \t\r]
 P [^\x00-\x1f\x7f\\\'\"]
 
+%option header-file="lexer_funcs.hpp"
 %option noyywrap
 %option nounput noinput
 %x CHAR
 %x STRING
 %x COMMENT
+%x INCLUDE
+%x INCLUDESTRING
 
 %%
+
+^"#include"         { BEGIN(INCLUDE); }
+<INCLUDE>{W}+       { /* nothing */   }
+<INCLUDE>\"         { BEGIN(INCLUDESTRING); tempstr = ""; }
+<INCLUDE>.|\n       { fatal("Expected #inlude \"filename\""); }
+<INCLUDE><<EOF>>    { fatal("Expected #inlude \"filename\" Got EOF"); }
+<INCLUDESTRING>\"   { 
+                        if(fileset.count(tempstr) != 0){
+                            fatal("File \"%s\" already included", tempstr.c_str());
+                        }
+                        yyin = fopen( tempstr.c_str(), "r" );
+                        if( ! yyin){
+                            fatal("Failed to open %s", tempstr.c_str());
+                        }
+                        fileset.insert(tempstr);
+                    	currentFilename = fileset.find(tempstr)->c_str();
+                        yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
+                        BEGIN(INITIAL);
+                    }
+
+<INCLUDESTRING>\\x[0-9a-fA-F][0-9a-fA-F]   { tempstr.append(yytext); }
+<INCLUDESTRING>\\[ntr0\\\'\"]              { tempstr.append(yytext); }
+<INCLUDESTRING>{P}                         { tempstr.append(yytext); }
+<INCLUDESTRING>.|\n                        { fatal("Did not expect non printable in string (Ascii %d)", yytext[0]); }
+<INCLUDESTRING><<EOF>>                     { fatal("Received EOF without string closing"); }
+
 
 "bool"	    { return T_bool; }
 "break"	    { return T_break; }
@@ -65,16 +109,16 @@ P [^\x00-\x1f\x7f\\\'\"]
 <CHAR>\\x[0-9a-fA-F][0-9a-fA-F]\'   { yylval.c = getCharFromString(yytext); BEGIN(INITIAL); return T_char_const; }
 <CHAR>\\[ntr0\\\'\"]\'              { yylval.c = getCharFromString(yytext); BEGIN(INITIAL); return T_char_const; }
 <CHAR>{P}\'                         { yylval.c = yytext[0]; BEGIN(INITIAL); return T_char_const; }
-<CHAR>.|\n                          { fprintf(stderr, "didnot expect non printable in string %d\n", yytext[0]); exit(1); }
-<CHAR><<EOF>>                       { fprintf(stderr, "received EOF without string closing\n"); exit(1);}
+<CHAR>.|\n                          { fatal("Didnot expect non printable in char (Ascii %d)", yytext[0]);}
+<CHAR><<EOF>>                       { fatal("Received EOF without char closing"); }
 
 \"                                  { BEGIN(STRING); tempstr = ""; }
-<STRING>\"                          { yylval.str = new char[strlen(tempstr.c_str())+1]; memcpy(yylval.str, tempstr.c_str(), strlen(tempstr.c_str())+1); ; BEGIN(INITIAL); return T_string_const; }
+<STRING>\"                          { yylval.str = new char[strlen(tempstr.c_str())+1]; tempstr = fixChars(tempstr) ; memcpy(yylval.str, tempstr.c_str(), strlen(tempstr.c_str())+1); ; BEGIN(INITIAL); return T_string_const; }
 <STRING>\\x[0-9a-fA-F][0-9a-fA-F]   { tempstr.append(yytext); }
 <STRING>\\[ntr0\\\'\"]              { tempstr.append(yytext); }
 <STRING>{P}                         { tempstr.append(yytext); }
-<STRING>.|\n                        { fprintf(stderr, "didnot expect non printable in string %d\n", yytext[0]); exit(1);}
-<STRING><<EOF>>                     { fprintf(stderr, "received EOF without string closing\n"); exit(1);}
+<STRING>.|\n                        { fatal("Didnot expect non printable in string (Ascii %d)\n", yytext[0]); }
+<STRING><<EOF>>                     { fatal("Received EOF without string closing"); }
 
 \n                                  { ++lineno; }
 {W}+	                            { /* nothing */ }
@@ -85,18 +129,21 @@ P [^\x00-\x1f\x7f\\\'\"]
 <COMMENT>\n                         { ++lineno; }
 <COMMENT>"*"                        { /* nothing */ }
 <COMMENT>[^*\n]+                    { /* nothing */ }
-<COMMENT><<EOF>>                    { fprintf(stderr, "received EOF without string closing\n"); exit(1);}
-.	                                { fprintf(stderr,"Illegal character %c at line %d\n",yytext[0],lineno);
-                                        exit(1); }
+<COMMENT><<EOF>>                    { fatal("Received EOF without comment closing");}
+.	                                { fatal("Illegal character"); }
 
+<<EOF>>                             { yypop_buffer_state(); if (!YY_CURRENT_BUFFER) {yytext = emptyString; return 0;} }
 %%
 
 
-uint8_t getCharFromString(char* s){
+/**
+ * Handle Escape Characters Functions
+ */
+uint8_t getCharFromString(const char* s){
     uint8_t c;
     if(s[0] == '\\'){
         if(strlen(s) < 2){
-            yyerror("getCharFromString: got \\ but no character after that!\n");
+            fatal("Got \\ but no character after that!");
         }
         switch(s[1]) {
             case '\\':
@@ -116,7 +163,7 @@ uint8_t getCharFromString(char* s){
                 break;
             case 'x':
                 if (strlen(s) < 4){
-                    yyerror("getCharFromString: got \\x but no 2 digit hecadecimal number afterwards");
+                    fatal("Got \\x but no 2 digit hecadecimal number afterwards");
                 }
                 int i;
                 sscanf(s+2, "%02x", &i);
@@ -128,4 +175,16 @@ uint8_t getCharFromString(char* s){
     }else{
         return (uint8_t)s[0];
     }
+}
+
+std::string fixChars(std::string s){
+    std::string dest;
+    for(int i = 0 ; i < s.size(); i++){
+        if(s[i] == '\\'){
+            dest.push_back(getCharFromString(s.c_str() + i++));
+        }
+        else dest.push_back(getCharFromString(s.c_str() + i));
+    }
+    return dest;
+        
 }

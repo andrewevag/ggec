@@ -1,0 +1,37 @@
+void writeString(char * str);
+void writeInteger(int i);
+void writeChar(char c);
+void writeReal(double d);
+double x[2];
+void writeIntegerLn(int i){
+	writeInteger(i);
+	writeChar('\n');
+}
+void writeRealLn(double i){
+	writeReal(i);
+	writeChar('\n');
+}
+void writeBoolean(bool b);
+
+void writeBooleanLn(bool b){
+	writeBoolean(b);
+	writeChar('\n');
+}
+
+void main(){
+	int a, b, i, j;
+	bool f, g, h;
+	bool * p;
+	a = 13;
+	b = 120;
+
+	f = true;
+	g = false;
+	p = (bool*) NULL;
+	if (f || *p){
+		writeString("Correctly Got here\n");
+	}
+	if (g && *p){
+		writeString("Incorrect to get here\n");
+	}
+}

@@ -1,0 +1,41 @@
+void writeString(char * str);
+void writeInteger(int i);
+void writeChar(char c);
+void writeReal(double d);
+double x[2];
+void writeIntegerLn(int i){
+	writeInteger(i);
+	writeChar('\n');
+}
+void writeRealLn(double i){
+	writeReal(i);
+	writeChar('\n');
+}
+
+void main(){
+	int res;
+	int **p;
+	int i, j, k;
+	bool f, g, s;
+	i = 100;
+	res = 10000;
+	p = new int* [i];
+	for(j = 0; j < i; j++){
+		p[j] = new int[i];
+	}
+	for(j = 0; j < i; j++){
+		for(k = 0; k < i; k++){
+			p[j][k] = k;
+			writeString("p[");
+			writeInteger(j);
+			writeString("][");
+			writeInteger(k);
+			writeString("]=");
+			writeIntegerLn(p[j][k]);
+		}
+	}
+	for(j =0 ; j < i; j++){
+		delete p[j];
+	}
+	delete p;
+}
