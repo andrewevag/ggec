@@ -25,7 +25,7 @@ A Compiler for the Edsger Programming Language
 ```
 
 # Build & Install
-Run
+Read Documentation.md or for just building run
 ```
 make help
 ```
