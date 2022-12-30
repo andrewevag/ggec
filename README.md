@@ -24,8 +24,10 @@ A Compiler for the Edsger Programming Language
 `---------------------------------------~___~--------------------------------------''
 ```
 
+Should run on Linux on any target supported by LLVM-10. Run make test to see that everything is running as it should be.
+
 # Build & Install
-Read Documentation.md or for just building run
+Read **Documentation.pdf/md** or for just building run
 ```
 make help
 ```
@@ -40,9 +42,9 @@ and use
 ```
 ./compile.sh test.eds
 ```
-it automatically does the linking with the -lm. and -lc.
+it automatically does the linking with the libEdsger libm. and libc needed by libEdsger.
 
-Use #include "headers/stdio.h" for the Standard Library in test.eds. Results is in 
+Use #include "headers/stdio.h" for the **Standard Library** or the complete path from where the compiler is called to `ggec/headers`
 
 
 # Known bugs

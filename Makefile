@@ -19,11 +19,11 @@ LLVMCONFIG=llvm-config-10
 ## Variables for Running Tests                                                        ##
 ##====================================================================================##
 
-PYTHON3?=$(shell which python3)
-ERL?=$(shell which erl)
-ERL_LIBS?=/home/andreas/other/proper
-PROGRAMGENPATH?=/home/andreas/Projects/EdsgerProgramGenerator/ 
-GEN?=10 # Number Of Programs to Generate 100 may take some time to run
+export PYTHON3?=$(shell which python3)
+export ERL?=$(shell which erl)
+export ERL_LIBS?=/home/andreas/other/proper
+export PROGRAMGENPATH?=$(PWD)/EdsgerProgramGenerator
+export GEN?=10 # Number Of Programs to Generate 100 may take some time to run
 
 
 ##====================================================================================##
@@ -102,8 +102,8 @@ parsersuite: parsertest
 	@$(PYTHON3) ./tests/parser/runner.sh
 	@echo "🧪 Running Randomly Generated Edsger Programs :"
 	@echo "Generating the input files :"
-	@export ERL
-	@export ERL_LIBS
+	@export ERL=$(ERL)
+	@export ERL_LIBS=$(ERL_LIBS)
 	@$(MAKE) -C examples/syntax_gen generate GEN="$(GEN)" ERL="$(ERL)" ERL_LIBS="$(ERL_LIBS)"
 	@echo "Running the input files on the parser : ⛏️"
 	@$(PYTHON3) ./tests/parser/runner_gen.sh $(GEN) 
