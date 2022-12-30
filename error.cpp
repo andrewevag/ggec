@@ -78,14 +78,16 @@ void fatal (const char * fmt, ...)
       fprintf(stderr, "Fatal Error @ \"%s\":%d:%d \n", currentFilename.c_str(), lineno, columnno);
    vfprintf(stderr, fmt, ap);
    fprintf(stderr, "\n");
-   auto s = getLine(currentFilename, lineno, columnno);
-   printf("%s\n", s.c_str());
-   for(int i = 0; i < columnno-1; i++){
-		if(s[i] == '\t')
-			fprintf(stderr, "_______");
-		fprintf(stderr, "_");
+   if (currentFilename != "stdin"){
+      auto s = getLine(currentFilename, lineno, columnno);
+      fprintf(stderr, "%s\n", s.c_str());
+      for(int i = 0; i < columnno-1; i++){
+         if(s[i] == '\t')
+            fprintf(stderr, "_______");
+         fprintf(stderr, "_");
+      }
+      fprintf(stderr, "^\n");   
    }
-	fprintf(stderr, "^\n");   
    va_end(ap);
    exit(1);
 }
@@ -152,14 +154,16 @@ void ErrorInfo::fatal(const char * fmt, ...){
       fprintf(stderr, "Fatal Error @ \"%s\":%d:%d \n", this->_fileappeared->c_str(), this->_lineappeared, this->_columnappeared);
    vfprintf(stderr, fmt, ap);
    fprintf(stderr, "\n");
-   auto s = getLine(*this->_fileappeared, this->_lineappeared, this->_columnappeared);
-   fprintf(stderr, "%s\n", s.c_str());
-   for(int i = 0; i < this->_columnappeared-1; i++){
-		if(s[i] == '\t')
-			fprintf(stderr, "_______");
-		fprintf(stderr, "_");
+   if (*this->_fileappeared != "stdin"){
+      auto s = getLine(*this->_fileappeared, this->_lineappeared, this->_columnappeared);
+      fprintf(stderr, "%s\n", s.c_str());
+      for(int i = 0; i < this->_columnappeared-1; i++){
+         if(s[i] == '\t')
+            fprintf(stderr, "_______");
+         fprintf(stderr, "_");
+      }
+      fprintf(stderr, "^\n");
    }
-	fprintf(stderr, "^\n"); 
    va_end(ap);
    exit(1);   
 }

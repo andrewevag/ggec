@@ -122,7 +122,7 @@ struct SymbolEntry_tag {
          SymbolEntry   * lastArgument;        /* Τελευταία παράμετρος  */
          Type            resultType;          /* Τύπος αποτελέσματος   */
          PARDEF          pardef;              /* Κατάσταση παραμέτρων  */
-         // Still considering
+         
          llvm::Value   * env;                 /* Current Environament  */
          llvm::Function* fun;                 /* Handle for the func   */
          bool            hasHead;             /* If the head for the   */
