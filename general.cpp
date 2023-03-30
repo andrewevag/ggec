@@ -28,6 +28,7 @@ extern std::string currentFilename;
 
 
 
+
 #define BOLD  "\e[1m"
 #define reset "\e[0m"
 void printHelpMessage(){
@@ -114,6 +115,7 @@ void handleArguments(int argc, char** argv)
       
       fileset = { currentFilename };
    }
+
 
    // see Kaleidoscope Ch.8 
    // https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl08.html

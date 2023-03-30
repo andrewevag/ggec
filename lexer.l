@@ -12,6 +12,7 @@ std::set<std::string> fileset;
 int lineno = 1;
 int columnno = 0;
 std::string currentFilename;
+std::stack<std::tuple<std::string, int, int> > filenameStack;
 #define YY_USER_ACTION \
     for(int i = 0; yytext[i] != '\0'; i++) { \
         if(yytext[i] == '\n') { \
@@ -54,7 +55,11 @@ P [^\x00-\x1f\x7f\\\'\"]
                             fatal("Failed to open %s", tempstr.c_str());
                         }
                         fileset.insert(tempstr);
+                        filenameStack.push({currentFilename, lineno, columnno});
                     	currentFilename = fileset.find(tempstr)->c_str();
+                        
+                        lineno = 1;
+                        columnno = 0;
                         yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
                         BEGIN(INITIAL);
                     }
@@ -132,7 +137,7 @@ P [^\x00-\x1f\x7f\\\'\"]
 <COMMENT><<EOF>>                    { fatal("Received EOF without comment closing");}
 .	                                { fatal("Illegal character"); }
 
-<<EOF>>                             { yypop_buffer_state(); if (!YY_CURRENT_BUFFER) {yytext = emptyString; return 0;} }
+<<EOF>>                             { yypop_buffer_state(); if (!YY_CURRENT_BUFFER) {yytext = emptyString; return 0;} currentFilename=std::get<0>(filenameStack.top()); lineno=std::get<1>(filenameStack.top()); columnno=std::get<2>(filenameStack.top()); filenameStack.pop(); }
 %%
 
 

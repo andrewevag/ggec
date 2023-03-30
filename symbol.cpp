@@ -410,6 +410,14 @@ SymbolEntry * newParameter (const char * name, Type type,
                 e = f->u.eFunction.firstArgument;
             else
                 e = e->u.eParameter.next;
+
+            if(e->u.eParameter.mode == PASS_BY_REFERENCE){
+                    auto tt = typePointer(type);
+                    currentScope->varOffset += sizeOfType(tt);
+                    destroyType(tt);    
+            }else
+                currentScope->varOffset += sizeOfType(type);
+            
             if (e == NULL)
                 error("More parameters than expected in redeclaration "
                       "of function %s", f->id);

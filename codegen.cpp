@@ -167,6 +167,10 @@ void FunctionHead::declare(){
 	}
 	auto tt = this->_resultType->toType();
 	
+	if (!e->u.eFunction.hasHead){
+		
+	
+
 	// Change the name if main to _main because it is wrapped to return with 0 to system. 
 	// See Program::codegen
 	llvm::Function* f = 
@@ -181,6 +185,7 @@ void FunctionHead::declare(){
 
 	e->u.eFunction.fun = f;
 	e->u.eFunction.hasHead = true;
+	}
 	destroyType(tt);
 }
 
