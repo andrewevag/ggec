@@ -5,7 +5,7 @@
 ##====================================================================================##
 
 
-CXX=clang++-10
+CXX=clang++-11
 CXXFLAGS=-Wall -std=c++14 -g `$(LLVMCONFIG) --cxxflags` -fexceptions
 LDFLAGS=$(shell $(LLVMCONFIG) --ldflags --system-libs --libs all)
 BINS=ggec
@@ -13,7 +13,7 @@ INCLUDE=-I$(PWD)/inc
 INCLUDE+= -I$(PWD)
 DEPSOURCE=$(wildcard src/*.cpp)
 DEPOBJECTS=$(patsubst %.cpp, %.o, $(DEPSOURCE))
-LLVMCONFIG=llvm-config-10
+LLVMCONFIG=llvm-config-11
 
 ##====================================================================================##
 ## Variables for Running Tests                                                        ##
@@ -133,7 +133,7 @@ test: lexersuite parsersuite semanticssuite codegensuite
 
 EDSGERLIBSOURCE = $(wildcard lib/*.c)
 EDSGEROBJ = $(patsubst %.c, %.o, $(EDSGERLIBSOURCE))
-CC=clang-10
+CC=clang-11
 CFLAGS=-g -Wall
 
 library: libEdsger.a
@@ -179,14 +179,14 @@ help:
 	@echo "➖ $(BLUE)make: $(RESET)"
 	@echo "\tBuilds the compiler"
 	@echo "\t     Deps:"
-	@echo "\t\t- clang++-10"
-	@echo "\t\t- llvm-10"
+	@echo "\t\t- clang++-11"
+	@echo "\t\t- llvm-11"
 	@echo "\t\t- flex  >= 2.6.4"
 	@echo "\t\t- bison >= 3.5.1"
 	@echo "➖ $(BLUE)make library: $(RESET)"
 	@echo "\tBuild the Edsger Library"
 	@echo "\t     Deps:"
-	@echo "\t\t- clang-10"
+	@echo "\t\t- clang-11"
 	@echo "➖ $(BLUE)make pythonModules: $(RESET)"
 	@echo "\t Install Python Modules"
 	@echo "➖ $(BLUE)make deps: $(RESET)"

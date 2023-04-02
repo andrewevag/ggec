@@ -96,6 +96,12 @@ void FunctionDeclaration::sem(){
 
 	SymbolEntry* f;
 	/* Calculate the new name based on the parameter list */
+	SymbolEntry* e = lookupEntry(this->getName().c_str(), LOOKUP_CURRENT_SCOPE, false);
+	if(e != NULL && e->entryType == ENTRY_FUNCTION && e->u.eFunction.isForward){
+		fatal("Redeclaration of A Forward Function (%s)", this->_name.c_str());
+	}
+		
+
 	f = newFunction(this->getName().c_str());
 	if(f == NULL){
 		fatal("Duplicate Function Definition (%s) In Current Scope", this->_name.c_str());

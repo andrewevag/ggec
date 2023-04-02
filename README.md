@@ -24,7 +24,7 @@ A Compiler for the Edsger Programming Language
 `---------------------------------------~___~--------------------------------------''
 ```
 
-Should run on Linux on any target supported by LLVM-10. Run make test to see that everything is running as it should be.
+Should run on Linux on any target supported by LLVM-11. Run make test to see that everything is running as it should be.
 
 # Build & Install
 Read **Documentation.pdf/md** or for just building run
@@ -54,19 +54,19 @@ Use ./ggec program.eds instead
 
 
 # Requirements for Building
-- clang++-10
-- clang-10
-- llvm-10
+- clang++-11
+- clang-11
+- llvm-11
 - flex 2.6.4
 - bison 3.5.1
   
 # Requirements for Testing
-- clang++-10
-- clang-10
-- llvm-10
+- clang++-11
+- clang-11
+- llvm-11
 - flex 2.6.4
 - bison 3.5.1
-- llc-10
+- llc-11
 - python3 with (subprocess, os, deepdiff)
 - erl
 - erlang proper

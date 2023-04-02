@@ -1,0 +1,26 @@
+
+int add(byref int z, int x, int y);
+void add(int x, int y);
+
+void main(){
+	int z;
+	z = 0;
+	z = add(z, 1, 2);
+	add(0, 1);
+	return;
+
+}
+
+int add(byref int z, int x, int y){
+	int z1;
+	void printGotHere(){
+	}
+	printGotHere();
+	z = x + y;
+	printGotHere();
+	return z;
+}
+
+void add(int x, int y){
+	return;
+}

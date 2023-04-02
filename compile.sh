@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ./ggec -i < "$@" > out.ll
-llc-10 out.ll
-clang-10 -o out out.s libEdsger.a -lm
+llc-11 out.ll
+clang-11 -o out out.s libEdsger.a -lm
 
 
